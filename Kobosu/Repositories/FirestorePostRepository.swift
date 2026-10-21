@@ -34,7 +34,7 @@ final class FirestorePostRepository: PostRepository {
     }
 
     func timeline(category: PostCategory?) async throws -> [Post] {
-        // 読み出しもサインインした人だけにする（ルールはタスク 23）
+        // 読み出しもサインインした人だけにする（firestore.rules）
         _ = try await userID()
         let posts = try await FirestorePostAPI.timeline(
             category: category,

@@ -15,7 +15,7 @@
 //
 //  運営は Firebase コンソールの Firestore で確かめる（通知や Cloud Functions は使わない）。posts を reportCount で絞り込み、
 //  ReportPolicy.autoHideThreshold 以上のものが自動で非表示になった投稿。理由はその下の reports を見る。
-//  どちらも expireAt を過ぎると TTL で消えるので、確かめられるのは投稿が残っている間だけ（手順書はタスク 23 で書く）
+//  どちらも expireAt を過ぎると TTL で消えるので、確かめられるのは投稿が残っている間だけ（手順は docs/firebase.md）
 //
 
 import Foundation
