@@ -8,7 +8,8 @@
 
 import Foundation
 
-nonisolated enum EmpathyStamp: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
+/// CodingKeyRepresentable にして、スタンプごとの人数（[EmpathyStamp: Int]）を `{"same_here": 41}` の形で保存する
+nonisolated enum EmpathyStamp: String, CaseIterable, Codable, CodingKeyRepresentable, Hashable, Identifiable, Sendable {
     case understand
     case hardDay = "hard_day"
     /// 強調する数字はこのスタンプの人数だけにする

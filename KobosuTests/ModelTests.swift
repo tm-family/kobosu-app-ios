@@ -86,6 +86,28 @@ struct ModelTests {
     }
 
     @Test
+    func postLimitsMatchSpec() {
+        #expect(Post.maxBodyLength == 400)
+        #expect(Post.lifetime == 24 * 60 * 60)
+    }
+
+    /// スタンプの人数は、項目ごとに加算できるよう JSON のオブジェクト（{"same_here": 41}）で保存する
+    @Test
+    func stampCountsEncodeAsObject() throws {
+        let post = Post(
+            id: "post",
+            body: "本文",
+            category: .inLaws,
+            createdAt: Date(timeIntervalSince1970: 1_000_000),
+            stampCounts: [.sameHere: 41]
+        )
+        let data = try JSONEncoder().encode(post)
+        let object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let counts = try #require(object["stampCounts"] as? [String: Int])
+        #expect(counts == ["same_here": 41])
+    }
+
+    @Test
     func postRoundTripsThroughJSON() throws {
         let post = Post(
             id: "post",
