@@ -122,9 +122,7 @@ final class KobosuUITests: XCTestCase {
     /// 撮影モードのデモデータで、投稿に共感を送る
     @MainActor
     func testSendingStampFromTimeline() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["-uitest-without-firebase", "-screenshot-demo", "-screenshot-scene", "home"]
-        app.launch()
+        let app = UITestApp.launchScreenshotScene("home")
 
         let post = app.buttons["post.preview-0"]
         XCTAssertTrue(post.waitForExistence(timeout: 5))
@@ -142,9 +140,7 @@ final class KobosuUITests: XCTestCase {
     /// 撮影モードのデモデータで、共感のシートから通報すると、その投稿がタイムラインから消える
     @MainActor
     func testReportingFromEmpathySheet() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["-uitest-without-firebase", "-screenshot-demo", "-screenshot-scene", "home"]
-        app.launch()
+        let app = UITestApp.launchScreenshotScene("home")
 
         let post = app.buttons["post.preview-0"]
         XCTAssertTrue(post.waitForExistence(timeout: 5))
@@ -167,10 +163,8 @@ final class KobosuUITests: XCTestCase {
 
     @MainActor
     func testOnboardingRequiresAgreement() throws {
-        let app = XCUIApplication()
         // 初回の画面を出す（同意していない状態にしてから起動する）
-        app.launchArguments += ["-uitest-without-firebase", "-uitest-reset-onboarding"]
-        app.launch()
+        let app = UITestApp.launch([UITestApp.resetOnboarding])
 
         let start = app.buttons["onboarding.start"]
         XCTAssertTrue(start.waitForExistence(timeout: 5))
@@ -191,9 +185,6 @@ final class KobosuUITests: XCTestCase {
     /// やさしさの約束に同意した状態で起動する
     @MainActor
     private static func launchAfterOnboarding() -> XCUIApplication {
-        let app = XCUIApplication()
-        app.launchArguments += ["-uitest-without-firebase", "-uitest-skip-onboarding"]
-        app.launch()
-        return app
+        UITestApp.launch([UITestApp.skipOnboarding])
     }
 }

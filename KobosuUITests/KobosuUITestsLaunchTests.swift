@@ -18,10 +18,8 @@ final class KobosuUITestsLaunchTests: XCTestCase {
 
     @MainActor
     func testLaunch() throws {
-        let app = XCUIApplication()
-        // Firebase につながずに起動する（FirebaseSetup.uiTestArgument）
-        app.launchArguments += ["-uitest-without-firebase"]
-        app.launch()
+        // Firebase につながずに起動する
+        let app = UITestApp.launch()
 
         // 起動直後のスクリーンショットをテスト結果に添付する
         let attachment = XCTAttachment(screenshot: app.screenshot())
