@@ -40,6 +40,14 @@ final class KeychainAnonymousIDStore: AnonymousIDStore {
         }
     }
 
+    func replaceID(with id: String) throws {
+        guard try readID() != id else {
+            return
+        }
+        try deleteID()
+        try save(id)
+    }
+
     private var baseQuery: [String: Any] {
         [
             kSecClass as String: kSecClassGenericPassword,

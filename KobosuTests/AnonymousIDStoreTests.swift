@@ -38,6 +38,29 @@ struct AnonymousIDStoreTests {
         #expect(newID != id)
     }
 
+    /// 置き換えた ID（Firebase の uid）は、別のインスタンスでも同じ値になる
+    @Test
+    func keychainStoreReplacesID() throws {
+        let service = "KobosuTests.anonymous-id.\(UUID().uuidString)"
+        let store = KeychainAnonymousIDStore(service: service)
+        defer { try? store.deleteID() }
+
+        _ = try store.currentID()
+        try store.replaceID(with: "firebase-uid")
+        #expect(try store.currentID() == "firebase-uid")
+        #expect(try KeychainAnonymousIDStore(service: service).currentID() == "firebase-uid")
+        // 同じ値で置き換えても変わらない
+        try store.replaceID(with: "firebase-uid")
+        #expect(try store.currentID() == "firebase-uid")
+    }
+
+    @Test
+    func inMemoryStoreReplacesID() {
+        let store = InMemoryAnonymousIDStore(id: "local")
+        store.replaceID(with: "firebase-uid")
+        #expect(store.currentID() == "firebase-uid")
+    }
+
     @Test
     func keychainDeleteWithoutIDSucceeds() throws {
         let store = KeychainAnonymousIDStore(service: "KobosuTests.anonymous-id.\(UUID().uuidString)")
