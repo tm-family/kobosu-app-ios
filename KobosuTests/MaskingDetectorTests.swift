@@ -122,12 +122,14 @@ struct MaskingDetectorTests {
         }
     }
 
-    /// 種類の違う候補が重なったら、長いほうの 1 つにまとめる
+    /// 種類の違う候補が重なったら 1 つにまとめ、同じ長さなら優先する種類にする。
+    /// 「012-3456」は郵便番号と電話番号の両方の正規表現に一致する（NSDataDetector の結果に左右されない入力にする）
     @Test
     func overlappingCandidatesOfDifferentKindsAreMerged() {
-        let found = candidates("〒123-4567 東京都新宿区")
+        let found = candidates("番号は 012-3456 です").filter { $0.text.contains("012-3456") }
         #expect(found.count == 1)
-        #expect(found.first?.text.contains("東京都") == true)
+        #expect(found.first?.text == "012-3456")
+        #expect(found.first?.kind == .phoneNumber)
     }
 
     /// 改行をまたいでも、行ごとに候補を見つける
