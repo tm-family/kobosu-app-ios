@@ -46,14 +46,17 @@ final class AppDependencies {
         )
     }
 
-    /// Firebase を設定したとき。投稿とタイムラインは Firestore で読み書きし、匿名認証の uid を Keychain の匿名 ID として控える。
-    /// 通報・「この投稿を表示しない」は、タスク 21 までは「まだ使えない」を返す
+    /// Firebase を設定したとき。投稿・タイムライン・通報は Firestore で読み書きし、匿名認証の uid を Keychain の匿名 ID として控える。
+    /// 「この投稿を表示しない」は端末の中にだけ保存する
     static func firebase() -> AppDependencies {
         let identity = KeychainAnonymousIDStore()
+        // サインインを 1 つずつ行うため、投稿と通報で同じものを使う
+        let auth = FirebaseAnonymousAuth()
+        let hiddenPosts = UserDefaultsHiddenPostStore()
         return AppDependencies(
             identity: identity,
-            posts: FirestorePostRepository(identity: identity),
-            reports: FirestoreReportRepository(),
+            posts: FirestorePostRepository(identity: identity, auth: auth, hiddenPosts: hiddenPosts),
+            reports: FirestoreReportRepository(identity: identity, auth: auth, hiddenPosts: hiddenPosts),
             drafts: UserDefaultsComposeDraftStore(),
             appLock: LocalAuthenticationAppLock(),
             lockSettings: AppLockSettings()
