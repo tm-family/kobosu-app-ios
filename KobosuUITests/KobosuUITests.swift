@@ -88,6 +88,32 @@ final class KobosuUITests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    /// 撮影モードのデモデータで、共感のシートから通報すると、その投稿がタイムラインから消える
+    @MainActor
+    func testReportingFromEmpathySheet() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-screenshot-demo", "-screenshot-scene", "home"]
+        app.launch()
+
+        let post = app.buttons["post.preview-0"]
+        XCTAssertTrue(post.waitForExistence(timeout: 5))
+        post.tap()
+        let report = app.buttons["empathy.report"]
+        XCTAssertTrue(report.waitForExistence(timeout: 5))
+        report.tap()
+
+        let submit = app.buttons["report.submit"]
+        XCTAssertTrue(submit.waitForExistence(timeout: 5))
+        // 理由を選ぶまでは通報できない
+        XCTAssertFalse(submit.isEnabled)
+        app.buttons["report.reason.spam"].tap()
+        XCTAssertTrue(submit.isEnabled)
+        submit.tap()
+
+        XCTAssertTrue(submit.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(post.waitForNonExistence(timeout: 5))
+    }
+
     @MainActor
     func testOnboardingRequiresAgreement() throws {
         let app = XCUIApplication()
