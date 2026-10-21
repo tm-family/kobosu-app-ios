@@ -15,8 +15,7 @@ final class KobosuUITests: XCTestCase {
 
     @MainActor
     func testLaunchShowsTabs() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = Self.launchAfterOnboarding()
 
         XCTAssertTrue(app.buttons["tab.listen"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["tab.note"].exists)
@@ -25,8 +24,7 @@ final class KobosuUITests: XCTestCase {
 
     @MainActor
     func testComposeButtonOpensAndClosesModal() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = Self.launchAfterOnboarding()
 
         app.buttons["tab.compose"].tap()
         let cancel = app.buttons["compose.cancel"]
@@ -38,12 +36,37 @@ final class KobosuUITests: XCTestCase {
 
     @MainActor
     func testSwitchingTabs() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = Self.launchAfterOnboarding()
 
         app.buttons["tab.note"].tap()
         XCTAssertTrue(app.buttons["tab.note"].isSelected)
         app.buttons["tab.listen"].tap()
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
+    }
+
+    @MainActor
+    func testOnboardingRequiresAgreement() throws {
+        let app = XCUIApplication()
+        // 初回の画面を出す（UserDefaults の引数で、同意していない状態にする）
+        app.launchArguments += ["-onboarding.agreedPromiseVersion", "0"]
+        app.launch()
+
+        app.buttons["onboarding.start"].tap()
+        let agree = app.buttons["onboarding.agree"]
+        XCTAssertTrue(agree.waitForExistence(timeout: 5))
+        XCTAssertFalse(agree.isEnabled)
+        app.descendants(matching: .any)["onboarding.promiseCheck"].firstMatch.tap()
+        XCTAssertTrue(agree.isEnabled)
+        agree.tap()
+        XCTAssertTrue(app.buttons["tab.listen"].waitForExistence(timeout: 5))
+    }
+
+    /// やさしさの約束に同意した状態で起動する
+    @MainActor
+    private static func launchAfterOnboarding() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments += ["-onboarding.agreedPromiseVersion", "1"]
+        app.launch()
+        return app
     }
 }
