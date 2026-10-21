@@ -26,7 +26,7 @@ struct Kobosu: App {
     @ViewBuilder private var rootView: some View {
         switch ScreenshotDemo.scene {
         case .home, nil:
-            MainTabView(dependencies: dependencies)
+            RootView(dependencies: dependencies)
         }
     }
 }
