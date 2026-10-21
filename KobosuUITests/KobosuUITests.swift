@@ -32,8 +32,8 @@ final class KobosuUITests: XCTestCase {
         let cancel = app.buttons["compose.cancel"]
         XCTAssertTrue(cancel.waitForExistence(timeout: 5))
         cancel.tap()
-        XCTAssertTrue(app.buttons["tab.listen"].waitForExistence(timeout: 5))
-        XCTAssertFalse(cancel.exists)
+        XCTAssertTrue(cancel.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["tab.listen"].exists)
     }
 
     @MainActor
