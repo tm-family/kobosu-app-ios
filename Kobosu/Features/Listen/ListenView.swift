@@ -112,6 +112,7 @@ struct ListenView: View {
         let card = PostCard(post: post, sentStamps: model.sentStamps(for: post), now: now)
         if model.isMine(post) {
             card
+                .accessibilityIdentifier("post.mine.\(post.id)")
         } else {
             Button {
                 sheet = .empathy(post)
@@ -129,6 +130,7 @@ struct ListenView: View {
                         Image(systemName: "flag")
                     }
                 }
+                .accessibilityIdentifier("post.menu.report")
             }
             .accessibilityHint(Text("共感を送る画面を開きます"))
             .accessibilityAction(named: Text("通報・表示しない")) {
