@@ -90,6 +90,25 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
     }
 
+    /// ノートの右上から設定を開き、ライセンス表記を見て閉じる
+    @MainActor
+    func testOpeningSettingsFromNote() throws {
+        let app = Self.launchAfterOnboarding()
+
+        app.buttons["tab.note"].tap()
+        let settings = app.buttons["note.settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        settings.tap()
+        XCTAssertTrue(app.buttons["settings.erase"].waitForExistence(timeout: 5))
+        app.buttons["settings.license"].tap()
+        XCTAssertTrue(app.staticTexts["Zen Maru Gothic"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let close = app.buttons["settings.close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 5))
+        close.tap()
+        XCTAssertTrue(close.waitForNonExistence(timeout: 5))
+    }
+
     @MainActor
     func testSwitchingTabs() throws {
         let app = Self.launchAfterOnboarding()
