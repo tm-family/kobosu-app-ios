@@ -104,7 +104,7 @@ final class KobosuUITests: XCTestCase {
     @MainActor
     func testSendingStampFromTimeline() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-screenshot-demo", "-screenshot-scene", "home"]
+        app.launchArguments += ["-uitest-without-firebase", "-screenshot-demo", "-screenshot-scene", "home"]
         app.launch()
 
         let post = app.buttons["post.preview-0"]
@@ -124,7 +124,7 @@ final class KobosuUITests: XCTestCase {
     @MainActor
     func testReportingFromEmpathySheet() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-screenshot-demo", "-screenshot-scene", "home"]
+        app.launchArguments += ["-uitest-without-firebase", "-screenshot-demo", "-screenshot-scene", "home"]
         app.launch()
 
         let post = app.buttons["post.preview-0"]
@@ -150,7 +150,7 @@ final class KobosuUITests: XCTestCase {
     func testOnboardingRequiresAgreement() throws {
         let app = XCUIApplication()
         // 初回の画面を出す（同意していない状態にしてから起動する）
-        app.launchArguments += ["-uitest-reset-onboarding"]
+        app.launchArguments += ["-uitest-without-firebase", "-uitest-reset-onboarding"]
         app.launch()
 
         let start = app.buttons["onboarding.start"]
@@ -173,7 +173,7 @@ final class KobosuUITests: XCTestCase {
     @MainActor
     private static func launchAfterOnboarding() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += ["-uitest-skip-onboarding"]
+        app.launchArguments += ["-uitest-without-firebase", "-uitest-skip-onboarding"]
         app.launch()
         return app
     }

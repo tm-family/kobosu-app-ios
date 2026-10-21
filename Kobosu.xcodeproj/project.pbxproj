@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4FA0000000000000000000F3 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 4FA0000000000000000000F1 /* FirebaseAuth */; };
+		4FA0000000000000000000F4 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 4FA0000000000000000000F2 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4FC9E1FA2BF1049C00F630AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -68,6 +73,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FA0000000000000000000F3 /* FirebaseAuth in Frameworks */,
+				4FA0000000000000000000F4 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +146,10 @@
 				4FA0000000000000000000B1 /* Kobosu */,
 			);
 			name = Kobosu;
+			packageProductDependencies = (
+				4FA0000000000000000000F1 /* FirebaseAuth */,
+				4FA0000000000000000000F2 /* FirebaseFirestore */,
+			);
 			productName = Kobosu;
 			productReference = 4FC9E1E92BF1049B00F630AB /* Kobosu.app */;
 			productType = "com.apple.product-type.application";
@@ -221,6 +232,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				4F27869D2BF373B800E9F5EF /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				4FA0000000000000000000F0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4FC9E1EA2BF1049B00F630AB /* Products */;
@@ -601,6 +613,14 @@
 				minimumVersion = 0.65.1;
 			};
 		};
+		4FA0000000000000000000F0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -618,6 +638,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4F27869D2BF373B800E9F5EF /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		4FA0000000000000000000F1 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FA0000000000000000000F0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		4FA0000000000000000000F2 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FA0000000000000000000F0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
