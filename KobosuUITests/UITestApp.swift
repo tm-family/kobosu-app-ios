@@ -33,4 +33,26 @@ enum UITestApp {
     static func launchScreenshotScene(_ scene: String) -> XCUIApplication {
         launch(["-screenshot-demo", "-screenshot-scene", scene])
     }
+
+    /// 共感のシートが開いているときに stamp を送り、送れたことと、2 回は送れないことを確かめる。
+    /// 送っている間は、すべてのスタンプが押せなくなる（EmpathySheet の sending）。
+    /// ほかのスタンプが押せるように戻ったら送り終えた印なので、そのあとで送ったスタンプを見る
+    @MainActor
+    static func sendStamp(_ stamp: String, otherStamp: String, in app: XCUIApplication) {
+        let button = app.buttons["empathy.\(stamp)"]
+        let other = app.buttons["empathy.\(otherStamp)"]
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        XCTAssertTrue(button.isEnabled)
+        XCTAssertTrue(other.isEnabled)
+        button.tap()
+
+        let finished = XCTNSPredicateExpectation(predicate: NSPredicate(format: "isEnabled == true"), object: other)
+        XCTAssertEqual(XCTWaiter.wait(for: [finished], timeout: 5), .completed)
+        XCTAssertFalse(button.isEnabled)
+        // 送った印（String Catalog の「送りました」。en は Sent）
+        XCTAssertTrue(sentStampValues.contains(button.value as? String ?? ""))
+    }
+
+    /// 送ったスタンプの accessibilityValue（ja / en）
+    static let sentStampValues = ["送りました", "Sent"]
 }

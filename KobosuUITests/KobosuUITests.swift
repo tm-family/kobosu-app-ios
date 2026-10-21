@@ -128,14 +128,8 @@ final class KobosuUITests: XCTestCase {
         let post = app.buttons["post.preview-0"]
         XCTAssertTrue(post.waitForExistence(timeout: 5))
         post.tap()
-        let stamp = app.buttons["empathy.understand"]
-        XCTAssertTrue(stamp.waitForExistence(timeout: 5))
-        XCTAssertTrue(stamp.isEnabled)
-        stamp.tap()
         // 送ったスタンプは 2 回送れない
-        let predicate = NSPredicate(format: "isEnabled == false")
-        expectation(for: predicate, evaluatedWith: stamp)
-        waitForExpectations(timeout: 5)
+        UITestApp.sendStamp("understand", otherStamp: "same_here", in: app)
     }
 
     /// 撮影モードのデモデータで、共感のシートから通報すると、その投稿がタイムラインから消える
