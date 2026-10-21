@@ -13,6 +13,7 @@ struct Kobosu: App {
     @State private var dependencies = ScreenshotDemo.isEnabled ? AppDependencies.demo() : AppDependencies.local()
 
     init() {
+        OnboardingStatus.applyLaunchArguments(ProcessInfo.processInfo.arguments, to: .standard)
         NavigationBarAppearance.apply()
     }
 
@@ -26,7 +27,7 @@ struct Kobosu: App {
     @ViewBuilder private var rootView: some View {
         switch ScreenshotDemo.scene {
         case .home, nil:
-            MainTabView(dependencies: dependencies)
+            RootView(dependencies: dependencies)
         }
     }
 }
