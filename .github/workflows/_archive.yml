@@ -91,6 +91,21 @@ jobs:
             -archivePath "$RUNNER_TEMP/build.xcarchive" \
             CODE_SIGNING_ALLOWED=NO
 
+      - name: Re-sign linker-signed frameworks
+        # Xcode は、リソースを含む静的な framework（Firestore が使う absl・grpc など）から実行ファイルを抜いてアプリに入れ、
+        # 中身の無い動的ライブラリ（stub）を差し込む。CODE_SIGNING_ALLOWED=NO の Archive では stub がリンカーの ad-hoc 署名
+        # （識別子 arm64-apple）のまま残る。Export で署名し直すと識別子と designated requirement が食い違い、
+        # App Store Connect が Invalid Signature（90035）で拒否する。Export の前に ad-hoc で署名し直し、識別子を bundle ID にそろえる
+        run: |
+          shopt -s nullglob
+          for framework in "$RUNNER_TEMP"/build.xcarchive/Products/Applications/*.app/Frameworks/*.framework; do
+            signature=$(codesign -dv "$framework" 2>&1 || true)
+            if [[ "$signature" == *linker-signed* ]]; then
+              codesign --force --sign - "$framework"
+              codesign -dv "$framework" 2>&1 | grep '^Identifier='
+            fi
+          done
+
       - name: Create ExportOptions.plist and API private key
         # Secrets はシェル展開ではなく env 経由で渡す
         env:
