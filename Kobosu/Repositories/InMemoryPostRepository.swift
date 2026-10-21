@@ -101,6 +101,23 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
         return Set(record.stampSenders.filter { $0.value.contains(myID) }.keys)
     }
 
+    func deleteAllMyData() async throws {
+        let myID = try identity.currentID()
+        var remaining: [Post.ID: Record] = [:]
+        for (postID, record) in records where record.authorID != myID {
+            var record = record
+            record.reporterIDs.remove(myID)
+            for stamp in EmpathyStamp.allCases {
+                record.stampSenders[stamp]?.remove(myID)
+                let count = record.stampSenders[stamp]?.count ?? 0
+                record.post.stampCounts[stamp] = count > 0 ? count : nil
+            }
+            remaining[postID] = record
+        }
+        records = remaining
+        hiddenPostIDs = []
+    }
+
     // MARK: - ReportRepository
 
     func report(postID: Post.ID, reason: ReportReason) async throws {

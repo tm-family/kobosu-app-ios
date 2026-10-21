@@ -33,6 +33,10 @@ protocol PostRepository: AnyObject {
 
     /// 投稿ごとに自分が送ったスタンプ。送っていない投稿はキーを持たない（タイムラインでまとめて読む）
     func sentStamps(for postIDs: [Post.ID]) async throws -> [Post.ID: Set<EmpathyStamp>]
+
+    /// 「すべてのデータを削除」のサーバー側。自分の投稿と、自分が送った共感・通報をすべて消す。
+    /// 匿名 ID はこの後に破棄するので、ここでは破棄しない（先に ID を消すと、自分の投稿を消せなくなる）
+    func deleteAllMyData() async throws
 }
 
 extension PostRepository {
@@ -49,6 +53,18 @@ extension PostRepository {
             }
         }
         return result
+    }
+
+    /// 自分の投稿を 1 件ずつ消す（共感・通報は投稿と一緒に消える）。自分が送った共感・通報も消せる実装は上書きする
+    func deleteAllMyData() async throws {
+        for post in try await myPosts() {
+            do {
+                try await delete(postID: post.id)
+            } catch PostRepositoryError.postNotFound {
+                // 消しているあいだに期限が過ぎた投稿は、もう無いので飛ばす
+                continue
+            }
+        }
     }
 }
 
