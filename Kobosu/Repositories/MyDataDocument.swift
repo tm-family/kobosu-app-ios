@@ -37,9 +37,16 @@ nonisolated enum MyDataDocument {
     }
 
     /// 投稿の人数から引く値（フィールドのパス → -1）。いま 1 以上のものだけ引き、0 より小さくしない。
-    /// 投稿が無い（消えた・TTL で消えた）ときは何も引かない
-    static func decrements(post data: [String: Any]?, withdrawal: Withdrawal) -> [String: Int64] {
-        guard let data else {
+    /// 投稿が無い（消えた・TTL で消えた）ときと、期限を過ぎて TTL を待っているときは何も引かない。
+    /// 期限切れの投稿はもう出ないので人数は関係なく、通報の記録が投稿より先に TTL で消えていると、
+    /// ルール（通報の記録を消すときだけ reportCount を 1 減らせる）にはじかれて消し直せなくなるため
+    static func decrements(
+        post data: [String: Any]?,
+        expireAt: Date?,
+        withdrawal: Withdrawal,
+        now: Date
+    ) -> [String: Int64] {
+        guard let data, let expireAt, expireAt > now else {
             return [:]
         }
         var result: [String: Int64] = [:]

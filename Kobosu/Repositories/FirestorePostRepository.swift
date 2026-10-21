@@ -99,7 +99,7 @@ final class FirestorePostRepository: PostRepository {
     /// 途中で失敗しても、消し終わったものはもう無いので、もう一度呼べば残りから消し直せる
     func deleteAllMyData() async throws {
         let uid = try await userID()
-        try await FirestorePostAPI.deleteAllMyData(uid: uid)
+        try await FirestorePostAPI.deleteAllMyData(uid: uid, now: now())
         try await auth.deleteUser()
     }
 
@@ -304,7 +304,7 @@ nonisolated private enum FirestorePostAPI {
     }
 
     /// 「すべてのデータを削除」のサーバー側（MyDataDocument のコメント）
-    static func deleteAllMyData(uid: String) async throws {
+    static func deleteAllMyData(uid: String, now: Date) async throws {
         // 自分の投稿。期限で絞らず、2 段目を書けなかった投稿の目印も含めて消す
         let marks = try await ownPosts(uid: uid).getDocuments(source: .server)
         // 1 件につき投稿と目印の 2 つを消す
@@ -327,14 +327,19 @@ nonisolated private enum FirestorePostAPI {
             reportedPostIDs: Set(reported.documents.map(\.documentID))
         )
         for withdrawal in withdrawals {
-            try await withdraw(withdrawal, uid: uid)
+            try await withdraw(withdrawal, uid: uid, now: now)
         }
     }
 
-    private static func withdraw(_ withdrawal: MyDataDocument.Withdrawal, uid: String) async throws {
+    private static func withdraw(_ withdrawal: MyDataDocument.Withdrawal, uid: String, now: Date) async throws {
         let postRef = database.collection(PostDocument.postsCollection).document(withdrawal.postID)
         let snapshot = try await postRef.getDocument(source: .server)
-        let decrements = MyDataDocument.decrements(post: snapshot.data(), withdrawal: withdrawal)
+        let decrements = MyDataDocument.decrements(
+            post: snapshot.data(),
+            expireAt: (snapshot.get(Field.expireAt) as? Timestamp)?.dateValue(),
+            withdrawal: withdrawal,
+            now: now
+        )
         let batch = database.batch()
         if !decrements.isEmpty {
             batch.updateData(decrements.mapValues { FieldValue.increment($0) }, forDocument: postRef)
