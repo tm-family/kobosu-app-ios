@@ -30,4 +30,14 @@ struct UITestLaunchTests {
         #expect(!UITestLaunch.seedsPosts(arguments: []))
         #expect(!UITestLaunch.seedsPosts(arguments: [OnboardingStatus.skipArgument]))
     }
+
+    /// ふだんの起動（引数なし）のタイムラインに、UI テスト用のデモデータが混ざらない
+    @Test
+    func localWithoutSeedHasEmptyTimeline() async throws {
+        let plain = AppDependencies.local()
+        #expect(try await plain.posts.timeline(category: nil).isEmpty)
+
+        let seeded = AppDependencies.local(seedsPosts: true)
+        #expect(try await !seeded.posts.timeline(category: nil).isEmpty)
+    }
 }
