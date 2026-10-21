@@ -12,29 +12,39 @@ import Foundation
 nonisolated enum FirestoreRepositoryError: Error, Equatable {
     /// 作った投稿にサーバーの時刻が入っていない
     case missingServerTimestamp
-    /// Firestore ではまだ使えない（通報はタスク 21、削除はタスク 22 で実装する）
+    /// Firestore ではまだ使えない（削除はタスク 22 で実装する）
     case notSupportedYet
 }
 
 final class FirestorePostRepository: PostRepository {
     private let identity: AnonymousIDStore
     private let auth: FirebaseAnonymousAuth
+    /// 「この投稿を表示しない」にした投稿（FirestoreReportRepository と同じものを渡す）
+    private let hiddenPosts: HiddenPostStore
     private let now: () -> Date
 
     init(
         identity: AnonymousIDStore,
         auth: FirebaseAnonymousAuth = FirebaseAnonymousAuth(),
+        hiddenPosts: HiddenPostStore,
         now: @escaping () -> Date = { Date() }
     ) {
         self.identity = identity
         self.auth = auth
+        self.hiddenPosts = hiddenPosts
         self.now = now
     }
 
     func timeline(category: PostCategory?) async throws -> [Post] {
         // 読み出しもサインインした人だけにする（ルールはタスク 23）
         _ = try await userID()
-        return try await FirestorePostAPI.timeline(category: category, now: now())
+        let posts = try await FirestorePostAPI.timeline(
+            category: category,
+            now: now(),
+            autoHideThreshold: ReportPolicy.autoHideThreshold
+        )
+        let hidden = hiddenPosts.hiddenPostIDs()
+        return posts.filter { !hidden.contains($0.id) }
     }
 
     func submit(body: String, category: PostCategory) async throws -> Post {
@@ -87,17 +97,6 @@ final class FirestorePostRepository: PostRepository {
     }
 }
 
-/// ReportRepository の Firestore の実装（タスク 21 で作る）。それまでは、通報を黙って捨てずに「まだ使えない」を返す
-final class FirestoreReportRepository: ReportRepository {
-    func report(postID: Post.ID, reason: ReportReason) async throws {
-        throw FirestoreRepositoryError.notSupportedYet
-    }
-
-    func hide(postID: Post.ID) async throws {
-        throw FirestoreRepositoryError.notSupportedYet
-    }
-}
-
 /// Firestore を読み書きする部分。Firestore の型は外に出さず、Post にして返す
 nonisolated private enum FirestorePostAPI {
     private typealias Field = PostDocument.Field
@@ -120,8 +119,9 @@ nonisolated private enum FirestorePostAPI {
             .collection(PostDocument.sentStampsCollection)
     }
 
-    /// 期限内の投稿を新しい順に。expireAt は createdAt の 24 時間後なので、expireAt の順は作った順と同じ
-    static func timeline(category: PostCategory?, now: Date) async throws -> [Post] {
+    /// 期限内の投稿を新しい順に。expireAt は createdAt の 24 時間後なので、expireAt の順は作った順と同じ。
+    /// 通報が一定数に達した投稿は外す（reportCount が無い文書は Firestore の条件では選べないので、端末で外す）
+    static func timeline(category: PostCategory?, now: Date, autoHideThreshold: Int) async throws -> [Post] {
         var query = database
             .collection(PostDocument.postsCollection)
             .whereField(Field.expireAt, isGreaterThan: Timestamp(date: now))
@@ -132,7 +132,10 @@ nonisolated private enum FirestorePostAPI {
             .order(by: Field.expireAt, descending: true)
             .limit(to: PostDocument.timelineLimit)
             .getDocuments()
-        return PostDocument.activePosts(snapshot.documents.compactMap(post(from:)), at: now)
+        let posts = snapshot.documents
+            .filter { !ReportDocument.isAutoHidden(post: $0.data(), threshold: autoHideThreshold) }
+            .compactMap(post(from:))
+        return PostDocument.activePosts(posts, at: now)
     }
 
     /// 2 段で書く（PostDocument のコメント）。投稿と自分の投稿の目印は、どちらも同じバッチで書く
