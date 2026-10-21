@@ -180,6 +180,30 @@ struct TimelineViewModelTests {
         #expect(model.sentStamps(for: post).isEmpty)
     }
 
+    /// 通報できなかったら throw し、投稿は一覧に残す（もう一度通報できるように）
+    @Test
+    func failedReportKeepsPost() async throws {
+        let model = TimelineViewModel(repository: makeRepository(), reports: FailingReportRepository())
+        await model.load()
+        let post = try #require(model.post(id: "money"))
+        await #expect(throws: FailingReportRepository.Failure.self) {
+            try await model.report(post, reason: .spam)
+        }
+        #expect(model.posts.map(\.id) == ["money", "in-laws", "soon"])
+    }
+
+    /// 表示しないにできなかったら throw し、投稿は一覧に残す
+    @Test
+    func failedHideKeepsPost() async throws {
+        let model = TimelineViewModel(repository: makeRepository(), reports: FailingReportRepository())
+        await model.load()
+        let post = try #require(model.post(id: "money"))
+        await #expect(throws: FailingReportRepository.Failure.self) {
+            try await model.hide(post)
+        }
+        #expect(model.posts.map(\.id) == ["money", "in-laws", "soon"])
+    }
+
     /// テストで進められる時計
     private final class TestClock {
         var now: Date
@@ -221,6 +245,14 @@ private final class FailingPostRepository: PostRepository {
     func delete(postID: Post.ID) async throws { throw Failure() }
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws { throw Failure() }
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> { throw Failure() }
+}
+
+/// 通報も表示しないも、postNotFound 以外で失敗する
+private final class FailingReportRepository: ReportRepository {
+    struct Failure: Error {}
+
+    func report(postID: Post.ID, reason: ReportReason) async throws { throw Failure() }
+    func hide(postID: Post.ID) async throws { throw Failure() }
 }
 
 /// 呼ばれた回数を数え、失敗させることもできる Repository
