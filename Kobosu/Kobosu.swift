@@ -9,6 +9,9 @@ import SwiftUI
 
 @main
 struct Kobosu: App {
+    /// 撮影モードではデモデータで開く
+    @State private var dependencies = ScreenshotDemo.isEnabled ? AppDependencies.demo() : AppDependencies.local()
+
     init() {
         NavigationBarAppearance.apply()
     }
@@ -23,7 +26,7 @@ struct Kobosu: App {
     @ViewBuilder private var rootView: some View {
         switch ScreenshotDemo.scene {
         case .home, nil:
-            MainTabView()
+            MainTabView(dependencies: dependencies)
         }
     }
 }
