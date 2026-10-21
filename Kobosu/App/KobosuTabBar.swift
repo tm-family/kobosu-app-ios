@@ -12,23 +12,28 @@ struct KobosuTabBar: View {
     @Binding var selection: MainTab
     let onCompose: () -> Void
 
-    /// タブバーの面の高さ（ホームインジケーターの分は含まない）
-    @ScaledMetric(relativeTo: .caption2) private var barHeight: CGFloat = 56
+    /// こぼすボタンをタブバーの面から浮かせる高さ
+    private static let composeButtonLift: CGFloat = 20
+
+    @ScaledMetric(relativeTo: .caption2) private var iconSize: CGFloat = 22
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             tabButton(.listen, title: "きく", systemImage: "bubble.left", identifier: "tab.listen")
             ComposeButton(action: onCompose)
                 .frame(maxWidth: .infinity)
+                // 上を負の余白にして、ボタンの上の部分を面の外（上）にはみ出させる
+                .padding(.top, -Self.composeButtonLift)
             tabButton(.note, title: "ノート", systemImage: "doc.text", identifier: "tab.note")
         }
         .padding(.horizontal, 24)
+        .padding(.top, 4)
         .padding(.bottom, 4)
-        .background(alignment: .bottom) {
-            Rectangle()
-                .fill(Palette.card)
-                .frame(height: barHeight)
-                .shadow(color: Palette.ink.opacity(0.06), radius: 8, y: -2)
+        // 標準のタブバーと同じく、とても大きい文字サイズでは大きくしすぎず、長押しで拡大表示する
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .background {
+            Palette.card
+                .shadow(color: .black.opacity(0.06), radius: 8, y: -2)
                 .ignoresSafeArea(edges: .bottom)
         }
     }
@@ -41,8 +46,9 @@ struct KobosuTabBar: View {
             VStack(spacing: 2) {
                 Image(systemName: systemImage)
                     .symbolVariant(isSelected ? .fill : .none)
-                    .font(.system(size: 22))
-                    .frame(height: 26)
+                    .font(.system(size: iconSize))
+                    .frame(height: iconSize + 4)
+                    .accessibilityHidden(true)
                 Text(title)
                     .font(.zenMaruGothic(.bold, size: 10, relativeTo: .caption2))
             }
@@ -51,8 +57,16 @@ struct KobosuTabBar: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(Text(title))
         .accessibilityIdentifier(identifier)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityShowsLargeContentViewer {
+            Label {
+                Text(title)
+            } icon: {
+                Image(systemName: systemImage)
+            }
+        }
     }
 }
 
@@ -69,6 +83,7 @@ private struct ComposeButton: View {
                     .frame(width: 60, height: 60)
                     .background(Palette.gradient, in: Circle())
                     .shadow(color: Palette.accent.opacity(0.3), radius: 8, y: 4)
+                    .accessibilityHidden(true)
                 Text("こぼす")
                     .font(.zenMaruGothic(.bold, size: 10, relativeTo: .caption2))
                     .foregroundStyle(Palette.ink)
@@ -76,7 +91,6 @@ private struct ComposeButton: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("こぼす"))
         .accessibilityHint(Text("気持ちを書く画面を開きます"))
         .accessibilityIdentifier("tab.compose")
