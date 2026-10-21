@@ -27,6 +27,29 @@ protocol PostRepository: AnyObject {
 
     /// その投稿に自分が送ったスタンプ
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp>
+
+    /// 期限内の自分の投稿の ID。タイムラインで自分の投稿を見分けるのに使う（投稿の本文までは読まない）
+    func myPostIDs() async throws -> Set<Post.ID>
+
+    /// 投稿ごとに自分が送ったスタンプ。送っていない投稿はキーを持たない（タイムラインでまとめて読む）
+    func sentStamps(for postIDs: [Post.ID]) async throws -> [Post.ID: Set<EmpathyStamp>]
+}
+
+extension PostRepository {
+    func myPostIDs() async throws -> Set<Post.ID> {
+        Set(try await myPosts().map(\.id))
+    }
+
+    /// 1 件ずつ読む。読むあいだに消えた投稿は外す
+    func sentStamps(for postIDs: [Post.ID]) async throws -> [Post.ID: Set<EmpathyStamp>] {
+        var result: [Post.ID: Set<EmpathyStamp>] = [:]
+        for postID in postIDs {
+            if let stamps = try? await sentStamps(for: postID), !stamps.isEmpty {
+                result[postID] = stamps
+            }
+        }
+        return result
+    }
 }
 
 protocol ReportRepository: AnyObject {

@@ -12,7 +12,7 @@ import Foundation
 nonisolated enum FirestoreRepositoryError: Error, Equatable {
     /// 作った投稿にサーバーの時刻が入っていない
     case missingServerTimestamp
-    /// Firestore ではまだ使えない（共感はタスク 20、通報はタスク 21、削除はタスク 22 で実装する）
+    /// Firestore ではまだ使えない（通報はタスク 21、削除はタスク 22 で実装する）
     case notSupportedYet
 }
 
@@ -53,11 +53,30 @@ final class FirestorePostRepository: PostRepository {
     }
 
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
-        throw FirestoreRepositoryError.notSupportedYet
+        let uid = try await userID()
+        switch try await FirestorePostAPI.sendStamp(stamp, to: postID, uid: uid, now: now()) {
+        case .send, .alreadySent:
+            return
+        case .ownPost:
+            throw PostRepositoryError.ownPost
+        case .postNotFound:
+            throw PostRepositoryError.postNotFound
+        }
     }
 
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> {
-        throw FirestoreRepositoryError.notSupportedYet
+        let uid = try await userID()
+        return try await FirestorePostAPI.sentStamps(for: postID, uid: uid)
+    }
+
+    func myPostIDs() async throws -> Set<Post.ID> {
+        let uid = try await userID()
+        return try await FirestorePostAPI.myPostIDs(uid: uid, now: now())
+    }
+
+    func sentStamps(for postIDs: [Post.ID]) async throws -> [Post.ID: Set<EmpathyStamp>] {
+        let uid = try await userID()
+        return try await FirestorePostAPI.sentStamps(for: postIDs, uid: uid, now: now())
     }
 
     /// 匿名認証の uid。Keychain の匿名 ID としても控える
@@ -92,6 +111,13 @@ nonisolated private enum FirestorePostAPI {
             .collection(PostDocument.usersCollection)
             .document(uid)
             .collection(PostDocument.ownPostsCollection)
+    }
+
+    private static func sentStamps(uid: String) -> CollectionReference {
+        database
+            .collection(PostDocument.usersCollection)
+            .document(uid)
+            .collection(PostDocument.sentStampsCollection)
     }
 
     /// 期限内の投稿を新しい順に。expireAt は createdAt の 24 時間後なので、expireAt の順は作った順と同じ
@@ -145,12 +171,17 @@ nonisolated private enum FirestorePostAPI {
         )
     }
 
-    /// 自分の投稿の目印から、期限内の投稿を読む
-    static func myPosts(uid: String, now: Date) async throws -> [Post] {
+    /// 自分の投稿の目印のうち、期限内のものの ID
+    static func myPostIDs(uid: String, now: Date) async throws -> Set<String> {
         let marks = try await ownPosts(uid: uid)
             .whereField(Field.expireAt, isGreaterThan: Timestamp(date: now))
             .getDocuments()
-        let ids = marks.documents.map(\.documentID)
+        return Set(marks.documents.map(\.documentID))
+    }
+
+    /// 自分の投稿の目印から、期限内の投稿を読む
+    static func myPosts(uid: String, now: Date) async throws -> [Post] {
+        let ids = try await myPostIDs(uid: uid, now: now)
         let posts = try await withThrowingTaskGroup(of: Post?.self) { group in
             for id in ids {
                 group.addTask { try await post(id: id) }
@@ -164,6 +195,71 @@ nonisolated private enum FirestorePostAPI {
             return posts
         }
         return PostDocument.activePosts(posts, at: now)
+    }
+
+    /// 共感を送る。送ってよいときだけ、人数を 1 増やすのと送った記録を、同じバッチで書く。
+    /// 送った記録は投稿の下に置かず（投稿者にだれが送ったか分からない）、投稿と同じ expireAt で TTL で消す
+    static func sendStamp(
+        _ stamp: EmpathyStamp,
+        to postID: String,
+        uid: String,
+        now: Date
+    ) async throws -> PostDocument.StampSendCheck {
+        let postRef = database.collection(PostDocument.postsCollection).document(postID)
+        let sentRef = sentStamps(uid: uid).document(postID)
+        let postSnapshot = try await postRef.getDocument()
+        let isOwnPost = try await ownPosts(uid: uid).document(postID).getDocument().exists
+        let sentSnapshot = try await sentRef.getDocument()
+        let check = PostDocument.stampSendCheck(
+            post: postSnapshot.data().flatMap { post(id: postID, data: $0) },
+            isOwnPost: isOwnPost,
+            sentStamps: PostDocument.sentStamps(from: sentSnapshot.get(Field.stamps)),
+            stamp: stamp,
+            now: now
+        )
+        guard check == .send else {
+            return check
+        }
+        guard let expireAt = postSnapshot.get(Field.expireAt) as? Timestamp else {
+            return .postNotFound
+        }
+        let batch = database.batch()
+        batch.updateData([PostDocument.stampCountFieldPath(stamp): FieldValue.increment(Int64(1))], forDocument: postRef)
+        batch.setData(
+            [
+                Field.stamps: FieldValue.arrayUnion([stamp.rawValue]),
+                Field.expireAt: expireAt
+            ],
+            forDocument: sentRef,
+            merge: true
+        )
+        try await batch.commit()
+        return .send
+    }
+
+    /// その投稿に自分が送ったスタンプ
+    static func sentStamps(for postID: String, uid: String) async throws -> Set<EmpathyStamp> {
+        let snapshot = try await sentStamps(uid: uid).document(postID).getDocument()
+        return PostDocument.sentStamps(from: snapshot.get(Field.stamps))
+    }
+
+    /// 投稿ごとに自分が送ったスタンプ。期限内の送った記録を 1 回で読み、渡された投稿の分だけを返す
+    static func sentStamps(for postIDs: [String], uid: String, now: Date) async throws -> [String: Set<EmpathyStamp>] {
+        guard !postIDs.isEmpty else {
+            return [:]
+        }
+        let snapshot = try await sentStamps(uid: uid)
+            .whereField(Field.expireAt, isGreaterThan: Timestamp(date: now))
+            .getDocuments()
+        let wanted = Set(postIDs)
+        var result: [String: Set<EmpathyStamp>] = [:]
+        for document in snapshot.documents where wanted.contains(document.documentID) {
+            let stamps = PostDocument.sentStamps(from: document.get(Field.stamps))
+            if !stamps.isEmpty {
+                result[document.documentID] = stamps
+            }
+        }
+        return result
     }
 
     /// 1 件読む。消えていたら nil

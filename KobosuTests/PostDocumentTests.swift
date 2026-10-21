@@ -79,4 +79,41 @@ struct PostDocumentTests {
         let posts = PostDocument.activePosts([older, unfinished, newer, justExpired], at: now)
         #expect(posts.map(\.id) == ["newer", "older"])
     }
+
+    // MARK: - 共感
+
+    @Test
+    func stampSendCheck() {
+        let post = Post(id: "a", body: "本文", category: .other, createdAt: createdAt)
+        func check(_ post: Post?, own: Bool = false, sent: Set<EmpathyStamp> = [], at now: Date? = nil) -> PostDocument.StampSendCheck {
+            PostDocument.stampSendCheck(
+                post: post,
+                isOwnPost: own,
+                sentStamps: sent,
+                stamp: .sameHere,
+                now: now ?? createdAt.addingTimeInterval(60)
+            )
+        }
+        #expect(check(post) == .send)
+        #expect(check(post, sent: [.understand]) == .send)
+        #expect(check(post, sent: [.sameHere]) == .alreadySent)
+        #expect(check(post, own: true) == .ownPost)
+        #expect(check(nil) == .postNotFound)
+        // 期限ちょうどは期限切れ。自分の投稿でも、消えていれば postNotFound
+        #expect(check(post, own: true, at: post.expireAt) == .postNotFound)
+    }
+
+    @Test
+    func stampCountFieldPathUsesRawValue() {
+        #expect(PostDocument.stampCountFieldPath(.sameHere) == "stampCounts.same_here")
+        #expect(PostDocument.stampCountFieldPath(.understand) == "stampCounts.understand")
+    }
+
+    /// 知らないスタンプ・文字列でない値は外す
+    @Test
+    func sentStampsIgnoreUnknownValues() {
+        #expect(PostDocument.sentStamps(from: ["same_here", "hard_day", "unknown", 3]) == [.sameHere, .hardDay])
+        #expect(PostDocument.sentStamps(from: nil).isEmpty)
+        #expect(PostDocument.sentStamps(from: "same_here").isEmpty)
+    }
 }
