@@ -8,6 +8,9 @@
 //    通報した本人が「もう通報したか」を確かめる get のほかは、だれも読めない（運営は Firebase コンソールで見る）。投稿者には伝わらない
 //  - posts/{postId}.reportCount: 通報した人数。通報と同じバッチで 1 増やす。ReportPolicy.autoHideThreshold 以上ならタイムラインに出さない
 //
+//  - users/{uid}/sentReports/{postId}: 自分が通報した目印（expireAt は投稿と同じ）。本人だけが読める。
+//    「すべてのデータを削除」で自分の通報を探して消すのに使う（reports は本人の get しか許さず、探せないため）
+//
 //  TTL は親の文書を消してもサブコレクションを消さないので、通報にも投稿と同じ expireAt を置き、TTL で一緒に消えるようにする。
 //
 //  運営は Firebase コンソールの Firestore で確かめる（通知や Cloud Functions は使わない）。posts を reportCount で絞り込み、
@@ -20,6 +23,8 @@ import Foundation
 nonisolated enum ReportDocument {
     /// posts/{postId} の下の、通報
     static let reportsCollection = "reports"
+    /// users/{uid} の下の、自分が通報した目印。posts の下の reports とコレクション ID を分け、ルール・TTL が両方に効かないようにする
+    static let sentReportsCollection = "sentReports"
 
     enum Field {
         static let reason = "reason"
