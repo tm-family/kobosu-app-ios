@@ -61,7 +61,7 @@ struct DesignSystemTests {
         #expect(actual == hex, "\(name): \(String(actual, radix: 16)) != \(String(hex, radix: 16))")
     }
 
-    private static let colorNames = [
+    nonisolated private static let colorNames = [
         "Paper", "Card", "Ink", "InkSecondary", "AccentColor", "AccentDeep", "Lavender", "Caution", "Line",
         "DisabledSurface", "DisabledInk", "SegmentSurface", "GradientPink", "GradientMagenta", "GradientViolet", "GradientBlue"
     ]
