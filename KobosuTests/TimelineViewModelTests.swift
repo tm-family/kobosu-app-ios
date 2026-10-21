@@ -68,16 +68,22 @@ struct TimelineViewModelTests {
 }
 
 struct RemainingTimeTests {
-    @Test(arguments: [
-        (24 * 60 * 60.0, RemainingTime.hours(24)),
-        (22.5 * 60 * 60, .hours(22)),
-        (60 * 60.0, .hours(1)),
-        (59 * 60 + 1.0, .minutes(60)),
-        (45 * 60.0, .minutes(45)),
-        (1.0, .minutes(1)),
-        (0.0, .minutes(1)),
-        (-10.0, .minutes(1))
-    ])
+    nonisolated private static let hour: TimeInterval = 60 * 60
+    nonisolated private static let minute: TimeInterval = 60
+
+    /// 型推論に時間がかからないよう、型を明示する
+    nonisolated private static let cases: [(TimeInterval, RemainingTime)] = [
+        (24 * hour, .hours(24)),
+        (22.5 * hour, .hours(22)),
+        (hour, .hours(1)),
+        (59 * minute + 1, .minutes(60)),
+        (45 * minute, .minutes(45)),
+        (1, .minutes(1)),
+        (0, .minutes(1)),
+        (-10, .minutes(1))
+    ]
+
+    @Test(arguments: cases)
     func remainingTime(interval: TimeInterval, expected: RemainingTime) {
         #expect(RemainingTime(interval) == expected)
     }
