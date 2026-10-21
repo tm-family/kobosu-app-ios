@@ -32,6 +32,11 @@ final class AppDependencies {
         self.lockSettings = lockSettings
     }
 
+    /// 「すべてのデータを削除」
+    func makeEraser() -> DataEraser {
+        DataEraser(posts: posts, identity: identity, drafts: drafts, lockSettings: lockSettings)
+    }
+
     /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する
     static func local() -> AppDependencies {
         let identity = KeychainAnonymousIDStore()
