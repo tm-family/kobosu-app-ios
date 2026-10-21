@@ -48,6 +48,17 @@ struct PostDocumentTests {
         #expect(PostDocument.post(id: "a", data: noBody, createdAt: createdAt, expireAt: expireAt) == nil)
     }
 
+    /// 2 段目を書けなかった投稿（expireAt が createdAt のまま）は、端末の時計がサーバーより遅れていても読まない
+    @Test
+    func skipsUnfinishedDocumentsEvenWithSlowDeviceClock() {
+        let data: [String: Any] = [PostDocument.Field.body: "本文", PostDocument.Field.category: "partner"]
+        #expect(PostDocument.post(id: "a", data: data, createdAt: createdAt, expireAt: createdAt) == nil)
+        #expect(PostDocument.post(id: "a", data: data, createdAt: createdAt, expireAt: createdAt.addingTimeInterval(-1)) == nil)
+        // 端末の時計は 5 分遅れているが、書き終わった投稿は読む
+        let finished = PostDocument.post(id: "b", data: data, createdAt: createdAt, expireAt: createdAt.addingTimeInterval(Post.lifetime))
+        #expect(PostDocument.activePosts([finished].compactMap(\.self), at: createdAt.addingTimeInterval(-5 * 60)).map(\.id) == ["b"])
+    }
+
     /// 知らないスタンプ・0 以下の人数・数でない値は外す
     @Test
     func stampCountsIgnoreUnknownValues() {
