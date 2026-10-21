@@ -109,3 +109,8 @@ private_keys/
 
 # Firebase の設定ファイル。リポジトリには入れず、配信のビルドでは Secret の GOOGLE_SERVICE_INFO_PLIST_BASE64 から書き出す
 Kobosu/GoogleService-Info.plist
+
+# Firebase CLI のキャッシュとログ（firebase deploy で作られる）
+.firebase/
+firebase-debug.log
+firestore-debug.log
