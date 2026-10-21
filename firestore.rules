@@ -1,0 +1,312 @@
+rules_version = '2';
+
+// こぼす（Kobosu）の Firestore のルール。
+// アプリが書く形（Kobosu/Repositories の PostDocument・ReportDocument・MyDataDocument と Firestore*Repository）だけを許し、
+// それ以外はすべて拒む。手順と、なぜこの形にしたかは docs/firebase.md に書いた。
+//
+// - posts/{postId}: 投稿。サインインした人ならだれでも読める。投稿者を特定できる値は置かない
+// - posts/{postId}/reports/{uid}: 通報。文書 ID が通報した人の uid（1 人 1 回）。本人の get のほかはだれも読めない
+// - users/{uid}/ownPosts/{postId}: 自分の投稿の目印。本人だけ
+// - users/{uid}/sentStamps/{postId}: 自分が送ったスタンプ。本人だけ
+// - users/{uid}/sentReports/{postId}: 自分が通報した目印。本人だけ
+//
+// 人数（stampCounts・reportCount）は、送った記録・通報を新しく作るのと同じ書き込みでだけ 1 増やせ、
+// その記録を消すのと同じ書き込みでだけ 1 減らせる（記録を消して送り直し、人数を増やし続けられないように）。
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMe(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function postPath(postId) {
+      return /databases/$(database)/documents/posts/$(postId);
+    }
+
+    function reportPath(postId) {
+      return /databases/$(database)/documents/posts/$(postId)/reports/$(request.auth.uid);
+    }
+
+    function ownPostPath(postId) {
+      return /databases/$(database)/documents/users/$(request.auth.uid)/ownPosts/$(postId);
+    }
+
+    function sentStampsPath(postId) {
+      return /databases/$(database)/documents/users/$(request.auth.uid)/sentStamps/$(postId);
+    }
+
+    function sentReportPath(postId) {
+      return /databases/$(database)/documents/users/$(request.auth.uid)/sentReports/$(postId);
+    }
+
+    // EmpathyStamp の rawValue
+    function stampIDs() {
+      return ['understand', 'hard_day', 'same_here', 'well_done'];
+    }
+
+    // PostCategory の rawValue
+    function categoryIDs() {
+      return [
+        'in_laws', 'partner', 'parenting', 'housework', 'money',
+        'own_parents', 'relatives', 'caregiving', 'work_and_family', 'other'
+      ];
+    }
+
+    // ReportReason の rawValue
+    function reasonIDs() {
+      return ['identifiable_information', 'harassment', 'dangerous', 'spam', 'other'];
+    }
+
+    // 投稿が消えるまでの時間（Post.lifetime）
+    function lifetime() {
+      return duration.value(24, 'h');
+    }
+
+    function stampCount(data, stamp) {
+      return data.get('stampCounts', {}).get(stamp, 0);
+    }
+
+    function reportCount(data) {
+      return data.get('reportCount', 0);
+    }
+
+    // 2 段目まで書き終わっていて、期限内の投稿
+    function isLive(data) {
+      return data.expireAt > data.createdAt && data.expireAt > request.time;
+    }
+
+    // ---- 投稿 ----
+
+    // 1 段目: createdAt と expireAt をどちらもサーバーの時刻にして作る。自分の目印も同じ書き込みで作る
+    function createsPost(postId) {
+      let data = request.resource.data;
+      return data.keys().hasOnly(['body', 'category', 'createdAt', 'expireAt'])
+        && data.keys().hasAll(['body', 'category', 'createdAt', 'expireAt'])
+        && data.body is string
+        && data.body.size() > 0
+        // 400 字はアプリで数える（絵文字などは 1 字が何文字にもなるので、ここではゆるい上限だけ）
+        && data.body.size() <= 4000
+        && data.category in categoryIDs()
+        && data.createdAt == request.time
+        && data.expireAt == request.time
+        && existsAfter(ownPostPath(postId));
+    }
+
+    // 2 段目: 本人が、まだ期限切れのままの投稿の expireAt を createdAt の 24 時間後にする（あとから延ばせない）
+    function finishesPost(postId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return after.diff(before).affectedKeys().hasOnly(['expireAt'])
+        && before.expireAt == before.createdAt
+        && after.expireAt == before.createdAt + lifetime()
+        && exists(ownPostPath(postId));
+    }
+
+    // スタンプ 1 つぶん: 変わらないか、送った記録にこの書き込みで新しく入ったときだけ 1 増える
+    function stampAdded(before, after, stamp, postId) {
+      return stampCount(after, stamp) == stampCount(before, stamp)
+        || (stampCount(after, stamp) == stampCount(before, stamp) + 1
+          && getAfter(sentStampsPath(postId)).data.stamps.hasAny([stamp])
+          && !(exists(sentStampsPath(postId)) && get(sentStampsPath(postId)).data.stamps.hasAny([stamp])));
+    }
+
+    // 共感を送る: 期限内の他の人の投稿の、スタンプ 1 つの人数を 1 増やす
+    function addsStamp(postId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return isLive(before)
+        && !exists(ownPostPath(postId))
+        && after.diff(before).affectedKeys().hasOnly(['stampCounts'])
+        && after.stampCounts.diff(before.get('stampCounts', {})).affectedKeys().hasOnly(stampIDs())
+        && after.stampCounts.diff(before.get('stampCounts', {})).affectedKeys().size() == 1
+        && existsAfter(sentStampsPath(postId))
+        && stampAdded(before, after, 'understand', postId)
+        && stampAdded(before, after, 'hard_day', postId)
+        && stampAdded(before, after, 'same_here', postId)
+        && stampAdded(before, after, 'well_done', postId);
+    }
+
+    // 通報する: 期限内の他の人の投稿の reportCount を、通報を新しく作るのと同じ書き込みで 1 増やす
+    function addsReport(postId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return isLive(before)
+        && !exists(ownPostPath(postId))
+        && after.diff(before).affectedKeys().hasOnly(['reportCount'])
+        && reportCount(after) == reportCount(before) + 1
+        && !exists(reportPath(postId))
+        && existsAfter(reportPath(postId));
+    }
+
+    // スタンプ 1 つぶんの取り下げ: 変わらないか、送った記録を消すのと同じ書き込みで 1 減る
+    function stampWithdrawn(before, after, stamp, postId) {
+      return stampCount(after, stamp) == stampCount(before, stamp)
+        || (stampCount(after, stamp) == stampCount(before, stamp) - 1
+          && stampCount(before, stamp) > 0
+          && exists(sentStampsPath(postId))
+          && get(sentStampsPath(postId)).data.stamps.hasAny([stamp])
+          && !existsAfter(sentStampsPath(postId)));
+    }
+
+    // 通報の取り下げ: 変わらないか、自分の通報を消すのと同じ書き込みで 1 減る
+    function reportWithdrawn(before, after, postId) {
+      return reportCount(after) == reportCount(before)
+        || (reportCount(after) == reportCount(before) - 1
+          && reportCount(before) > 0
+          && exists(reportPath(postId))
+          && !existsAfter(reportPath(postId)));
+    }
+
+    // すべてのデータを削除: 送った共感・通報の人数を 1 ずつ引く
+    function withdraws(postId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return after.diff(before).affectedKeys().hasOnly(['stampCounts', 'reportCount'])
+        && after.get('stampCounts', {}).diff(before.get('stampCounts', {})).affectedKeys().hasOnly(stampIDs())
+        && stampWithdrawn(before, after, 'understand', postId)
+        && stampWithdrawn(before, after, 'hard_day', postId)
+        && stampWithdrawn(before, after, 'same_here', postId)
+        && stampWithdrawn(before, after, 'well_done', postId)
+        && reportWithdrawn(before, after, postId);
+    }
+
+    match /posts/{postId} {
+      // タイムラインの条件（expireAt が端末の時刻より後）は request.time で確かめられないので、読み出しはサインインだけを見る。
+      // 期限切れ・自動で非表示にした投稿はアプリで外す（docs/firebase.md の「ルールで守れないこと」）
+      allow get, list: if signedIn();
+      allow create: if signedIn() && createsPost(postId);
+      allow update: if signedIn()
+        && (finishesPost(postId) || addsStamp(postId) || addsReport(postId) || withdraws(postId));
+      // 自分の投稿だけ。目印は同じ書き込みで消すので、書き込みの前の状態（exists）で見る
+      allow delete: if signedIn() && exists(ownPostPath(postId));
+
+      match /reports/{uid} {
+        // 「もう通報したか」を本人が確かめるときだけ。運営は Firebase コンソールで見る
+        allow get: if isMe(uid);
+        // 1 人 1 回（作り直し・書き換えは許さない）。人数と自分の目印も同じ書き込みで書く
+        allow create: if isMe(uid) && createsReport(postId);
+        allow delete: if isMe(uid) && deletesReport(postId);
+      }
+    }
+
+    function createsReport(postId) {
+      let data = request.resource.data;
+      let post = get(postPath(postId)).data;
+      return data.keys().hasOnly(['reason', 'createdAt', 'expireAt'])
+        && data.keys().hasAll(['reason', 'createdAt', 'expireAt'])
+        && data.reason in reasonIDs()
+        && data.createdAt == request.time
+        && data.expireAt == post.expireAt
+        && isLive(post)
+        && !exists(ownPostPath(postId))
+        && reportCount(getAfter(postPath(postId)).data) == reportCount(post) + 1
+        && existsAfter(sentReportPath(postId));
+    }
+
+    // 通報を消すのは、投稿が無い・期限切れのとき、人数が 0 のとき、または同じ書き込みで reportCount を 1 減らすときだけ
+    function deletesReport(postId) {
+      return resource == null
+        || !exists(postPath(postId))
+        || !isLive(get(postPath(postId)).data)
+        || reportCount(get(postPath(postId)).data) == 0
+        || reportCount(getAfter(postPath(postId)).data) == reportCount(get(postPath(postId)).data) - 1;
+    }
+
+    // ---- 本人だけのもの ----
+
+    match /users/{uid}/ownPosts/{postId} {
+      allow get, list: if isMe(uid);
+      // 投稿を新しく作るのと同じ書き込みでだけ作れる（他の人の投稿の目印は作れない）
+      allow create: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['createdAt', 'expireAt'])
+        && request.resource.data.keys().hasAll(['createdAt', 'expireAt'])
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expireAt == request.time
+        && !exists(postPath(postId))
+        && existsAfter(postPath(postId));
+      // 投稿の 2 段目と同じ
+      allow update: if isMe(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['expireAt'])
+        && resource.data.expireAt == resource.data.createdAt
+        && request.resource.data.expireAt == resource.data.createdAt + lifetime();
+      allow delete: if isMe(uid);
+    }
+
+    match /users/{uid}/sentStamps/{postId} {
+      allow get, list: if isMe(uid);
+      allow create: if isMe(uid) && createsSentStamps(postId);
+      allow update: if isMe(uid) && addsSentStamp(postId);
+      allow delete: if isMe(uid) && deletesSentStamps(postId);
+    }
+
+    // スタンプを 1 つ足した記録は、投稿のその人数を 1 増やすのと同じ書き込みでだけ書ける
+    function stampCounted(stamp, postId) {
+      return stampCount(getAfter(postPath(postId)).data, stamp) == stampCount(get(postPath(postId)).data, stamp) + 1;
+    }
+
+    function createsSentStamps(postId) {
+      let data = request.resource.data;
+      return data.keys().hasOnly(['stamps', 'expireAt'])
+        && data.keys().hasAll(['stamps', 'expireAt'])
+        && data.stamps is list
+        && data.stamps.size() == 1
+        && data.stamps[0] in stampIDs()
+        && data.expireAt == get(postPath(postId)).data.expireAt
+        && stampCounted(data.stamps[0], postId);
+    }
+
+    // 新しく入ったスタンプなら、その人数も 1 増えている
+    function newStampCounted(before, after, stamp, postId) {
+      return !(after.stamps.hasAny([stamp]) && !before.stamps.hasAny([stamp])) || stampCounted(stamp, postId);
+    }
+
+    function addsSentStamp(postId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return after.diff(before).affectedKeys().hasOnly(['stamps'])
+        && after.stamps is list
+        && after.stamps.size() == before.stamps.size() + 1
+        && after.stamps.hasAll(before.stamps)
+        && after.stamps.hasOnly(stampIDs())
+        && newStampCounted(before, after, 'understand', postId)
+        && newStampCounted(before, after, 'hard_day', postId)
+        && newStampCounted(before, after, 'same_here', postId)
+        && newStampCounted(before, after, 'well_done', postId);
+    }
+
+    // スタンプ 1 つぶん: 送っていない・人数が 0・同じ書き込みで 1 減らす、のどれか
+    function sentStampWithdrawn(stamp, postId) {
+      return !resource.data.stamps.hasAny([stamp])
+        || stampCount(get(postPath(postId)).data, stamp) == 0
+        || stampCount(getAfter(postPath(postId)).data, stamp) == stampCount(get(postPath(postId)).data, stamp) - 1;
+    }
+
+    // 送った記録を消すのは、投稿が無い・期限切れのとき、または送ったスタンプの人数を同じ書き込みで 1 ずつ減らすときだけ
+    function deletesSentStamps(postId) {
+      return resource == null
+        || !exists(postPath(postId))
+        || !isLive(get(postPath(postId)).data)
+        || (sentStampWithdrawn('understand', postId)
+          && sentStampWithdrawn('hard_day', postId)
+          && sentStampWithdrawn('same_here', postId)
+          && sentStampWithdrawn('well_done', postId));
+    }
+
+    match /users/{uid}/sentReports/{postId} {
+      allow get, list: if isMe(uid);
+      // 通報を新しく作るのと同じ書き込みでだけ作れる
+      allow create: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['expireAt'])
+        && request.resource.data.keys().hasAll(['expireAt'])
+        && request.resource.data.expireAt == get(postPath(postId)).data.expireAt
+        && !exists(reportPath(postId))
+        && existsAfter(reportPath(postId));
+      // 通報と一緒に消すときだけ
+      allow delete: if isMe(uid) && !existsAfter(reportPath(postId));
+    }
+  }
+}
