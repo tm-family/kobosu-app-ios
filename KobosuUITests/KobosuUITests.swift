@@ -102,7 +102,8 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["settings.erase"].waitForExistence(timeout: 5))
         app.buttons["settings.license"].tap()
         XCTAssertTrue(app.staticTexts["Zen Maru Gothic"].waitForExistence(timeout: 5))
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        // シートの下のノートの画面にも戻るボタンは無いので、戻るボタン（BackButton）は 1 つだけ
+        app.navigationBars.buttons["BackButton"].tap()
         let close = app.buttons["settings.close"]
         XCTAssertTrue(close.waitForExistence(timeout: 5))
         close.tap()
@@ -122,29 +123,19 @@ final class KobosuUITests: XCTestCase {
     /// 撮影モードのデモデータで、投稿に共感を送る
     @MainActor
     func testSendingStampFromTimeline() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["-uitest-without-firebase", "-screenshot-demo", "-screenshot-scene", "home"]
-        app.launch()
+        let app = UITestApp.launchScreenshotScene("home")
 
         let post = app.buttons["post.preview-0"]
         XCTAssertTrue(post.waitForExistence(timeout: 5))
         post.tap()
-        let stamp = app.buttons["empathy.understand"]
-        XCTAssertTrue(stamp.waitForExistence(timeout: 5))
-        XCTAssertTrue(stamp.isEnabled)
-        stamp.tap()
         // 送ったスタンプは 2 回送れない
-        let predicate = NSPredicate(format: "isEnabled == false")
-        expectation(for: predicate, evaluatedWith: stamp)
-        waitForExpectations(timeout: 5)
+        UITestApp.sendStamp("understand", otherStamp: "same_here", in: app)
     }
 
     /// 撮影モードのデモデータで、共感のシートから通報すると、その投稿がタイムラインから消える
     @MainActor
     func testReportingFromEmpathySheet() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["-uitest-without-firebase", "-screenshot-demo", "-screenshot-scene", "home"]
-        app.launch()
+        let app = UITestApp.launchScreenshotScene("home")
 
         let post = app.buttons["post.preview-0"]
         XCTAssertTrue(post.waitForExistence(timeout: 5))
@@ -167,10 +158,8 @@ final class KobosuUITests: XCTestCase {
 
     @MainActor
     func testOnboardingRequiresAgreement() throws {
-        let app = XCUIApplication()
         // 初回の画面を出す（同意していない状態にしてから起動する）
-        app.launchArguments += ["-uitest-without-firebase", "-uitest-reset-onboarding"]
-        app.launch()
+        let app = UITestApp.launch([UITestApp.resetOnboarding])
 
         let start = app.buttons["onboarding.start"]
         XCTAssertTrue(start.waitForExistence(timeout: 5))
@@ -191,9 +180,6 @@ final class KobosuUITests: XCTestCase {
     /// やさしさの約束に同意した状態で起動する
     @MainActor
     private static func launchAfterOnboarding() -> XCUIApplication {
-        let app = XCUIApplication()
-        app.launchArguments += ["-uitest-without-firebase", "-uitest-skip-onboarding"]
-        app.launch()
-        return app
+        UITestApp.launch([UITestApp.skipOnboarding])
     }
 }
