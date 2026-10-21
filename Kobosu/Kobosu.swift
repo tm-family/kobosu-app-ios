@@ -12,7 +12,9 @@ struct Kobosu: App {
     @State private var dependencies: AppDependencies
 
     init() {
-        OnboardingStatus.applyLaunchArguments(ProcessInfo.processInfo.arguments, to: .standard)
+        let arguments = ProcessInfo.processInfo.arguments
+        OnboardingStatus.applyLaunchArguments(arguments, to: .standard)
+        UITestLaunch.applyLaunchArguments(arguments, to: .standard)
         NavigationBarAppearance.apply()
         // GoogleService-Info.plist があれば Firebase を設定し、Firestore の実装で動かす（無ければローカルの実装）。
         // 撮影モードではデモデータで開く
@@ -23,7 +25,7 @@ struct Kobosu: App {
         } else if usesFirebase {
             dependencies = .firebase()
         } else {
-            dependencies = .local()
+            dependencies = .local(seedsPosts: UITestLaunch.seedsPosts(arguments: arguments))
         }
         _dependencies = State(initialValue: dependencies)
     }

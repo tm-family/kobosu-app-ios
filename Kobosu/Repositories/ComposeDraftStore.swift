@@ -31,7 +31,7 @@ protocol ComposeDraftStore: AnyObject {
 /// ふだんの起動。UserDefaults に JSON で保存する
 final class UserDefaultsComposeDraftStore: ComposeDraftStore {
     /// 下書きを保存するキー
-    static let key = "compose.draft"
+    nonisolated static let key = "compose.draft"
 
     private let defaults: UserDefaults
 

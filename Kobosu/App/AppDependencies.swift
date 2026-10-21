@@ -41,10 +41,13 @@ final class AppDependencies {
         DataEraser(posts: posts, identity: identity, drafts: drafts, lockSettings: lockSettings, defaults: settingsDefaults)
     }
 
-    /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する
-    static func local() -> AppDependencies {
+    /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する。
+    /// seedsPosts は UI テスト用で、他の人の投稿（Preview と同じデモデータ）を置いて開く
+    static func local(seedsPosts: Bool = false) -> AppDependencies {
         let identity = KeychainAnonymousIDStore()
-        let repository = InMemoryPostRepository(identity: identity)
+        let repository = seedsPosts
+            ? InMemoryPostRepository.preview(identity: identity)
+            : InMemoryPostRepository(identity: identity)
         return AppDependencies(
             identity: identity,
             posts: repository,
