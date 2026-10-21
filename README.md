@@ -107,6 +107,8 @@ Archive / Upload ワークフローは App Store Connect API Key で認証しま
 API Key は App Store Connect の「ユーザとアクセス → 統合 → App Store Connect API」で、App Manager 以上の権限で発行します。
 
 `GoogleService-Info.plist` はリポジトリに入れません（`.gitignore` に入っています）。手元で Firebase につないで動かすときは、`Kobosu/GoogleService-Info.plist` に置いてビルドします。テスト（Build ワークフロー）は Firebase につながないので、この Secret を使いません。
+Firebase のプロジェクト・匿名認証・Firestore のルールと TTL の設定は [docs/firebase.md](docs/firebase.md) にまとめています。
+
 ### 5. App Store Connect にアプリを作成する
 
 Bundle ID・証明書・プロビジョニングプロファイルは、Export のときに API Key で自動的に作成されます（`-allowProvisioningUpdates`）。
@@ -216,7 +218,8 @@ App Store のプロダクトページに載せるものは、`AppStore/` の JSO
 ├── Kobosu.xcodeproj # 共有スキーム Kobosu を含む
 ├── AppStore/                # App Store の掲載情報（言語・撮る画面・説明文・クリエイティブアセット）
 ├── Tools/                   # スクリーンショットの撮影と App Store Connect への反映
-├── docs/                    # ExportOptions.plist のサンプル
+├── docs/                    # ExportOptions.plist のサンプル・Firebase の設定の手順（firebase.md）
+├── firebase.json            # Firebase CLI の設定（firestore.rules・firestore.indexes.json を出す）
 ├── scripts/                 # rename.sh
 ├── .swiftlint.yml           # SwiftLint 設定
 └── .github/

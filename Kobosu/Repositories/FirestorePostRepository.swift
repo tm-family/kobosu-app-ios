@@ -34,7 +34,7 @@ final class FirestorePostRepository: PostRepository {
     }
 
     func timeline(category: PostCategory?) async throws -> [Post] {
-        // 読み出しもサインインした人だけにする（ルールはタスク 23）
+        // 読み出しもサインインした人だけにする（firestore.rules）
         _ = try await userID()
         let posts = try await FirestorePostAPI.timeline(
             category: category,
@@ -63,7 +63,14 @@ final class FirestorePostRepository: PostRepository {
 
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         let uid = try await userID()
-        switch try await FirestorePostAPI.sendStamp(stamp, to: postID, uid: uid, now: now()) {
+        let check = try await FirestorePostAPI.sendStamp(
+            stamp,
+            to: postID,
+            uid: uid,
+            now: now(),
+            autoHideThreshold: ReportPolicy.autoHideThreshold
+        )
+        switch check {
         case .send, .alreadySent:
             return
         case .ownPost:
@@ -92,7 +99,7 @@ final class FirestorePostRepository: PostRepository {
     /// 途中で失敗しても、消し終わったものはもう無いので、もう一度呼べば残りから消し直せる
     func deleteAllMyData() async throws {
         let uid = try await userID()
-        try await FirestorePostAPI.deleteAllMyData(uid: uid)
+        try await FirestorePostAPI.deleteAllMyData(uid: uid, now: now())
         try await auth.deleteUser()
     }
 
@@ -220,16 +227,19 @@ nonisolated private enum FirestorePostAPI {
         _ stamp: EmpathyStamp,
         to postID: String,
         uid: String,
-        now: Date
+        now: Date,
+        autoHideThreshold: Int
     ) async throws -> PostDocument.StampSendCheck {
         let postRef = database.collection(PostDocument.postsCollection).document(postID)
         let sentRef = sentStamps(uid: uid).document(postID)
-        let postSnapshot = try await postRef.getDocument()
-        let isOwnPost = try await ownPosts(uid: uid).document(postID).getDocument().exists
-        let sentSnapshot = try await sentRef.getDocument()
+        // キャッシュの古い reportCount・送った記録で決めないよう、サーバーから読む
+        let postSnapshot = try await postRef.getDocument(source: .server)
+        let isOwnPost = try await ownPosts(uid: uid).document(postID).getDocument(source: .server).exists
+        let sentSnapshot = try await sentRef.getDocument(source: .server)
         let check = PostDocument.stampSendCheck(
             post: postSnapshot.data().flatMap { post(id: postID, data: $0) },
             isOwnPost: isOwnPost,
+            isAutoHidden: ReportDocument.isAutoHidden(post: postSnapshot.data() ?? [:], threshold: autoHideThreshold),
             sentStamps: PostDocument.sentStamps(from: sentSnapshot.get(Field.stamps)),
             stamp: stamp,
             now: now
@@ -295,11 +305,11 @@ nonisolated private enum FirestorePostAPI {
     }
 
     /// 「すべてのデータを削除」のサーバー側（MyDataDocument のコメント）
-    static func deleteAllMyData(uid: String) async throws {
+    static func deleteAllMyData(uid: String, now: Date) async throws {
         // 自分の投稿。期限で絞らず、2 段目を書けなかった投稿の目印も含めて消す
         let marks = try await ownPosts(uid: uid).getDocuments(source: .server)
-        // 1 件につき投稿と目印の 2 つを消す
-        for chunk in MyDataDocument.chunked(marks.documents, size: MyDataDocument.batchLimit / 2) {
+        // 1 件につき投稿と目印の 2 つを消す。ルールの exists() の回数の上限に収まるように分ける
+        for chunk in MyDataDocument.chunked(marks.documents, size: MyDataDocument.postsPerDeletionBatch) {
             let batch = database.batch()
             for mark in chunk {
                 batch.deleteDocument(database.collection(PostDocument.postsCollection).document(mark.documentID))
@@ -318,14 +328,19 @@ nonisolated private enum FirestorePostAPI {
             reportedPostIDs: Set(reported.documents.map(\.documentID))
         )
         for withdrawal in withdrawals {
-            try await withdraw(withdrawal, uid: uid)
+            try await withdraw(withdrawal, uid: uid, now: now)
         }
     }
 
-    private static func withdraw(_ withdrawal: MyDataDocument.Withdrawal, uid: String) async throws {
+    private static func withdraw(_ withdrawal: MyDataDocument.Withdrawal, uid: String, now: Date) async throws {
         let postRef = database.collection(PostDocument.postsCollection).document(withdrawal.postID)
         let snapshot = try await postRef.getDocument(source: .server)
-        let decrements = MyDataDocument.decrements(post: snapshot.data(), withdrawal: withdrawal)
+        let decrements = MyDataDocument.decrements(
+            post: snapshot.data(),
+            expireAt: (snapshot.get(Field.expireAt) as? Timestamp)?.dateValue(),
+            withdrawal: withdrawal,
+            now: now
+        )
         let batch = database.batch()
         if !decrements.isEmpty {
             batch.updateData(decrements.mapValues { FieldValue.increment($0) }, forDocument: postRef)

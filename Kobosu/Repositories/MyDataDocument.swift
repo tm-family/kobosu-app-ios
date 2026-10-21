@@ -14,8 +14,14 @@
 import Foundation
 
 nonisolated enum MyDataDocument {
-    /// 1 つのバッチに入れられる書き込みの数（Firestore の上限）
-    static let batchLimit = 500
+    /// ルールが 1 つのバッチの中で exists()・get() を呼べる回数（Firestore の上限）。超えるとバッチごと拒否される
+    static let ruleCallLimit = 20
+
+    /// 投稿 1 件を消すときにルールが呼ぶ回数（投稿の delete の exists と、目印の delete の existsAfter）
+    static let ruleCallsPerPostDeletion = 2
+
+    /// 1 つのバッチで消す投稿の数。投稿と目印の 2 つを消すので、書き込みの数はこの 2 倍（バッチの上限 500 より十分少ない）
+    static let postsPerDeletionBatch = ruleCallLimit / ruleCallsPerPostDeletion
 
     /// 投稿ごとに、取り下げる共感・通報
     struct Withdrawal: Equatable {
@@ -37,9 +43,16 @@ nonisolated enum MyDataDocument {
     }
 
     /// 投稿の人数から引く値（フィールドのパス → -1）。いま 1 以上のものだけ引き、0 より小さくしない。
-    /// 投稿が無い（消えた・TTL で消えた）ときは何も引かない
-    static func decrements(post data: [String: Any]?, withdrawal: Withdrawal) -> [String: Int64] {
-        guard let data else {
+    /// 投稿が無い（消えた・TTL で消えた）ときと、期限を過ぎて TTL を待っているときは何も引かない。
+    /// 期限切れの投稿はもう出ないので人数は関係なく、通報の記録が投稿より先に TTL で消えていると、
+    /// ルール（通報の記録を消すときだけ reportCount を 1 減らせる）にはじかれて消し直せなくなるため
+    static func decrements(
+        post data: [String: Any]?,
+        expireAt: Date?,
+        withdrawal: Withdrawal,
+        now: Date
+    ) -> [String: Int64] {
+        guard let data, let expireAt, expireAt > now else {
             return [:]
         }
         var result: [String: Int64] = [:]

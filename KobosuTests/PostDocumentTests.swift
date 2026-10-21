@@ -103,6 +103,21 @@ struct PostDocumentTests {
         #expect(check(post, own: true, at: post.expireAt) == .postNotFound)
     }
 
+    /// 通報が一定数に達した投稿には送らない（タイムラインと同じく無いものとして扱う）
+    @Test
+    func stampSendCheckTreatsAutoHiddenPostAsNotFound() {
+        let post = Post(id: "a", body: "本文", category: .other, createdAt: createdAt)
+        let check = PostDocument.stampSendCheck(
+            post: post,
+            isOwnPost: false,
+            isAutoHidden: true,
+            sentStamps: [],
+            stamp: .sameHere,
+            now: createdAt.addingTimeInterval(60)
+        )
+        #expect(check == .postNotFound)
+    }
+
     @Test
     func stampCountFieldPathUsesRawValue() {
         #expect(PostDocument.stampCountFieldPath(.sameHere) == "stampCounts.same_here")
