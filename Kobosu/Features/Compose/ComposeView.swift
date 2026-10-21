@@ -29,12 +29,14 @@ struct ComposeView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 12) {
                         PostTextArea(text: $model.body, limit: Post.maxBodyLength, count: model.bodyLength)
+                            .disabled(model.isBusy)
                         if model.isOverLimit {
                             note("\(Post.maxBodyLength) 文字までにすると、投稿できます")
                         }
                         hint
                     }
                     categorySection
+                        .disabled(model.isBusy)
                     lifetimeSection
                     if model.state == .failed {
                         note("投稿できませんでした。時間をおいて、もう一度ためせます。")
@@ -54,7 +56,7 @@ struct ComposeView: View {
                         Text("キャンセル")
                     }
                     .foregroundStyle(Palette.inkSecondary)
-                    .disabled(model.isSubmitting)
+                    .disabled(model.isBusy)
                     .accessibilityIdentifier("compose.cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -69,7 +71,7 @@ struct ComposeView: View {
                 }
             }
             // 送っている途中は閉じさせない（送れたかどうか分からなくなるため）
-            .interactiveDismissDisabled(model.isSubmitting)
+            .interactiveDismissDisabled(model.isBusy)
             .onChange(of: model.body) {
                 model.saveDraft()
             }
