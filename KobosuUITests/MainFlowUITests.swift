@@ -25,14 +25,19 @@ final class MainFlowUITests: XCTestCase {
         let start = app.buttons["onboarding.start"]
         XCTAssertTrue(start.waitForExistence(timeout: 5))
         start.tap()
-        app.descendants(matching: .any)["onboarding.promiseCheck"].firstMatch.tap()
-        app.buttons["onboarding.agree"].tap()
+        let promiseCheck = app.descendants(matching: .any)["onboarding.promiseCheck"].firstMatch
+        let agree = app.buttons["onboarding.agree"]
+        XCTAssertTrue(promiseCheck.waitForExistence(timeout: 5))
+        XCTAssertTrue(agree.waitForExistence(timeout: 5))
+        promiseCheck.tap()
+        XCTAssertTrue(agree.isEnabled)
+        agree.tap()
         let later = app.buttons["onboarding.lockLater"]
         XCTAssertTrue(later.waitForExistence(timeout: 5))
         later.tap()
 
         // 投稿する
-        let body = "UI test main flow"
+        let body = "きょうは ごはんを つくって くたくた"
         Self.post(body, category: "housework", in: app)
 
         // 自分の投稿がタイムラインに出る。タップしても共感のシートは開かない
@@ -45,11 +50,7 @@ final class MainFlowUITests: XCTestCase {
         let post = app.buttons["post.preview-0"]
         XCTAssertTrue(post.waitForExistence(timeout: 5))
         post.tap()
-        let stamp = app.buttons["empathy.understand"]
-        XCTAssertTrue(stamp.waitForExistence(timeout: 5))
-        stamp.tap()
-        expectation(for: NSPredicate(format: "isEnabled == false"), evaluatedWith: stamp)
-        waitForExpectations(timeout: 5)
+        UITestApp.sendStamp("understand", otherStamp: "same_here", in: app)
 
         // 同じシートから通報すると、その投稿はタイムラインから消える
         app.buttons["empathy.report"].tap()
@@ -89,7 +90,7 @@ final class MainFlowUITests: XCTestCase {
     func testOwnPostHasNoReportMenu() throws {
         let app = UITestApp.launch([UITestApp.skipOnboarding, UITestApp.seedPosts])
 
-        let body = "UI test own post"
+        let body = "せんたくものを たたんで ひとやすみ"
         Self.post(body, category: "other", in: app)
 
         let myPost = Self.myPost(in: app, containing: body)
@@ -100,7 +101,8 @@ final class MainFlowUITests: XCTestCase {
     }
 
     /// 投稿の画面を開いて投稿し、投稿完了の画面から、きくに戻る。
-    /// 伏せ字の候補が見つかって確認の画面に進んだときは、そのまま投稿する（伏せ字の検知はここでは確かめない）
+    /// 本文は伏せ字の候補が出ないひらがなにする。確認の画面に進むと本文が伏せられて、自分の投稿を本文で探せなくなるため、
+    /// 確認の画面に進んだら失敗にする（伏せ字の検知はユニットテストで確かめる）
     @MainActor
     private static func post(_ body: String, category: String, in app: XCUIApplication) {
         let compose = app.buttons["tab.compose"]
@@ -113,11 +115,8 @@ final class MainFlowUITests: XCTestCase {
         app.buttons["compose.category.\(category)"].tap()
         app.buttons["compose.submit"].tap()
         let back = app.buttons["complete.back"]
-        let masking = app.buttons["masking.submit"]
-        if !back.waitForExistence(timeout: 5), masking.exists {
-            masking.tap()
-        }
         XCTAssertTrue(back.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["masking.submit"].exists)
         back.tap()
         XCTAssertTrue(back.waitForNonExistence(timeout: 5))
     }
