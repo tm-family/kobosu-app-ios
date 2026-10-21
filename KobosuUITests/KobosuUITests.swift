@@ -58,6 +58,30 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
     }
 
+    /// 伏せ字の候補（電話番号）があると確認の画面に進み、伏せ字にした本文を見てから投稿できる
+    @MainActor
+    func testPostingThroughMaskingReview() throws {
+        let app = Self.launchAfterOnboarding()
+
+        app.buttons["tab.compose"].tap()
+        let body = app.textViews.firstMatch
+        XCTAssertTrue(body.waitForExistence(timeout: 5))
+        body.tap()
+        body.typeText("call 090-1234-5678")
+        app.buttons["compose.category.other"].tap()
+        app.buttons["compose.submit"].tap()
+
+        let submit = app.buttons["masking.submit"]
+        XCTAssertTrue(submit.waitForExistence(timeout: 5))
+        let preview = app.staticTexts["masking.preview"]
+        XCTAssertTrue(preview.label.contains("〇〇"))
+        XCTAssertFalse(preview.label.contains("5678"))
+
+        submit.tap()
+        XCTAssertTrue(submit.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["tab.listen"].isSelected)
+    }
+
     @MainActor
     func testSwitchingTabs() throws {
         let app = Self.launchAfterOnboarding()
