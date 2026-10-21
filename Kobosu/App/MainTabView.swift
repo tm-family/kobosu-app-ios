@@ -26,7 +26,7 @@ struct MainTabView: View {
             ListenView(repository: dependencies.posts, reloadID: postedCount)
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.listen)
-            NoteView()
+            NoteView(repository: dependencies.posts)
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.note)
         }

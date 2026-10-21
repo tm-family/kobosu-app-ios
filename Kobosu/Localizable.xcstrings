@@ -86,6 +86,23 @@
         }
       }
     },
+    "%lld人が「うちも同じ」" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld said “Same here”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld人が「うちも同じ」"
+          }
+        }
+      }
+    },
     "24時間たつと、自動で消えます" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -120,6 +137,23 @@
         }
       }
     },
+    "「うちも同じ」が届くと、ここに人数が出ます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When someone says “Same here”, the count shows up here"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「うちも同じ」が届くと、ここに人数が出ます"
+          }
+        }
+      }
+    },
     "あなたが「うちも同じ」を送りました" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -133,6 +167,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "あなたが「うちも同じ」を送りました"
+          }
+        }
+      }
+    },
+    "あなただけじゃないよ。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're not alone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなただけじゃないよ。"
           }
         }
       }
@@ -303,6 +354,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この投稿は、もう消えています。"
+          }
+        }
+      }
+    },
+    "この投稿を消しますか？" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this post?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この投稿を消しますか？"
+          }
+        }
+      }
+    },
+    "この投稿を消す" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this post"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この投稿を消す"
           }
         }
       }
@@ -630,6 +715,23 @@
         }
       }
     },
+    "人が「うちも同じ」" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " said “Same here”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "人が「うちも同じ」"
+          }
+        }
+      }
+    },
     "人の名前" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -728,6 +830,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "共感を送る画面を開きます"
+          }
+        }
+      }
+    },
+    "共有した投稿" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared posts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有した投稿"
+          }
+        }
+      }
+    },
+    "共有した投稿は、ここに出ます。24時間たつと、自動で消えます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your shared posts appear here. They disappear automatically after 24 hours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有した投稿は、ここに出ます。24時間たつと、自動で消えます。"
           }
         }
       }
@@ -885,6 +1021,23 @@
         }
       }
     },
+    "届いた共感も一緒に消えて、もとに戻せません。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The empathy you received will be deleted too. This can't be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "届いた共感も一緒に消えて、もとに戻せません。"
+          }
+        }
+      }
+    },
     "投稿" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1017,6 +1170,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "消えるまで"
+          }
+        }
+      }
+    },
+    "消す" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消す"
+          }
+        }
+      }
+    },
+    "消せませんでした。時間をおいて、もう一度ためせます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't delete. You can try again in a little while."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消せませんでした。時間をおいて、もう一度ためせます。"
           }
         }
       }
