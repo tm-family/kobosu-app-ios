@@ -74,6 +74,7 @@ jobs:
         run: |
           if [[ -z "$GOOGLE_SERVICE_INFO_PLIST_BASE64" ]]; then
             echo "::warning::Secret GOOGLE_SERVICE_INFO_PLIST_BASE64 が無いため、Firebase につながないビルドになります"
+            echo "⚠️ Secret \`GOOGLE_SERVICE_INFO_PLIST_BASE64\` が無いため、Firebase につながない（ローカルの実装で動く）ビルドです" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           plist="$PROJECT_NAME/GoogleService-Info.plist"
