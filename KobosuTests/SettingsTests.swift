@@ -50,6 +50,24 @@ struct SettingsTests {
         #expect(timeline.first { $0.id == "others" }?.sameHereCount == 1)
     }
 
+    /// 自分の通報も取り下げる。しきい値に届いていた投稿は、自分の分が減るとまた出る
+    @Test
+    func deleteAllMyDataWithdrawsReports() async throws {
+        let identity = InMemoryAnonymousIDStore(id: "me")
+        let repository = try await makeRepository(identity: identity)
+        for other in ["other-1", "other-2"] {
+            identity.replaceID(with: other)
+            try await repository.report(postID: "reported", reason: .spam)
+        }
+        identity.replaceID(with: "me")
+        let before = try await repository.timeline(category: nil)
+        #expect(!before.contains { $0.id == "reported" })
+
+        try await repository.deleteAllMyData()
+        let after = try await repository.timeline(category: nil)
+        #expect(after.contains { $0.id == "reported" })
+    }
+
     /// すべて消すと、下書き・アプリロックの設定・約束の同意・匿名 ID もなくなる
     @Test
     func eraseAllDeletesEverything() async throws {
@@ -61,11 +79,14 @@ struct SettingsTests {
         let lockSettings = AppLockSettings(defaults: isolated.defaults)
         lockSettings.isEnabled = false
         isolated.defaults.set(PromiseRule.currentVersion, forKey: OnboardingStatus.agreedVersionKey)
+        let hiddenPosts = UserDefaultsHiddenPostStore(defaults: isolated.defaults, now: { [now] in now })
+        hiddenPosts.hide("others")
         let eraser = DataEraser(
             posts: repository,
             identity: identity,
             drafts: drafts,
             lockSettings: lockSettings,
+            hiddenPosts: hiddenPosts,
             defaults: isolated.defaults
         )
 
@@ -74,7 +95,33 @@ struct SettingsTests {
         #expect(drafts.load() == nil)
         #expect(lockSettings.isEnabled)
         #expect(isolated.defaults.object(forKey: OnboardingStatus.agreedVersionKey) == nil)
+        #expect(hiddenPosts.hiddenPostIDs().isEmpty)
         #expect(identity.currentID() != "me")
+    }
+
+    /// 消し終わると .erased になり、もう一度呼んでも消し直さない
+    @Test
+    func eraseFinishesOnce() async throws {
+        let isolated = try IsolatedDefaults()
+        defer { isolated.clear() }
+        let identity = InMemoryAnonymousIDStore(id: "me")
+        let lockSettings = AppLockSettings(defaults: isolated.defaults)
+        let eraser = DataEraser(
+            posts: InMemoryPostRepository(identity: identity),
+            identity: identity,
+            drafts: InMemoryComposeDraftStore(),
+            lockSettings: lockSettings,
+            defaults: isolated.defaults
+        )
+        let model = SettingsViewModel(authenticator: StubAppLockAuthenticator(), lockSettings: lockSettings, eraser: eraser)
+
+        await model.eraseAll()
+        #expect(model.eraseState == .erased)
+        // 消したあとに作られた ID は、2 回目では消さない
+        let newID = identity.currentID()
+        await model.eraseAll()
+        #expect(model.eraseState == .erased)
+        #expect(identity.currentID() == newID)
     }
 
     /// サーバーを消せなかったら、端末の中も消さずに止める
@@ -84,11 +131,17 @@ struct SettingsTests {
         defer { isolated.clear() }
         let identity = InMemoryAnonymousIDStore(id: "me")
         let drafts = InMemoryComposeDraftStore(draft: ComposeDraft(body: "下書き", category: .money))
+        let lockSettings = AppLockSettings(defaults: isolated.defaults)
+        lockSettings.isEnabled = false
+        isolated.defaults.set(PromiseRule.currentVersion, forKey: OnboardingStatus.agreedVersionKey)
+        let hiddenPosts = UserDefaultsHiddenPostStore(defaults: isolated.defaults, now: { [now] in now })
+        hiddenPosts.hide("others")
         let eraser = DataEraser(
             posts: FailingDeleteRepository(),
             identity: identity,
             drafts: drafts,
-            lockSettings: AppLockSettings(defaults: isolated.defaults),
+            lockSettings: lockSettings,
+            hiddenPosts: hiddenPosts,
             defaults: isolated.defaults
         )
         let model = SettingsViewModel(
@@ -101,6 +154,9 @@ struct SettingsTests {
         #expect(model.eraseState == .failed)
         #expect(drafts.load() != nil)
         #expect(identity.currentID() == "me")
+        #expect(!lockSettings.isEnabled)
+        #expect(isolated.defaults.object(forKey: OnboardingStatus.agreedVersionKey) != nil)
+        #expect(hiddenPosts.hiddenPostIDs() == ["others"])
     }
 
     /// オンにするときは確かめ、確かめられなければオフのまま。オフにするときは確かめない
