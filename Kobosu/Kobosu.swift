@@ -15,6 +15,9 @@ struct Kobosu: App {
     init() {
         OnboardingStatus.applyLaunchArguments(ProcessInfo.processInfo.arguments, to: .standard)
         NavigationBarAppearance.apply()
+        // GoogleService-Info.plist があれば Firebase を設定する（無ければローカルの実装のまま動く）。
+        // Repository を Firestore の実装に差し替えるのはタスク 19
+        _ = FirebaseSetup.configureIfAvailable(isScreenshotDemo: ScreenshotDemo.isEnabled)
     }
 
     var body: some Scene {
