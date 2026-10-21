@@ -232,9 +232,10 @@ nonisolated private enum FirestorePostAPI {
     ) async throws -> PostDocument.StampSendCheck {
         let postRef = database.collection(PostDocument.postsCollection).document(postID)
         let sentRef = sentStamps(uid: uid).document(postID)
-        let postSnapshot = try await postRef.getDocument()
-        let isOwnPost = try await ownPosts(uid: uid).document(postID).getDocument().exists
-        let sentSnapshot = try await sentRef.getDocument()
+        // キャッシュの古い reportCount・送った記録で決めないよう、サーバーから読む
+        let postSnapshot = try await postRef.getDocument(source: .server)
+        let isOwnPost = try await ownPosts(uid: uid).document(postID).getDocument(source: .server).exists
+        let sentSnapshot = try await sentRef.getDocument(source: .server)
         let check = PostDocument.stampSendCheck(
             post: postSnapshot.data().flatMap { post(id: postID, data: $0) },
             isOwnPost: isOwnPost,
