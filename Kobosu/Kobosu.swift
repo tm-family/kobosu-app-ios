@@ -39,6 +39,14 @@ struct Kobosu: App {
         switch ScreenshotDemo.scene {
         case .home, nil:
             RootView(dependencies: dependencies)
+        case .empathy:
+            MainTabView(dependencies: dependencies, empathyPostID: ScreenshotDemo.empathyPostID)
+        case .compose:
+            MainTabView(dependencies: dependencies, opensComposer: true)
+        case .note:
+            MainTabView(dependencies: dependencies, initialTab: .note)
+        case .welcome:
+            OnboardingView(authenticator: dependencies.appLock, lockSettings: dependencies.lockSettings) {}
         }
     }
 }

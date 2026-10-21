@@ -17,10 +17,13 @@ struct ListenView: View {
     @State private var model: TimelineViewModel
     /// 開いているシート
     @State private var sheet: PostSheet?
+    /// 読み込んだら共感のシートを開く投稿（撮影モード）
+    @State private var pendingEmpathyPostID: Post.ID?
 
-    init(repository: any PostRepository, reports: any ReportRepository, reloadID: Int = 0) {
+    init(repository: any PostRepository, reports: any ReportRepository, reloadID: Int = 0, empathyPostID: Post.ID? = nil) {
         self.reloadID = reloadID
         _model = State(initialValue: TimelineViewModel(repository: repository, reports: reports))
+        _pendingEmpathyPostID = State(initialValue: empathyPostID)
     }
 
     var body: some View {
@@ -42,6 +45,7 @@ struct ListenView: View {
             }
             .task(id: reloadID) {
                 await model.load()
+                openPendingEmpathySheet()
             }
             .sheet(item: $sheet) { sheet in
                 switch sheet {
@@ -132,6 +136,14 @@ struct ListenView: View {
             }
             .accessibilityIdentifier("post.\(post.id)")
         }
+    }
+
+    private func openPendingEmpathySheet() {
+        guard let id = pendingEmpathyPostID, let post = model.post(id: id), !model.isMine(post) else {
+            return
+        }
+        pendingEmpathyPostID = nil
+        sheet = .empathy(post)
     }
 
     private func message(_ text: LocalizedStringResource) -> some View {

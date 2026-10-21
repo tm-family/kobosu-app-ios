@@ -12,7 +12,11 @@
     "              6.3 inch（1206x2622）は 6.9 inch（1320x2868）と縦横比がほぼ同じなので縮めて作る。"
   ],
   "scenes": [
-    { "file": "01_home", "scene": "home" }
+    { "file": "01_home", "scene": "home" },
+    { "file": "02_empathy", "scene": "empathy" },
+    { "file": "03_compose", "scene": "compose" },
+    { "file": "04_note", "scene": "note" },
+    { "file": "05_welcome", "scene": "welcome" }
   ],
   "displayTypes": {
     "APP_IPHONE_67": {
