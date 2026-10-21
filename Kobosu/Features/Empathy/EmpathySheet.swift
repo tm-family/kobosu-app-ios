@@ -13,6 +13,8 @@ struct EmpathySheet: View {
     let post: Post
     let sentStamps: Set<EmpathyStamp>
     let onSend: (EmpathyStamp) async throws -> Void
+    /// 通報・「この投稿を表示しない」のシートに切り替える
+    let onReport: () -> Void
 
     @State private var sending: EmpathyStamp?
     @State private var floating: EmpathyStamp?
@@ -25,13 +27,26 @@ struct EmpathySheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("気持ちを送る")
-                        .font(.kobosuTitle)
-                        .foregroundStyle(Palette.ink)
-                        .accessibilityAddTraits(.isHeader)
-                    Text("送れるのは共感のスタンプだけです")
-                        .kobosuMetaLabel()
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("気持ちを送る")
+                            .font(.kobosuTitle)
+                            .foregroundStyle(Palette.ink)
+                            .accessibilityAddTraits(.isHeader)
+                        Text("送れるのは共感のスタンプだけです")
+                            .kobosuMetaLabel()
+                    }
+                    Spacer(minLength: 8)
+                    Button(action: onReport) {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.title3)
+                            .foregroundStyle(Palette.inkSecondary)
+                            .frame(minWidth: KobosuButtonStyle.minimumTapSize, minHeight: KobosuButtonStyle.minimumTapSize)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("通報・表示しない"))
+                    .accessibilityIdentifier("empathy.report")
                 }
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(EmpathyStamp.allCases) { stamp in
@@ -148,6 +163,6 @@ private struct FloatingStamp: View {
                 sentStamps: sent
             ) { stamp in
                 sent.insert(stamp)
-            }
+            } onReport: {}
         }
 }

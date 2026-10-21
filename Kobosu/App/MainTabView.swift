@@ -23,7 +23,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            ListenView(repository: dependencies.posts, reloadID: postedCount)
+            ListenView(repository: dependencies.posts, reports: dependencies.reports, reloadID: postedCount)
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.listen)
             NoteView(repository: dependencies.posts)

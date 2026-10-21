@@ -5,6 +5,7 @@
 //  「きく」タブのタイムライン（デザイン案 SCREEN 01）。カテゴリで絞り込んで、他の人の投稿を読む。
 //  開いたままでも 1 分ごとに残り時間を更新し、期限を過ぎた投稿は表示から外す。
 //  他の人の投稿をタップすると、共感を送るハーフシートを開く。
+//  通報・「この投稿を表示しない」は、共感のシートの右上・長押しのメニュー・VoiceOver のアクションから開く（他の人の投稿だけ）。
 //
 
 import SwiftUI
@@ -14,12 +15,12 @@ struct ListenView: View {
     let reloadID: Int
 
     @State private var model: TimelineViewModel
-    /// 共感を送るシートで開いている投稿
-    @State private var selectedPost: Post?
+    /// 開いているシート
+    @State private var sheet: PostSheet?
 
-    init(repository: any PostRepository, reloadID: Int = 0) {
+    init(repository: any PostRepository, reports: any ReportRepository, reloadID: Int = 0) {
         self.reloadID = reloadID
-        _model = State(initialValue: TimelineViewModel(repository: repository))
+        _model = State(initialValue: TimelineViewModel(repository: repository, reports: reports))
     }
 
     var body: some View {
@@ -42,9 +43,21 @@ struct ListenView: View {
             .task(id: reloadID) {
                 await model.load()
             }
-            .sheet(item: $selectedPost) { post in
-                EmpathySheet(post: model.post(id: post.id) ?? post, sentStamps: model.sentStamps(for: post)) { stamp in
-                    try await model.send(stamp, to: post)
+            .sheet(item: $sheet) { sheet in
+                switch sheet {
+                case .empathy(let post):
+                    EmpathySheet(post: model.post(id: post.id) ?? post, sentStamps: model.sentStamps(for: post)) { stamp in
+                        try await model.send(stamp, to: post)
+                    } onReport: {
+                        // 共感のシートを閉じてから、通報のシートに切り替える
+                        self.sheet = .report(post)
+                    }
+                case .report(let post):
+                    ReportSheet { reason in
+                        try await model.report(post, reason: reason)
+                    } onHide: {
+                        try await model.hide(post)
+                    }
                 }
             }
         }
@@ -97,12 +110,26 @@ struct ListenView: View {
             card
         } else {
             Button {
-                selectedPost = post
+                sheet = .empathy(post)
             } label: {
                 card
             }
             .buttonStyle(.plain)
+            .contextMenu {
+                Button {
+                    sheet = .report(post)
+                } label: {
+                    Label {
+                        Text("通報・表示しない")
+                    } icon: {
+                        Image(systemName: "flag")
+                    }
+                }
+            }
             .accessibilityHint(Text("共感を送る画面を開きます"))
+            .accessibilityAction(named: Text("通報・表示しない")) {
+                sheet = .report(post)
+            }
             .accessibilityIdentifier("post.\(post.id)")
         }
     }
@@ -116,10 +143,27 @@ struct ListenView: View {
     }
 }
 
+/// タイムラインから開くシート
+private enum PostSheet: Identifiable {
+    case empathy(Post)
+    case report(Post)
+
+    var id: String {
+        switch self {
+        case .empathy(let post):
+            "empathy-\(post.id)"
+        case .report(let post):
+            "report-\(post.id)"
+        }
+    }
+}
+
 #Preview {
-    ListenView(repository: InMemoryPostRepository.preview())
+    let repository = InMemoryPostRepository.preview()
+    ListenView(repository: repository, reports: repository)
 }
 
 #Preview("投稿なし") {
-    ListenView(repository: InMemoryPostRepository())
+    let repository = InMemoryPostRepository()
+    ListenView(repository: repository, reports: repository)
 }

@@ -112,6 +112,9 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
     func report(postID: Post.ID, reason: ReportReason) async throws {
         var record = try activeRecord(postID)
         let myID = try identity.currentID()
+        guard record.authorID != myID else {
+            throw PostRepositoryError.ownPost
+        }
         record.reporterIDs.insert(myID)
         records[postID] = record
     }
