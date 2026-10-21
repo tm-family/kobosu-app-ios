@@ -34,6 +34,30 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.listen"].exists)
     }
 
+    /// 本文を書いてカテゴリを選ぶと投稿でき、投稿するとモーダルが閉じる
+    @MainActor
+    func testPostingFromCompose() throws {
+        let app = Self.launchAfterOnboarding()
+
+        app.buttons["tab.compose"].tap()
+        let submit = app.buttons["compose.submit"]
+        XCTAssertTrue(submit.waitForExistence(timeout: 5))
+        XCTAssertFalse(submit.isEnabled)
+
+        let body = app.textViews.firstMatch
+        XCTAssertTrue(body.waitForExistence(timeout: 5))
+        body.tap()
+        body.typeText("UI test")
+        // カテゴリを選ぶまでは投稿できない
+        XCTAssertFalse(submit.isEnabled)
+        app.buttons["compose.category.housework"].tap()
+        XCTAssertTrue(submit.isEnabled)
+
+        submit.tap()
+        XCTAssertTrue(submit.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["tab.listen"].isSelected)
+    }
+
     @MainActor
     func testSwitchingTabs() throws {
         let app = Self.launchAfterOnboarding()
