@@ -86,6 +86,23 @@
         }
       }
     },
+    "きく" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "きく"
+          }
+        }
+      }
+    },
     "きょうだい・親戚" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -99,6 +116,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "きょうだい・親戚"
+          }
+        }
+      }
+    },
+    "こぼす" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vent"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "こぼす"
           }
         }
       }
@@ -167,6 +201,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "わかる"
+          }
+        }
+      }
+    },
+    "キャンセル" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        }
+      }
+    },
+    "ノート" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ノート"
           }
         }
       }
@@ -303,6 +371,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "家事分担"
+          }
+        }
+      }
+    },
+    "気持ちを書く画面を開きます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens a page to write how you feel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "気持ちを書く画面を開きます"
           }
         }
       }
