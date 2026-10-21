@@ -130,6 +130,10 @@ final class KobosuUITests: XCTestCase {
         app.descendants(matching: .any)["onboarding.promiseCheck"].firstMatch.tap()
         XCTAssertTrue(agree.isEnabled)
         agree.tap()
+        // アプリロックの設定は、あとで設定する（Simulator では Face ID を確かめられないため）
+        let later = app.buttons["onboarding.lockLater"]
+        XCTAssertTrue(later.waitForExistence(timeout: 5))
+        later.tap()
         XCTAssertTrue(app.buttons["tab.listen"].waitForExistence(timeout: 5))
     }
 

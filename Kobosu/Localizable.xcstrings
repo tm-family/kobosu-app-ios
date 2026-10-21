@@ -120,6 +120,57 @@
         }
       }
     },
+    "Face ID でロック" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock with Face ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID でロック"
+          }
+        }
+      }
+    },
+    "Optic ID でロック" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock with Optic ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optic ID でロック"
+          }
+        }
+      }
+    },
+    "Touch ID でロック" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock with Touch ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID でロック"
+          }
+        }
+      }
+    },
     "URL" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -150,6 +201,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「うちも同じ」が届くと、ここに人数が出ます"
+          }
+        }
+      }
+    },
+    "あとで設定する" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up later"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとで設定する"
           }
         }
       }
@@ -426,6 +494,23 @@
         }
       }
     },
+    "この端末にはパスコードが設定されていないため、ロックは使えません。端末の設定でパスコードを決めると使えるようになります。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lock isn't available because this device has no passcode. Set a passcode in the device settings to use it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末にはパスコードが設定されていないため、ロックは使えません。端末の設定でパスコードを決めると使えるようになります。"
+          }
+        }
+      }
+    },
     "こぼす" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -630,6 +715,23 @@
         }
       }
     },
+    "アプリのロックを確かめます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm the app lock"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリのロックを確かめます"
+          }
+        }
+      }
+    },
     "カテゴリ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -732,6 +834,23 @@
         }
       }
     },
+    "パスコードでロック" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock with passcode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスコードでロック"
+          }
+        }
+      }
+    },
     "パートナー" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -762,6 +881,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メールアドレス"
+          }
+        }
+      }
+    },
+    "ロックを確かめられませんでした。もう一度ためすか、あとで設定できます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't confirm the lock. You can try again or set it up later."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロックを確かめられませんでした。もう一度ためすか、あとで設定できます。"
           }
         }
       }
@@ -1072,6 +1208,23 @@
         }
       }
     },
+    "家族に見られないように" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep it private from family"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "家族に見られないように"
+          }
+        }
+      }
+    },
     "届いた共感も一緒に消えて、もとに戻せません。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1378,6 +1531,23 @@
         }
       }
     },
+    "設定して次へ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up and continue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定して次へ"
+          }
+        }
+      }
+    },
     "読み込めませんでした。下に引っぱると、もう一度読み込みます。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1544,6 +1714,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "郵便番号"
+          }
+        }
+      }
+    },
+    "開くときに、ロックをかけられます。あとから設定でも変えられます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can lock the app when opening it. You can change this later in Settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開くときに、ロックをかけられます。あとから設定でも変えられます。"
           }
         }
       }

@@ -13,20 +13,26 @@ final class AppDependencies {
     let posts: any PostRepository
     let reports: any ReportRepository
     let drafts: any ComposeDraftStore
+    let appLock: any AppLockAuthenticating
+    let lockSettings: AppLockSettings
 
     init(
         identity: any AnonymousIDStore,
         posts: any PostRepository,
         reports: any ReportRepository,
-        drafts: any ComposeDraftStore
+        drafts: any ComposeDraftStore,
+        appLock: any AppLockAuthenticating,
+        lockSettings: AppLockSettings
     ) {
         self.identity = identity
         self.posts = posts
         self.reports = reports
         self.drafts = drafts
+        self.appLock = appLock
+        self.lockSettings = lockSettings
     }
 
-    /// ふだんの起動。匿名 ID は Keychain に、下書きは UserDefaults に保存する
+    /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する
     static func local() -> AppDependencies {
         let identity = KeychainAnonymousIDStore()
         let repository = InMemoryPostRepository(identity: identity)
@@ -34,7 +40,9 @@ final class AppDependencies {
             identity: identity,
             posts: repository,
             reports: repository,
-            drafts: UserDefaultsComposeDraftStore()
+            drafts: UserDefaultsComposeDraftStore(),
+            appLock: LocalAuthenticationAppLock(),
+            lockSettings: AppLockSettings()
         )
     }
 
@@ -46,7 +54,10 @@ final class AppDependencies {
             identity: identity,
             posts: repository,
             reports: repository,
-            drafts: InMemoryComposeDraftStore()
+            drafts: InMemoryComposeDraftStore(),
+            appLock: StubAppLockAuthenticator(),
+            // 撮影モードの設定は、ふだんの設定と混ぜない
+            lockSettings: AppLockSettings(defaults: UserDefaults(suiteName: "screenshot-demo") ?? .standard)
         )
     }
 }
