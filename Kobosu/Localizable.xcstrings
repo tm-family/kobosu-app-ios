@@ -290,6 +290,23 @@
         }
       }
     },
+    "「手伝おうか」って言われるたびにモヤっとする。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every time I hear “Want me to help?”, something in me sinks."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「手伝おうか」って言われるたびにモヤっとする。"
+          }
+        }
+      }
+    },
     "あとで設定する" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -456,6 +473,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お問い合わせ"
+          }
+        }
+      }
+    },
+    "お義母さんからの電話、今日で 3 回目。鳴るたびに体がこわばる。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The third call from my mother-in-law today. I tense up every time it rings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お義母さんからの電話、今日で 3 回目。鳴るたびに体がこわばる。"
           }
         }
       }
@@ -936,6 +970,23 @@
         }
       }
     },
+    "ほんとは「ありがとう」って、ひとこと言ってほしかっただけ。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All I really wanted was a simple “thank you.”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほんとは「ありがとう」って、ひとこと言ってほしかっただけ。"
+          }
+        }
+      }
+    },
     "やさしさの約束" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1378,6 +1429,23 @@
         }
       }
     },
+    "今日も黙って洗い物をした。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I did the dishes in silence again today."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日も黙って洗い物をした。"
+          }
+        }
+      }
+    },
     "介護" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1786,6 +1854,23 @@
         }
       }
     },
+    "寝かしつけに 2 時間。気づいたら自分の夕飯を食べそびれていた。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two hours to get the kids to sleep. Then I noticed I'd missed my own dinner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "寝かしつけに 2 時間。気づいたら自分の夕飯を食べそびれていた。"
+          }
+        }
+      }
+    },
     "届いた共感も一緒に消えて、もとに戻せません。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1799,6 +1884,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "届いた共感も一緒に消えて、もとに戻せません。"
+          }
+        }
+      }
+    },
+    "帰省のたびに「まだなの？」と聞かれる。笑ってかわすのにもう疲れた。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every visit home, it's “Not yet?” again. I'm tired of laughing it off."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "帰省のたびに「まだなの？」と聞かれる。笑ってかわすのにもう疲れた。"
           }
         }
       }
@@ -2326,6 +2428,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通報・表示しない"
+          }
+        }
+      }
+    },
+    "通院の付き添いで仕事を早退。誰にも言えないけど、正直しんどい。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left work early to take them to the hospital. I can't tell anyone, but honestly, it's hard."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通院の付き添いで仕事を早退。誰にも言えないけど、正直しんどい。"
           }
         }
       }
