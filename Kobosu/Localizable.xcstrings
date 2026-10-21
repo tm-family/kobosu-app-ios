@@ -35,6 +35,40 @@
         }
       }
     },
+    "%@「%@」を伏せる" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mask %1$@ “%2$@”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@「%@」を伏せる"
+          }
+        }
+      }
+    },
+    "%@を見つけました。伏せ字にすれば、このまま投稿できます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Found %@. Mask them and you can post as is."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@を見つけました。伏せ字にすれば、このまま投稿できます。"
+          }
+        }
+      }
+    },
     "%lld 文字までにすると、投稿できます" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -409,6 +443,23 @@
         }
       }
     },
+    "この内容で投稿する" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post this"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この内容で投稿する"
+          }
+        }
+      }
+    },
     "この投稿について" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -732,6 +783,23 @@
         }
       }
     },
+    "オフにした言葉は、そのまま投稿されます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words you turn off are posted as they are"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフにした言葉は、そのまま投稿されます"
+          }
+        }
+      }
+    },
     "カテゴリ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -983,6 +1051,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "仕事と家庭"
+          }
+        }
+      }
+    },
+    "伏せる言葉" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Words to mask"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伏せる言葉"
+          }
+        }
+      }
+    },
+    "伏せ字にすると %lld 文字をこえます。書き直すと投稿できます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masking makes it longer than %lld characters. Rewrite it to post"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伏せ字にすると %lld 文字をこえます。書き直すと投稿できます"
+          }
+        }
+      }
+    },
+    "伏せ字の確認" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check before posting"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伏せ字の確認"
+          }
+        }
+      }
+    },
+    "伏せ字プレビュー" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masked preview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伏せ字プレビュー"
           }
         }
       }
@@ -1514,6 +1650,23 @@
         }
       }
     },
+    "自分で書き直す" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rewrite it myself"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自分で書き直す"
+          }
+        }
+      }
+    },
     "自分の気持ちを主語にして書く" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1578,6 +1731,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "誰かを強く攻撃している"
+          }
+        }
+      }
+    },
+    "身バレにつながる言葉があります" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some words could identify you"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "身バレにつながる言葉があります"
           }
         }
       }

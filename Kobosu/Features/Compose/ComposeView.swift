@@ -7,6 +7,7 @@
 //  ナビゲーションバーは左が取り消し・中央がタイトル・右が投稿（COMPONENTS 3/3）。
 //  書いている途中の本文とカテゴリは端末に下書きとして残し、キャンセルや引いて閉じても続きから書ける。
 //  公開範囲は今回「みんなに共有」だけ、消える期間は 24 時間だけなので、選ぶ UI は出さない。
+//  「投稿」を押すと伏せ字の候補を探し、見つかったら伏せ字の確認（MaskingReviewView）に進む。
 //
 
 import SwiftUI
@@ -72,6 +73,11 @@ struct ComposeView: View {
             }
             // 送っている途中は閉じさせない（送れたかどうか分からなくなるため）
             .interactiveDismissDisabled(model.isBusy)
+            .navigationDestination(isPresented: isReviewing) {
+                MaskingReviewView(model: model) { post in
+                    finish(post)
+                }
+            }
             .onChange(of: model.body) {
                 model.saveDraft()
             }
@@ -134,10 +140,25 @@ struct ComposeView: View {
             .foregroundStyle(Palette.caution)
     }
 
+    /// 伏せ字の確認を出しているか。戻る（自分で書き直す）と確認を閉じる
+    private var isReviewing: Binding<Bool> {
+        Binding {
+            model.review != nil
+        } set: { isPresented in
+            if !isPresented {
+                model.review = nil
+            }
+        }
+    }
+
     private func submit() async {
         guard let post = await model.submit() else {
             return
         }
+        finish(post)
+    }
+
+    private func finish(_ post: Post) {
         onPosted(post)
         dismiss()
     }
