@@ -47,11 +47,13 @@ final class KobosuUITests: XCTestCase {
     @MainActor
     func testOnboardingRequiresAgreement() throws {
         let app = XCUIApplication()
-        // 初回の画面を出す（UserDefaults の引数で、同意していない状態にする）
-        app.launchArguments += ["-onboarding.agreedPromiseVersion", "0"]
+        // 初回の画面を出す（同意していない状態にしてから起動する）
+        app.launchArguments += ["-uitest-reset-onboarding"]
         app.launch()
 
-        app.buttons["onboarding.start"].tap()
+        let start = app.buttons["onboarding.start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5))
+        start.tap()
         let agree = app.buttons["onboarding.agree"]
         XCTAssertTrue(agree.waitForExistence(timeout: 5))
         XCTAssertFalse(agree.isEnabled)
@@ -65,7 +67,7 @@ final class KobosuUITests: XCTestCase {
     @MainActor
     private static func launchAfterOnboarding() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += ["-onboarding.agreedPromiseVersion", "1"]
+        app.launchArguments += ["-uitest-skip-onboarding"]
         app.launch()
         return app
     }

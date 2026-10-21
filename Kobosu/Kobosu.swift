@@ -13,6 +13,7 @@ struct Kobosu: App {
     @State private var dependencies = ScreenshotDemo.isEnabled ? AppDependencies.demo() : AppDependencies.local()
 
     init() {
+        OnboardingStatus.applyLaunchArguments(ProcessInfo.processInfo.arguments, to: .standard)
         NavigationBarAppearance.apply()
     }
 

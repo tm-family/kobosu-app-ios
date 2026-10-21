@@ -11,15 +11,15 @@ import SwiftUI
 struct RootView: View {
     let dependencies: AppDependencies
 
-    @AppStorage("onboarding.agreedPromiseVersion") private var agreedPromiseVersion = 0
+    @AppStorage(OnboardingStatus.agreedVersionKey) private var agreedPromiseVersion = 0
 
     var body: some View {
-        if ScreenshotDemo.isEnabled || agreedPromiseVersion >= PromiseRule.currentVersion {
-            MainTabView(dependencies: dependencies)
-        } else {
+        if OnboardingStatus.needsOnboarding(agreedVersion: agreedPromiseVersion, isScreenshotDemo: ScreenshotDemo.isEnabled) {
             OnboardingView {
                 agreedPromiseVersion = PromiseRule.currentVersion
             }
+        } else {
+            MainTabView(dependencies: dependencies)
         }
     }
 }
