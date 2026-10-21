@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "%@、%lld人" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld people"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@、%lld人"
+          }
+        }
+      }
+    },
     "%lld 文字中 %lld 文字" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -35,6 +52,23 @@
         }
       }
     },
+    "あなたを含む%lld人が「うちも同じ」" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld people, including you, said “Same here”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたを含む%lld人が「うちも同じ」"
+          }
+        }
+      }
+    },
     "いま、どんな気持ち？" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -48,6 +82,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "いま、どんな気持ち？"
+          }
+        }
+      }
+    },
+    "いまは、ここに投稿がありません。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No posts here right now."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いまは、ここに投稿がありません。"
           }
         }
       }
@@ -167,6 +218,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "しんどいね"
+          }
+        }
+      }
+    },
+    "すべて" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて"
           }
         }
       }
@@ -303,6 +371,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "人の名前"
+          }
+        }
+      }
+    },
+    "今日も、おつかれさま。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You did well today, too."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日も、おつかれさま。"
           }
         }
       }
@@ -477,6 +562,40 @@
         }
       }
     },
+    "残り %lld分" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min left"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残り %lld分"
+          }
+        }
+      }
+    },
+    "残り %lld時間" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld h left"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残り %lld時間"
+          }
+        }
+      }
+    },
     "気持ちを書く画面を開きます" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -524,6 +643,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "義理の親"
+          }
+        }
+      }
+    },
+    "読み込めませんでした。下に引っぱると、もう一度読み込みます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t load. Pull down to try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込めませんでした。下に引っぱると、もう一度読み込みます。"
           }
         }
       }
