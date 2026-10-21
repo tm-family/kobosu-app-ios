@@ -10,6 +10,10 @@
 //
 //  TTL は親の文書を消してもサブコレクションを消さないので、通報にも投稿と同じ expireAt を置き、TTL で一緒に消えるようにする。
 //
+//  運営は Firebase コンソールの Firestore で確かめる（通知や Cloud Functions は使わない）。posts を reportCount で絞り込み、
+//  ReportPolicy.autoHideThreshold 以上のものが自動で非表示になった投稿。理由はその下の reports を見る。
+//  どちらも expireAt を過ぎると TTL で消えるので、確かめられるのは投稿が残っている間だけ（手順書はタスク 23 で書く）
+//
 
 import Foundation
 
