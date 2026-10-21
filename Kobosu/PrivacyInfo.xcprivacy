@@ -26,7 +26,7 @@
 				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
 			</array>
 		</dict>
-		<!-- Firebase 匿名認証の uid（端末ごとの匿名 ID。名前・メールアドレスなどは集めない） -->
+		<!-- Firebase 匿名アカウントの uid（端末ごとの匿名 ID。すべてのデータを削除で破棄する。名前・メールアドレスなどは集めない） -->
 		<dict>
 			<key>NSPrivacyCollectedDataType</key>
 			<string>NSPrivacyCollectedDataTypeUserID</string>
