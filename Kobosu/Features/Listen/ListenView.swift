@@ -10,11 +10,15 @@
 import SwiftUI
 
 struct ListenView: View {
+    /// 変わると読み直す（投稿した後など）
+    let reloadID: Int
+
     @State private var model: TimelineViewModel
     /// 共感を送るシートで開いている投稿
     @State private var selectedPost: Post?
 
-    init(repository: any PostRepository) {
+    init(repository: any PostRepository, reloadID: Int = 0) {
+        self.reloadID = reloadID
         _model = State(initialValue: TimelineViewModel(repository: repository))
     }
 
@@ -35,7 +39,7 @@ struct ListenView: View {
             .refreshable {
                 await model.load()
             }
-            .task {
+            .task(id: reloadID) {
                 await model.load()
             }
             .sheet(item: $selectedPost) { post in

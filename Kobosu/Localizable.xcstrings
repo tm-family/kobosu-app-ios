@@ -35,6 +35,23 @@
         }
       }
     },
+    "%lld 文字までにすると、投稿できます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep it to %lld characters to post"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 文字までにすると、投稿できます"
+          }
+        }
+      }
+    },
     "%lld 文字をこえています。いまは %lld 文字" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -65,6 +82,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 文字中 %lld 文字"
+          }
+        }
+      }
+    },
+    "24時間たつと、自動で消えます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It disappears automatically after 24 hours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24時間たつと、自動で消えます"
           }
         }
       }
@@ -460,6 +494,40 @@
         }
       }
     },
+    "カテゴリ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリ"
+          }
+        }
+      }
+    },
+    "カテゴリを 1 つえらぶと、投稿できます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose one category to post"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを 1 つえらぶと、投稿できます"
+          }
+        }
+      }
+    },
     "キャンセル" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -817,6 +885,40 @@
         }
       }
     },
+    "投稿" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投稿"
+          }
+        }
+      }
+    },
+    "投稿できませんでした。時間をおいて、もう一度ためせます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't post. You can try again in a little while."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投稿できませんでした。時間をおいて、もう一度ためせます。"
+          }
+        }
+      }
+    },
     "投稿は24時間で消える" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -902,6 +1004,23 @@
         }
       }
     },
+    "消えるまで" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disappears in"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消えるまで"
+          }
+        }
+      }
+    },
     "特定の人が分かる情報がある" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -932,6 +1051,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "相手が特定できることは書かない"
+          }
+        }
+      }
+    },
+    "相手より「自分の気持ち」を書くと届きやすいよ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Writing about your own feelings, rather than the other person, helps your words land"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相手より「自分の気持ち」を書くと届きやすいよ"
           }
         }
       }

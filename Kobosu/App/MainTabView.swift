@@ -18,10 +18,12 @@ struct MainTabView: View {
 
     @State private var selection: MainTab = .listen
     @State private var isComposing = false
+    /// 投稿した回数。変わるとタイムラインを読み直す
+    @State private var postedCount = 0
 
     var body: some View {
         TabView(selection: $selection) {
-            ListenView(repository: dependencies.posts)
+            ListenView(repository: dependencies.posts, reloadID: postedCount)
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.listen)
             NoteView()
@@ -34,7 +36,10 @@ struct MainTabView: View {
             }
         }
         .sheet(isPresented: $isComposing) {
-            ComposeView()
+            ComposeView(repository: dependencies.posts, drafts: dependencies.drafts) { _ in
+                postedCount += 1
+                selection = .listen
+            }
         }
     }
 }
