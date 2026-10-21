@@ -131,6 +131,27 @@ struct InMemoryPostRepositoryTests {
         #expect(try await repository.sentStamps(for: "a") == [.sameHere, .understand])
     }
 
+    /// まとめて読むときは、送った投稿だけを返し、消えた投稿は外す
+    @Test
+    func sentStampsForManyPostsSkipsUnsentAndMissing() async throws {
+        let repository = makeRepository()
+        repository.seed(otherPost(id: "a"))
+        repository.seed(otherPost(id: "b"))
+        try await repository.sendStamp(.sameHere, to: "a")
+        try await repository.sendStamp(.wellDone, to: "a")
+        #expect(try await repository.sentStamps(for: ["a", "b", "missing"]) == ["a": [.sameHere, .wellDone]])
+    }
+
+    @Test
+    func myPostIDsContainsOnlyMyActivePosts() async throws {
+        let repository = makeRepository()
+        repository.seed(otherPost(id: "other"))
+        let mine = try await repository.submit(body: "自分の投稿", category: .partner)
+        #expect(try await repository.myPostIDs() == [mine.id])
+        clock.advance(hours: 24)
+        #expect(try await repository.myPostIDs().isEmpty)
+    }
+
     @Test
     func cannotSendStampToOwnOrExpiredPost() async throws {
         let repository = makeRepository()

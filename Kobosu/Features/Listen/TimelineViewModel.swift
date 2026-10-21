@@ -50,12 +50,9 @@ final class TimelineViewModel {
         }
         do {
             let posts = try await repository.timeline(category: category)
-            let myPostIDs = Set(try await repository.myPosts().map(\.id))
-            var sentStamps: [Post.ID: Set<EmpathyStamp>] = [:]
-            for post in posts {
-                // 読み込みのあいだに消えた投稿があっても、一覧は出す
-                sentStamps[post.id] = (try? await repository.sentStamps(for: post.id)) ?? []
-            }
+            let myPostIDs = try await repository.myPostIDs()
+            // 送ったスタンプを読めなくても、一覧は出す
+            let sentStamps = (try? await repository.sentStamps(for: posts.map(\.id))) ?? [:]
             guard loadID == latestLoad else {
                 return
             }
