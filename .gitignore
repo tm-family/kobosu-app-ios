@@ -106,3 +106,6 @@ private_keys/
 # （ralph-loop の制御用 worktree に残ると、起動スクリプトが worktree を片付けられない）
 *.profraw
 *.profdata
+
+# Firebase の設定ファイル。リポジトリには入れず、配信のビルドでは Secret の GOOGLE_SERVICE_INFO_PLIST_BASE64 から書き出す
+Kobosu/GoogleService-Info.plist
