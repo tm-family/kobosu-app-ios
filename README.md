@@ -102,8 +102,11 @@ Archive / Upload ワークフローは App Store Connect API Key で認証しま
 | `APPLE_API_KEY_BASE64` | App Store Connect の API Key（`AuthKey_XXXXXXXXXX.p8`）を `base64 -i AuthKey_XXXXXXXXXX.p8` でエンコードした文字列 |
 | `APPLE_API_KEY_ID` | API Key の Key ID |
 | `APPLE_API_ISSUER_ID` | API Key の Issuer ID |
+| `GOOGLE_SERVICE_INFO_PLIST_BASE64` | Firebase コンソールからダウンロードした `GoogleService-Info.plist` を `base64 -i GoogleService-Info.plist` でエンコードした文字列。Archive / Upload のときに `Kobosu/GoogleService-Info.plist` に書き出してアプリに同梱します。登録しなければ Firebase につながない（ローカルの実装で動く）ビルドになります |
 
 API Key は App Store Connect の「ユーザとアクセス → 統合 → App Store Connect API」で、App Manager 以上の権限で発行します。
+
+`GoogleService-Info.plist` はリポジトリに入れません（`.gitignore` に入っています）。手元で Firebase につないで動かすときは、`Kobosu/GoogleService-Info.plist` に置いてビルドします。テスト（Build ワークフロー）は Firebase につながないので、この Secret を使いません。
 ### 5. App Store Connect にアプリを作成する
 
 Bundle ID・証明書・プロビジョニングプロファイルは、Export のときに API Key で自動的に作成されます（`-allowProvisioningUpdates`）。
