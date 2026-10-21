@@ -52,12 +52,13 @@ final class ScreenshotSceneUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.note"].isSelected)
     }
 
-    /// ようこそ: 初回の画面が開き、ロック画面は出ない
+    /// ようこそ: 初回の画面が開き、タブの画面は出ない（違う画面が写っていたら落ちる）
     @MainActor
     func testWelcomeScene() throws {
         let app = UITestApp.launchScreenshotScene("welcome")
 
         XCTAssertTrue(app.buttons["onboarding.start"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["lock.unlock"].exists)
+        XCTAssertFalse(app.buttons["tab.listen"].exists)
+        XCTAssertFalse(app.buttons["tab.compose"].exists)
     }
 }
