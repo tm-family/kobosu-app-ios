@@ -17,9 +17,9 @@ struct ListenView: View {
     /// 共感を送るシートで開いている投稿
     @State private var selectedPost: Post?
 
-    init(repository: any PostRepository, reloadID: Int = 0) {
+    init(repository: any PostRepository, reports: any ReportRepository, reloadID: Int = 0) {
         self.reloadID = reloadID
-        _model = State(initialValue: TimelineViewModel(repository: repository))
+        _model = State(initialValue: TimelineViewModel(repository: repository, reports: reports))
     }
 
     var body: some View {
@@ -117,9 +117,11 @@ struct ListenView: View {
 }
 
 #Preview {
-    ListenView(repository: InMemoryPostRepository.preview())
+    let repository = InMemoryPostRepository.preview()
+    ListenView(repository: repository, reports: repository)
 }
 
 #Preview("投稿なし") {
-    ListenView(repository: InMemoryPostRepository())
+    let repository = InMemoryPostRepository()
+    ListenView(repository: repository, reports: repository)
 }

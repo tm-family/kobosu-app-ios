@@ -171,6 +171,16 @@ struct InMemoryPostRepositoryTests {
         #expect(try await repository.timeline(category: nil).isEmpty)
     }
 
+    /// 自分の投稿は通報できない
+    @Test
+    func cannotReportOwnPost() async throws {
+        let repository = makeRepository()
+        let post = try await repository.submit(body: "本文", category: .money)
+        await #expect(throws: PostRepositoryError.ownPost) {
+            try await repository.report(postID: post.id, reason: .spam)
+        }
+    }
+
     @Test
     func hiddenPostIsExcludedFromTimeline() async throws {
         let repository = makeRepository()

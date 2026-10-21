@@ -10,8 +10,9 @@ import Testing
 struct TimelineViewModelTests {
     private let now = Date(timeIntervalSince1970: 1_000_000)
 
-    private func makeRepository() -> InMemoryPostRepository {
-        let repository = InMemoryPostRepository(identity: InMemoryAnonymousIDStore(id: "me"), now: { [now] in now })
+    private func makeRepository(clock: TestClock? = nil) -> InMemoryPostRepository {
+        let now = now
+        let repository = InMemoryPostRepository(identity: InMemoryAnonymousIDStore(id: "me"), now: { clock?.now ?? now })
         repository.seed(Post(id: "in-laws", body: "本文", category: .inLaws, createdAt: now.addingTimeInterval(-3 * 60 * 60)))
         repository.seed(Post(id: "money", body: "本文", category: .money, createdAt: now.addingTimeInterval(-2 * 60 * 60)))
         repository.seed(Post(id: "soon", body: "本文", category: .inLaws, createdAt: now.addingTimeInterval(-23.9 * 60 * 60)))
@@ -61,7 +62,7 @@ struct TimelineViewModelTests {
     @Test
     func selectingSameCategoryDoesNotReload() async {
         let repository = CountingPostRepository()
-        let model = TimelineViewModel(repository: repository)
+        let model = TimelineViewModel(repository: repository, reports: InMemoryPostRepository())
         await model.select(.money)
         await model.select(.money)
         #expect(repository.timelineCalls == 1)
@@ -71,7 +72,7 @@ struct TimelineViewModelTests {
     @Test
     func failedRefreshKeepsPosts() async {
         let repository = CountingPostRepository()
-        let model = TimelineViewModel(repository: repository)
+        let model = TimelineViewModel(repository: repository, reports: InMemoryPostRepository())
         await model.load()
         #expect(model.posts.count == 1)
         repository.fails = true
@@ -85,7 +86,7 @@ struct TimelineViewModelTests {
     func cancelledLoadIsNotFailure() async {
         let repository = CountingPostRepository()
         repository.error = CancellationError()
-        let model = TimelineViewModel(repository: repository)
+        let model = TimelineViewModel(repository: repository, reports: InMemoryPostRepository())
         await model.load()
         #expect(model.state == .idle)
     }
@@ -120,10 +121,72 @@ struct TimelineViewModelTests {
 
     @Test
     func failedLoadShowsFailure() async {
-        let model = TimelineViewModel(repository: FailingPostRepository())
+        let model = TimelineViewModel(repository: FailingPostRepository(), reports: InMemoryPostRepository())
         await model.load()
         #expect(model.state == .failed)
         #expect(model.posts.isEmpty)
+    }
+
+    // MARK: - 通報・表示しない
+
+    /// 「この投稿を表示しない」にした投稿は一覧から外し、読み直しても出さない
+    @Test
+    func hideRemovesPost() async throws {
+        let model = TimelineViewModel(repository: makeRepository())
+        await model.load()
+        let post = try #require(model.posts.first { $0.id == "money" })
+        try await model.hide(post)
+        #expect(model.posts.map(\.id) == ["in-laws", "soon"])
+        await model.load()
+        #expect(model.posts.map(\.id) == ["in-laws", "soon"])
+    }
+
+    /// 通報した投稿も、この端末のタイムラインにはもう出さない
+    @Test
+    func reportRemovesPost() async throws {
+        let model = TimelineViewModel(repository: makeRepository())
+        await model.load()
+        let post = try #require(model.posts.first { $0.id == "in-laws" })
+        try await model.report(post, reason: .harassment)
+        #expect(model.posts.map(\.id) == ["money", "soon"])
+        await model.load()
+        #expect(model.posts.map(\.id) == ["money", "soon"])
+    }
+
+    /// 読み込んだ後に期限を過ぎて消えた投稿を通報したら、失敗にせず一覧から外す
+    @Test
+    func reportOfMissingPostRemovesIt() async throws {
+        let clock = TestClock(now: now)
+        let model = TimelineViewModel(repository: makeRepository(clock: clock))
+        await model.load()
+        let post = try #require(model.posts.first { $0.id == "soon" })
+        clock.now = now.addingTimeInterval(60 * 60)
+        try await model.report(post, reason: .spam)
+        #expect(model.posts.map(\.id) == ["money", "in-laws"])
+    }
+
+    /// 読み込んだ後に消えた投稿に共感を送ろうとしたら、一覧からも外す
+    @Test
+    func sendToMissingPostRemovesIt() async throws {
+        let clock = TestClock(now: now)
+        let model = TimelineViewModel(repository: makeRepository(clock: clock))
+        await model.load()
+        let post = try #require(model.posts.first { $0.id == "soon" })
+        clock.now = now.addingTimeInterval(60 * 60)
+        await #expect(throws: PostRepositoryError.postNotFound) {
+            try await model.send(.understand, to: post)
+        }
+        #expect(model.posts.map(\.id) == ["money", "in-laws"])
+        #expect(model.sentStamps(for: post).isEmpty)
+    }
+
+    /// テストで進められる時計
+    private final class TestClock {
+        var now: Date
+
+        init(now: Date) {
+            self.now = now
+        }
     }
 }
 

@@ -30,7 +30,7 @@ protocol PostRepository: AnyObject {
 }
 
 protocol ReportRepository: AnyObject {
-    /// 通報する。同じ投稿への通報は 1 人 1 回まで（2 回目は何もしない）。通報は匿名で、投稿者には伝わらない
+    /// 通報する。同じ投稿への通報は 1 人 1 回まで（2 回目は何もしない）。通報は匿名で、投稿者には伝わらない。自分の投稿は通報できない
     func report(postID: Post.ID, reason: ReportReason) async throws
 
     /// 「この投稿を表示しない」。この端末のタイムラインにだけ効く
@@ -46,7 +46,7 @@ enum PostRepositoryError: Error, Equatable {
     case postNotFound
     /// 自分の投稿ではないので消せない
     case notOwner
-    /// 自分の投稿には共感を送れない
+    /// 自分の投稿には共感を送れない・通報できない
     case ownPost
 }
 

@@ -2,7 +2,7 @@
 //  TimelineViewModel.swift
 //  Kobosu
 //
-//  タイムラインの読み込みとカテゴリの絞り込み。
+//  タイムラインの読み込みとカテゴリの絞り込み。共感の送信と、通報・「この投稿を表示しない」。
 //
 
 import Foundation
@@ -27,11 +27,18 @@ final class TimelineViewModel {
     private(set) var state = LoadState.idle
 
     private let repository: any PostRepository
+    private let reports: any ReportRepository
     /// 最後に始めた読み込み。絞り込みを続けて切り替えたとき、古い読み込みの結果で上書きしないため
     private var latestLoad = 0
 
-    init(repository: any PostRepository) {
+    init(repository: any PostRepository, reports: any ReportRepository) {
         self.repository = repository
+        self.reports = reports
+    }
+
+    /// 投稿と通報を同じ Repository が受け持つとき（インメモリ実装など）
+    convenience init(repository: some PostRepository & ReportRepository) {
+        self.init(repository: repository, reports: repository)
     }
 
     func load() async {
@@ -98,11 +105,40 @@ final class TimelineViewModel {
         guard !sentStamps(for: post).contains(stamp) else {
             return
         }
-        try await repository.sendStamp(stamp, to: post.id)
+        do {
+            try await repository.sendStamp(stamp, to: post.id)
+        } catch PostRepositoryError.postNotFound {
+            // 消えた（期限切れ・投稿者が消した）投稿は、一覧からも外す
+            remove(post)
+            throw PostRepositoryError.postNotFound
+        }
         sentStamps[post.id, default: []].insert(stamp)
         if let index = posts.firstIndex(where: { $0.id == post.id }) {
             posts[index].stampCounts[stamp, default: 0] += 1
         }
+    }
+
+    /// 通報する。通報した投稿は、この端末のタイムラインにはもう出さない。送れなかったら throw する
+    func report(_ post: Post, reason: ReportReason) async throws {
+        do {
+            try await reports.report(postID: post.id, reason: reason)
+        } catch PostRepositoryError.postNotFound {
+            // もう消えている投稿は、通報しなくても出なくなる
+            remove(post)
+            return
+        }
+        try await hide(post)
+    }
+
+    /// 「この投稿を表示しない」。この端末のタイムラインにだけ効く。できなかったら throw する
+    func hide(_ post: Post) async throws {
+        try await reports.hide(postID: post.id)
+        remove(post)
+    }
+
+    private func remove(_ post: Post) {
+        posts.removeAll { $0.id == post.id }
+        sentStamps[post.id] = nil
     }
 
     /// 一覧の中の最新の投稿（シートで人数を出すため）
