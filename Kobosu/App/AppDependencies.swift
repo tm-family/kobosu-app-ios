@@ -3,7 +3,7 @@
 //  Kobosu
 //
 //  アプリ全体で使う Repository などをまとめて作り、画面に渡す。
-//  いまはインメモリ実装で動かし、Firebase の実装ができたら local() の中身を差し替える。
+//  Firebase を設定したときは firebase()、GoogleService-Info.plist が無いときは local()（インメモリ）で動かす。
 //
 
 import Foundation
@@ -40,6 +40,20 @@ final class AppDependencies {
             identity: identity,
             posts: repository,
             reports: repository,
+            drafts: UserDefaultsComposeDraftStore(),
+            appLock: LocalAuthenticationAppLock(),
+            lockSettings: AppLockSettings()
+        )
+    }
+
+    /// Firebase を設定したとき。投稿とタイムラインは Firestore で読み書きし、匿名認証の uid を Keychain の匿名 ID として控える。
+    /// 通報・「この投稿を表示しない」は、タスク 21 までは「まだ使えない」を返す
+    static func firebase() -> AppDependencies {
+        let identity = KeychainAnonymousIDStore()
+        return AppDependencies(
+            identity: identity,
+            posts: FirestorePostRepository(identity: identity),
+            reports: FirestoreReportRepository(),
             drafts: UserDefaultsComposeDraftStore(),
             appLock: LocalAuthenticationAppLock(),
             lockSettings: AppLockSettings()

@@ -40,6 +40,24 @@ final class KeychainAnonymousIDStore: AnonymousIDStore {
         }
     }
 
+    /// 項目があれば中身だけを書き換える（消してから作り直すと、途中で失敗したときに ID が無くなる）。
+    /// 項目が壊れていても書き直す（控えの ID なので、正しい値で上書きしてよい）
+    func replaceID(with id: String) throws {
+        if (try? readID()) == id {
+            return
+        }
+        let attributes = [kSecValueData as String: Data(id.utf8)]
+        let status = SecItemUpdate(baseQuery as CFDictionary, attributes as CFDictionary)
+        switch status {
+        case errSecSuccess:
+            return
+        case errSecItemNotFound:
+            try save(id)
+        default:
+            throw KeychainError.unexpectedStatus(status)
+        }
+    }
+
     private var baseQuery: [String: Any] {
         [
             kSecClass as String: kSecClassGenericPassword,

@@ -13,6 +13,8 @@ protocol AnonymousIDStore: AnyObject {
     func currentID() throws -> String
     /// 匿名 ID を破棄する（「すべてのデータを削除」）。次の currentID() では新しい ID になる
     func deleteID() throws
+    /// 匿名 ID を置き換える。Firebase につなぐときは、匿名認証の uid を匿名 ID として控える
+    func replaceID(with id: String) throws
 }
 
 /// テスト・Preview・撮影モード用。メモリ上にだけ持つ
@@ -36,5 +38,9 @@ final class InMemoryAnonymousIDStore: AnonymousIDStore {
 
     func deleteID() {
         id = nil
+    }
+
+    func replaceID(with id: String) {
+        self.id = id
     }
 }

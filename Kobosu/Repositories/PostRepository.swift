@@ -50,6 +50,20 @@ enum PostRepositoryError: Error, Equatable {
     case ownPost
 }
 
+extension Post {
+    /// 投稿する本文。前後の空白を除き、空や Post.maxBodyLength 文字を超えるものは投げる
+    static func validatedBody(_ body: String) throws -> String {
+        let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw PostRepositoryError.emptyBody
+        }
+        guard trimmed.count <= maxBodyLength else {
+            throw PostRepositoryError.bodyTooLong
+        }
+        return trimmed
+    }
+}
+
 /// 通報による自動の非表示
 enum ReportPolicy {
     /// この人数から通報されたら、タイムラインに出さない（運営の確認に回す）

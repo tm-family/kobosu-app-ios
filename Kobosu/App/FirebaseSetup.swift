@@ -7,6 +7,7 @@
 //
 
 import FirebaseCore
+import FirebaseFirestore
 import Foundation
 
 nonisolated enum FirebaseSetup {
@@ -51,6 +52,10 @@ nonisolated enum FirebaseSetup {
         }
         if FirebaseApp.app() == nil {
             FirebaseApp.configure()
+            // 他の人の投稿を端末のディスクに残さない（あとに残らない）。Firestore のキャッシュはメモリだけにする
+            let settings = Firestore.firestore().settings
+            settings.cacheSettings = MemoryCacheSettings()
+            Firestore.firestore().settings = settings
         }
         return true
     }

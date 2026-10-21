@@ -9,15 +9,23 @@ import SwiftUI
 
 @main
 struct Kobosu: App {
-    /// 撮影モードではデモデータで開く
-    @State private var dependencies = ScreenshotDemo.isEnabled ? AppDependencies.demo() : AppDependencies.local()
+    @State private var dependencies: AppDependencies
 
     init() {
         OnboardingStatus.applyLaunchArguments(ProcessInfo.processInfo.arguments, to: .standard)
         NavigationBarAppearance.apply()
-        // GoogleService-Info.plist があれば Firebase を設定する（無ければローカルの実装のまま動く）。
-        // Repository を Firestore の実装に差し替えるのはタスク 19
-        _ = FirebaseSetup.configureIfAvailable(isScreenshotDemo: ScreenshotDemo.isEnabled)
+        // GoogleService-Info.plist があれば Firebase を設定し、Firestore の実装で動かす（無ければローカルの実装）。
+        // 撮影モードではデモデータで開く
+        let usesFirebase = FirebaseSetup.configureIfAvailable(isScreenshotDemo: ScreenshotDemo.isEnabled)
+        let dependencies: AppDependencies
+        if ScreenshotDemo.isEnabled {
+            dependencies = .demo()
+        } else if usesFirebase {
+            dependencies = .firebase()
+        } else {
+            dependencies = .local()
+        }
+        _dependencies = State(initialValue: dependencies)
     }
 
     var body: some Scene {

@@ -59,13 +59,7 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
     }
 
     func submit(body: String, category: PostCategory) async throws -> Post {
-        let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            throw PostRepositoryError.emptyBody
-        }
-        guard trimmed.count <= Post.maxBodyLength else {
-            throw PostRepositoryError.bodyTooLong
-        }
+        let trimmed = try Post.validatedBody(body)
         let myID = try identity.currentID()
         let post = Post(id: makePostID(), body: trimmed, category: category, createdAt: now())
         records[post.id] = Record(post: post, authorID: myID)
