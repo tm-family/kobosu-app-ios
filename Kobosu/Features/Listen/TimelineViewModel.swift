@@ -52,11 +52,15 @@ final class TimelineViewModel {
             self.posts = posts
             self.sentStamps = sentStamps
             state = .loaded
+        } catch is CancellationError {
+            // 画面を離れて取り消されたときは、表示を変えない
+            return
         } catch {
             guard loadID == latestLoad else {
                 return
             }
-            state = .failed
+            // 表示中の一覧があるときは残す（引っぱって更新に失敗しても、読んでいた投稿を消さない）
+            state = posts.isEmpty ? .failed : .loaded
         }
     }
 
