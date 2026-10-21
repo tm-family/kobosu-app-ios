@@ -8,6 +8,7 @@
 //  書いている途中の本文とカテゴリは端末に下書きとして残し、キャンセルや引いて閉じても続きから書ける。
 //  公開範囲は今回「みんなに共有」だけ、消える期間は 24 時間だけなので、選ぶ UI は出さない。
 //  「投稿」を押すと伏せ字の候補を探し、見つかったら伏せ字の確認（MaskingReviewView）に進む。
+//  投稿できたら投稿完了（PostCompleteView）に切り替え、「きくに戻る」で閉じる・「続けてこぼす」で空の投稿画面に戻る。
 //
 
 import SwiftUI
@@ -18,6 +19,8 @@ struct ComposeView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var model: ComposeViewModel
+    /// 投稿できた投稿。あれば投稿完了の画面を出す
+    @State private var posted: Post?
 
     init(repository: any PostRepository, drafts: any ComposeDraftStore, onPosted: @escaping (Post) -> Void) {
         self.onPosted = onPosted
@@ -26,64 +29,76 @@ struct ComposeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        PostTextArea(text: $model.body, limit: Post.maxBodyLength, count: model.bodyLength)
-                            .disabled(model.isBusy)
-                        if model.isOverLimit {
-                            note("\(Post.maxBodyLength) 文字までにすると、投稿できます")
-                        }
-                        hint
-                    }
-                    categorySection
+            if let posted {
+                PostCompleteView(post: posted) {
+                    dismiss()
+                } onContinue: {
+                    self.posted = nil
+                }
+            } else {
+                editor
+            }
+        }
+    }
+
+    private var editor: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 12) {
+                    PostTextArea(text: $model.body, limit: Post.maxBodyLength, count: model.bodyLength)
                         .disabled(model.isBusy)
-                    lifetimeSection
-                    if model.state == .failed {
-                        note("投稿できませんでした。時間をおいて、もう一度ためせます。")
+                    if model.isOverLimit {
+                        note("\(Post.maxBodyLength) 文字までにすると、投稿できます")
                     }
+                    hint
                 }
-                .padding(16)
-            }
-            .scrollDismissesKeyboard(.interactively)
-            .background(Palette.paper)
-            .navigationTitle(Text("こぼす"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("キャンセル")
-                    }
-                    .foregroundStyle(Palette.inkSecondary)
+                categorySection
                     .disabled(model.isBusy)
-                    .accessibilityIdentifier("compose.cancel")
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        Task { await submit() }
-                    } label: {
-                        Text("投稿")
-                    }
-                    .buttonStyle(.kobosuPrimarySmall)
-                    .disabled(!model.canSubmit)
-                    .accessibilityIdentifier("compose.submit")
+                lifetimeSection
+                if model.state == .failed {
+                    note("投稿できませんでした。時間をおいて、もう一度ためせます。")
                 }
             }
-            // 送っている途中は閉じさせない（送れたかどうか分からなくなるため）
-            .interactiveDismissDisabled(model.isBusy)
-            .navigationDestination(isPresented: isReviewing) {
-                MaskingReviewView(model: model) { post in
-                    finish(post)
+            .padding(16)
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .background(Palette.paper)
+        .navigationTitle(Text("こぼす"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("キャンセル")
                 }
+                .foregroundStyle(Palette.inkSecondary)
+                .disabled(model.isBusy)
+                .accessibilityIdentifier("compose.cancel")
             }
-            .onChange(of: model.body) {
-                model.saveDraft()
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    Task { await submit() }
+                } label: {
+                    Text("投稿")
+                }
+                .buttonStyle(.kobosuPrimarySmall)
+                .disabled(!model.canSubmit)
+                .accessibilityIdentifier("compose.submit")
             }
-            .onChange(of: model.category) {
-                model.saveDraft()
+        }
+        // 送っている途中は閉じさせない（送れたかどうか分からなくなるため）
+        .interactiveDismissDisabled(model.isBusy)
+        .navigationDestination(isPresented: isReviewing) {
+            MaskingReviewView(model: model) { post in
+                finish(post)
             }
+        }
+        .onChange(of: model.body) {
+            model.saveDraft()
+        }
+        .onChange(of: model.category) {
+            model.saveDraft()
         }
     }
 
@@ -158,9 +173,10 @@ struct ComposeView: View {
         finish(post)
     }
 
+    /// 投稿できたら、投稿完了の画面に切り替える（タイムラインはこの時点で読み直す）
     private func finish(_ post: Post) {
         onPosted(post)
-        dismiss()
+        posted = post
     }
 }
 

@@ -54,7 +54,11 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(submit.isEnabled)
 
         submit.tap()
-        XCTAssertTrue(submit.waitForNonExistence(timeout: 5))
+        // 投稿完了の画面から、きくに戻る
+        let back = app.buttons["complete.back"]
+        XCTAssertTrue(back.waitForExistence(timeout: 5))
+        back.tap()
+        XCTAssertTrue(back.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
     }
 
@@ -78,7 +82,11 @@ final class KobosuUITests: XCTestCase {
         XCTAssertFalse(preview.label.contains("5678"))
 
         submit.tap()
-        XCTAssertTrue(submit.waitForNonExistence(timeout: 5))
+        // 投稿完了の画面から、きくに戻る
+        let back = app.buttons["complete.back"]
+        XCTAssertTrue(back.waitForExistence(timeout: 5))
+        back.tap()
+        XCTAssertTrue(back.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
     }
 

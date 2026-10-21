@@ -426,6 +426,23 @@
         }
       }
     },
+    "おつかれさま。24時間たつと、自動で消えます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're doing great. It disappears automatically after 24 hours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "おつかれさま。24時間たつと、自動で消えます。"
+          }
+        }
+      }
+    },
     "お金" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -456,6 +473,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "きく"
+          }
+        }
+      }
+    },
+    "きくに戻る" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to Listen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "きくに戻る"
           }
         }
       }
@@ -643,6 +677,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "こぼすを開くために、本人か確かめます"
+          }
+        }
+      }
+    },
+    "こぼせました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You let it out"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "こぼせました"
           }
         }
       }
@@ -1225,6 +1276,23 @@
         }
       }
     },
+    "共感が届いたら、ノートで見られます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When empathy arrives, you can see it in Notes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共感が届いたら、ノートで見られます"
+          }
+        }
+      }
+    },
     "共感を送る画面を開きます" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1701,6 +1769,23 @@
         }
       }
     },
+    "続けてこぼす" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let out another"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続けてこぼす"
+          }
+        }
+      }
+    },
     "義理の親" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1969,6 +2054,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "郵便番号"
+          }
+        }
+      }
+    },
+    "閉じる" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
           }
         }
       }
