@@ -222,6 +222,23 @@
         }
       }
     },
+    "ここを、安心できる場所にするために。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To keep this a safe place."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここを、安心できる場所にするために。"
+          }
+        }
+      }
+    },
     "こぼす" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -273,6 +290,23 @@
         }
       }
     },
+    "そっと、こぼしていい。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It’s okay to let it out, quietly."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "そっと、こぼしていい。"
+          }
+        }
+      }
+    },
     "そのほか" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -307,6 +341,57 @@
         }
       }
     },
+    "つらいときは、窓口も頼っていい" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When it’s hard, it’s okay to reach out for help"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "つらいときは、窓口も頼っていい"
+          }
+        }
+      }
+    },
+    "はじめる" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get started"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はじめる"
+          }
+        }
+      }
+    },
+    "やさしさの約束" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Our kindness promise"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やさしさの約束"
+          }
+        }
+      }
+    },
     "わかる" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -320,6 +405,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "わかる"
+          }
+        }
+      }
+    },
+    "アドバイスより、共感を返す" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offer empathy, not advice"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アドバイスより、共感を返す"
           }
         }
       }
@@ -494,6 +596,40 @@
         }
       }
     },
+    "同意してはじめる" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agree and start"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同意してはじめる"
+          }
+        }
+      }
+    },
+    "名前もフォロワーもない" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No names, no followers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前もフォロワーもない"
+          }
+        }
+      }
+    },
     "地名" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -596,6 +732,23 @@
         }
       }
     },
+    "投稿は24時間で消える" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posts disappear in 24 hours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投稿は24時間で消える"
+          }
+        }
+      }
+    },
     "残り %lld分" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -664,6 +817,40 @@
         }
       }
     },
+    "相手が特定できることは書かない" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don’t write anything that identifies others"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相手が特定できることは書かない"
+          }
+        }
+      }
+    },
+    "約束を守って使います" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I’ll keep this promise"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "約束を守って使います"
+          }
+        }
+      }
+    },
     "義理の親" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -677,6 +864,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "義理の親"
+          }
+        }
+      }
+    },
+    "義理の親のこと、家庭のこと。\n名前のない場所に、置いていこう。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your in-laws, your family.\nLeave it here, in a place with no names."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "義理の親のこと、家庭のこと。\n名前のない場所に、置いていこう。"
+          }
+        }
+      }
+    },
+    "自分の気持ちを主語にして書く" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write about your own feelings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自分の気持ちを主語にして書く"
           }
         }
       }
@@ -711,6 +932,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "誰かを強く攻撃している"
+          }
+        }
+      }
+    },
+    "返ってくるのは共感だけ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only empathy comes back"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "返ってくるのは共感だけ"
           }
         }
       }
