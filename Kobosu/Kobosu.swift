@@ -9,6 +9,10 @@ import SwiftUI
 
 @main
 struct Kobosu: App {
+    init() {
+        NavigationBarAppearance.apply()
+    }
+
     var body: some Scene {
         WindowGroup {
             rootView
@@ -19,7 +23,7 @@ struct Kobosu: App {
     @ViewBuilder private var rootView: some View {
         switch ScreenshotDemo.scene {
         case .home, nil:
-            ContentView()
+            MainTabView()
         }
     }
 }
