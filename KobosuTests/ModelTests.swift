@@ -98,7 +98,7 @@ struct ModelTests {
         #expect(try JSONDecoder().decode(Post.self, from: data) == post)
     }
 
-    private static let allTitles: [LocalizedStringResource] =
+    nonisolated private static let allTitles: [LocalizedStringResource] =
         PostCategory.allCases.map(\.title) + EmpathyStamp.allCases.map(\.title) + ReportReason.allCases.map(\.title)
 
     private static func localized(_ resource: LocalizedStringResource, language: String) -> String {
