@@ -67,7 +67,7 @@ private struct CheckboxToggleStyle: ToggleStyle {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: configuration.isOn ? "checkmark.square.fill" : "square")
-                    .font(.system(size: 22))
+                    .font(.title2)
                     .foregroundStyle(configuration.isOn ? Palette.accent : Palette.inkSecondary)
                     .accessibilityHidden(true)
                 configuration.label
@@ -76,7 +76,8 @@ private struct CheckboxToggleStyle: ToggleStyle {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(configuration.isOn ? .isSelected : [])
+        .accessibilityAddTraits(.isToggle)
+        .accessibilityValue(configuration.isOn ? Text("チェックあり") : Text("チェックなし"))
     }
 }
 

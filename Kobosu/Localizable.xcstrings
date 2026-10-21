@@ -443,6 +443,40 @@
         }
       }
     },
+    "チェックあり" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checked"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チェックあり"
+          }
+        }
+      }
+    },
+    "チェックなし" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not checked"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チェックなし"
+          }
+        }
+      }
+    },
     "ノート" : {
       "extractionState" : "manual",
       "localizations" : {

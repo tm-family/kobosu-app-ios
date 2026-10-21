@@ -28,6 +28,7 @@ struct WelcomeView: View {
                         Text("そっと、こぼしていい。")
                             .font(.kobosuTitle)
                             .foregroundStyle(Palette.ink)
+                            .accessibilityAddTraits(.isHeader)
                         Text("義理の親のこと、家庭のこと。\n名前のない場所に、置いていこう。")
                             .font(.kobosuBody)
                             .foregroundStyle(Palette.inkSecondary)
