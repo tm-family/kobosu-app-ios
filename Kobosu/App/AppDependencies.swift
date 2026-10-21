@@ -17,6 +17,8 @@ final class AppDependencies {
     let lockSettings: AppLockSettings
     /// 約束に同意した版などを置く UserDefaults（「すべてのデータを削除」で消す）
     let settingsDefaults: UserDefaults
+    /// 「この投稿を表示しない」を端末に保存しているとき（Firebase の構成）
+    let hiddenPosts: (any HiddenPostStore)?
 
     init(
         identity: any AnonymousIDStore,
@@ -25,7 +27,8 @@ final class AppDependencies {
         drafts: any ComposeDraftStore,
         appLock: any AppLockAuthenticating,
         lockSettings: AppLockSettings,
-        settingsDefaults: UserDefaults = .standard
+        settingsDefaults: UserDefaults = .standard,
+        hiddenPosts: (any HiddenPostStore)? = nil
     ) {
         self.identity = identity
         self.posts = posts
@@ -34,11 +37,19 @@ final class AppDependencies {
         self.appLock = appLock
         self.lockSettings = lockSettings
         self.settingsDefaults = settingsDefaults
+        self.hiddenPosts = hiddenPosts
     }
 
     /// 「すべてのデータを削除」
     func makeEraser() -> DataEraser {
-        DataEraser(posts: posts, identity: identity, drafts: drafts, lockSettings: lockSettings, defaults: settingsDefaults)
+        DataEraser(
+            posts: posts,
+            identity: identity,
+            drafts: drafts,
+            lockSettings: lockSettings,
+            hiddenPosts: hiddenPosts,
+            defaults: settingsDefaults
+        )
     }
 
     /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する
@@ -68,7 +79,8 @@ final class AppDependencies {
             reports: FirestoreReportRepository(identity: identity, auth: auth, hiddenPosts: hiddenPosts),
             drafts: UserDefaultsComposeDraftStore(),
             appLock: LocalAuthenticationAppLock(),
-            lockSettings: AppLockSettings()
+            lockSettings: AppLockSettings(),
+            hiddenPosts: hiddenPosts
         )
     }
 

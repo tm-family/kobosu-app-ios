@@ -24,6 +24,26 @@ actor FirebaseAnonymousAuth {
         return try await task.value
     }
 
+    /// 匿名ユーザーを消す（すべてのデータを削除）。次に userID() を呼ぶと、新しい匿名ユーザーでサインインする
+    func deleteUser() async throws {
+        if let signingIn {
+            _ = try? await signingIn.value
+        }
+        try await Self.deleteCurrentUser()
+    }
+
+    nonisolated private static func deleteCurrentUser() async throws {
+        guard let user = Auth.auth().currentUser else {
+            return
+        }
+        do {
+            try await user.delete()
+        } catch let error as NSError where error.code == AuthErrorCode.requiresRecentLogin.rawValue {
+            // 匿名ユーザーはサインインし直して確かめられないので、サインアウトして uid を手放す（サーバーのデータはもう消してある）
+            try Auth.auth().signOut()
+        }
+    }
+
     nonisolated private static func signInIfNeeded() async throws -> String {
         if let uid = Auth.auth().currentUser?.uid {
             return uid

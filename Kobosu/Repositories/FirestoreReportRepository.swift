@@ -107,12 +107,19 @@ nonisolated private enum FirestoreReportAPI {
             return .alreadyReported
         }
 
-        // 通報の記録と人数は同じバッチで書く（ルールで「通報を新しく作るときだけ 1 増やせる」と確かめるため）
+        // 通報の記録と人数は同じバッチで書く（ルールで「通報を新しく作るときだけ 1 増やせる」と確かめるため）。
+        // 自分の目印も同じバッチで書き、「すべてのデータを削除」で探せるようにする
         var fields = ReportDocument.reportFields(reason: reason)
         fields[ReportDocument.Field.createdAt] = FieldValue.serverTimestamp()
         fields[ReportDocument.Field.expireAt] = expireAt
+        let sentRef = database
+            .collection(PostDocument.usersCollection)
+            .document(uid)
+            .collection(ReportDocument.sentReportsCollection)
+            .document(postID)
         let batch = database.batch()
         batch.setData(fields, forDocument: reportRef)
+        batch.setData([ReportDocument.Field.expireAt: expireAt], forDocument: sentRef)
         batch.updateData([ReportDocument.Field.reportCount: FieldValue.increment(Int64(1))], forDocument: postRef)
         try await batch.commit()
         return .reported
