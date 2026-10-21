@@ -18,6 +18,7 @@ struct MainTabView: View {
 
     @State private var selection: MainTab = .listen
     @State private var isComposing = false
+    @State private var isShowingSettings = false
     /// 投稿した回数。変わるとタイムラインを読み直す
     @State private var postedCount = 0
 
@@ -26,7 +27,9 @@ struct MainTabView: View {
             ListenView(repository: dependencies.posts, reports: dependencies.reports, reloadID: postedCount)
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.listen)
-            NoteView(repository: dependencies.posts)
+            NoteView(repository: dependencies.posts) {
+                isShowingSettings = true
+            }
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.note)
         }
@@ -34,6 +37,13 @@ struct MainTabView: View {
             KobosuTabBar(selection: $selection) {
                 isComposing = true
             }
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            SettingsView(
+                authenticator: dependencies.appLock,
+                lockSettings: dependencies.lockSettings,
+                eraser: dependencies.makeEraser()
+            )
         }
         .sheet(isPresented: $isComposing) {
             ComposeView(repository: dependencies.posts, drafts: dependencies.drafts) { _ in

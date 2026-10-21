@@ -10,9 +10,13 @@
 import SwiftUI
 
 struct NoteView: View {
+    /// 右上の設定のボタンを押したとき
+    let onOpenSettings: () -> Void
+
     @State private var model: NoteViewModel
 
-    init(repository: any PostRepository) {
+    init(repository: any PostRepository, onOpenSettings: @escaping () -> Void = {}) {
+        self.onOpenSettings = onOpenSettings
         _model = State(initialValue: NoteViewModel(repository: repository))
     }
 
@@ -31,6 +35,16 @@ struct NoteView: View {
             }
             .background(Palette.paper)
             .navigationTitle(Text("ノート"))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: onOpenSettings) {
+                        Image(systemName: "gearshape")
+                            .foregroundStyle(Palette.inkSecondary)
+                    }
+                    .accessibilityLabel(Text("設定"))
+                    .accessibilityIdentifier("note.settings")
+                }
+            }
             .refreshable {
                 await model.load()
             }

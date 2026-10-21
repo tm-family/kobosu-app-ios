@@ -443,6 +443,23 @@
         }
       }
     },
+    "お問い合わせ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お問い合わせ"
+          }
+        }
+      }
+    },
     "お金" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -524,6 +541,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ここを、安心できる場所にするために。"
+          }
+        }
+      }
+    },
+    "このアプリについて" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリについて"
           }
         }
       }
@@ -630,6 +664,23 @@
         }
       }
     },
+    "この端末にはパスコードが設定されていないため、ロックは使えません。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lock isn't available because this device has no passcode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この端末にはパスコードが設定されていないため、ロックは使えません。"
+          }
+        }
+      }
+    },
     "この端末にはパスコードが設定されていないため、ロックは使えません。端末の設定でパスコードを決めると使えるようになります。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -728,6 +779,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべて"
+          }
+        }
+      }
+    },
+    "すべてのデータを削除" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを削除"
+          }
+        }
+      }
+    },
+    "すべてのデータを削除しますか？" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを削除しますか？"
+          }
+        }
+      }
+    },
+    "すべて削除する" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて削除する"
           }
         }
       }
@@ -919,6 +1021,23 @@
         }
       }
     },
+    "オンにすると、開くたびとアプリを切り替えるたびに確かめます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When on, the app checks it's you each time you open or switch back to it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、開くたびとアプリを切り替えるたびに確かめます。"
+          }
+        }
+      }
+    },
     "カテゴリ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1004,6 +1123,23 @@
         }
       }
     },
+    "データ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ"
+          }
+        }
+      }
+    },
     "ノート" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1017,6 +1153,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ノート"
+          }
+        }
+      }
+    },
+    "バージョン" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン"
           }
         }
       }
@@ -1072,6 +1225,40 @@
         }
       }
     },
+    "プライバシー" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシー"
+          }
+        }
+      }
+    },
+    "プライバシーポリシー" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
+          }
+        }
+      }
+    },
     "メールアドレス" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1085,6 +1272,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メールアドレス"
+          }
+        }
+      }
+    },
+    "ライセンス" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licenses"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライセンス"
+          }
+        }
+      }
+    },
+    "ロックをかけるために、本人か確かめます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify it's you to turn on the lock"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロックをかけるために、本人か確かめます"
           }
         }
       }
@@ -1340,6 +1561,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "共有した投稿は、ここに出ます。24時間たつと、自動で消えます。"
+          }
+        }
+      }
+    },
+    "共有した投稿・送った共感・下書き・設定と、この端末の匿名 ID を消します。もとには戻せません。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This deletes your shared posts, the empathy you sent, drafts, settings, and this device's anonymous ID. This can't be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有した投稿・送った共感・下書き・設定と、この端末の匿名 ID を消します。もとには戻せません。"
+          }
+        }
+      }
+    },
+    "利用規約" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Use"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用規約"
+          }
+        }
+      }
+    },
+    "削除できませんでした。端末の中のデータは消していません。時間をおいて、もう一度ためせます。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't delete. Nothing on this device was deleted. You can try again in a little while."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除できませんでした。端末の中のデータは消していません。時間をおいて、もう一度ためせます。"
           }
         }
       }
@@ -1854,6 +2126,23 @@
         }
       }
     },
+    "設定" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        }
+      }
+    },
     "設定して次へ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2037,6 +2326,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通報・表示しない"
+          }
+        }
+      }
+    },
+    "運営への連絡" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact us"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "運営への連絡"
           }
         }
       }
