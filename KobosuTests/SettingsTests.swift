@@ -160,6 +160,15 @@ struct SettingsTests {
     func licenseTextIsBundled() {
         #expect(LicenseView.fontLicense.contains("SIL OPEN FONT LICENSE"))
     }
+
+    /// 運営への連絡先と規約の URL がそろっていて、どれも https で開ける（審査ガイドライン 1.2）
+    @Test
+    func supportLinksAreHTTPS() throws {
+        let urls = [SupportInfo.contactURL, SupportInfo.termsURL, SupportInfo.privacyPolicyURL]
+        for url in urls {
+            #expect(try #require(url).scheme == "https")
+        }
+    }
 }
 
 /// 消すのがいつも失敗する Repository（既定の deleteAllMyData を通る）
