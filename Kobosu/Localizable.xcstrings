@@ -1,6 +1,40 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "%lld 文字中 %lld 文字" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld of %1$lld characters"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 文字中 %lld 文字"
+          }
+        }
+      }
+    },
+    "いま、どんな気持ち？" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How are you feeling right now?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いま、どんな気持ち？"
+          }
+        }
+      }
+    },
     "うちも同じ" : {
       "extractionState" : "manual",
       "localizations" : {
