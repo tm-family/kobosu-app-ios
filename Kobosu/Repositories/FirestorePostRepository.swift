@@ -307,8 +307,8 @@ nonisolated private enum FirestorePostAPI {
     static func deleteAllMyData(uid: String, now: Date) async throws {
         // 自分の投稿。期限で絞らず、2 段目を書けなかった投稿の目印も含めて消す
         let marks = try await ownPosts(uid: uid).getDocuments(source: .server)
-        // 1 件につき投稿と目印の 2 つを消す
-        for chunk in MyDataDocument.chunked(marks.documents, size: MyDataDocument.batchLimit / 2) {
+        // 1 件につき投稿と目印の 2 つを消す。ルールの exists() の回数の上限に収まるように分ける
+        for chunk in MyDataDocument.chunked(marks.documents, size: MyDataDocument.postsPerDeletionBatch) {
             let batch = database.batch()
             for mark in chunk {
                 batch.deleteDocument(database.collection(PostDocument.postsCollection).document(mark.documentID))

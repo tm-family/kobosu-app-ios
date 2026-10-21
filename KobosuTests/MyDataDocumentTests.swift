@@ -98,4 +98,14 @@ struct MyDataDocumentTests {
         #expect(MyDataDocument.chunked([Int](), size: 2).isEmpty)
         #expect(MyDataDocument.chunked(Array(1...3), size: 3) == [[1, 2, 3]])
     }
+
+    /// 自分の投稿を消すバッチは、ルールの exists()・get() の回数の上限（20）に収まる
+    @Test
+    func deletionBatchFitsRuleCallLimit() {
+        let size = MyDataDocument.postsPerDeletionBatch
+        #expect(size * MyDataDocument.ruleCallsPerPostDeletion <= MyDataDocument.ruleCallLimit)
+        let chunks = MyDataDocument.chunked(Array(1...21), size: size)
+        #expect(chunks.count == 3)
+        #expect(chunks.allSatisfy { $0.count * MyDataDocument.ruleCallsPerPostDeletion <= MyDataDocument.ruleCallLimit })
+    }
 }
