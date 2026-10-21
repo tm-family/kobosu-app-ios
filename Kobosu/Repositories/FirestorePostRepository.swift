@@ -12,8 +12,6 @@ import Foundation
 nonisolated enum FirestoreRepositoryError: Error, Equatable {
     /// 作った投稿にサーバーの時刻が入っていない
     case missingServerTimestamp
-    /// Firestore ではまだ使えない（削除はタスク 22 で実装する）
-    case notSupportedYet
 }
 
 final class FirestorePostRepository: PostRepository {
@@ -59,7 +57,8 @@ final class FirestorePostRepository: PostRepository {
     }
 
     func delete(postID: Post.ID) async throws {
-        throw FirestoreRepositoryError.notSupportedYet
+        let uid = try await userID()
+        try await FirestorePostAPI.delete(postID: postID, uid: uid)
     }
 
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
@@ -87,6 +86,14 @@ final class FirestorePostRepository: PostRepository {
     func sentStamps(for postIDs: [Post.ID]) async throws -> [Post.ID: Set<EmpathyStamp>] {
         let uid = try await userID()
         return try await FirestorePostAPI.sentStamps(for: postIDs, uid: uid, now: now())
+    }
+
+    /// 自分の投稿・送った共感・通報を消してから、匿名ユーザーを消す。
+    /// 途中で失敗しても、消し終わったものはもう無いので、もう一度呼べば残りから消し直せる
+    func deleteAllMyData() async throws {
+        let uid = try await userID()
+        try await FirestorePostAPI.deleteAllMyData(uid: uid)
+        try await auth.deleteUser()
     }
 
     /// 匿名認証の uid。Keychain の匿名 ID としても控える
@@ -117,6 +124,13 @@ nonisolated private enum FirestorePostAPI {
             .collection(PostDocument.usersCollection)
             .document(uid)
             .collection(PostDocument.sentStampsCollection)
+    }
+
+    private static func sentReports(uid: String) -> CollectionReference {
+        database
+            .collection(PostDocument.usersCollection)
+            .document(uid)
+            .collection(ReportDocument.sentReportsCollection)
     }
 
     /// 期限内の投稿を新しい順に。expireAt は createdAt の 24 時間後なので、expireAt の順は作った順と同じ。
@@ -263,6 +277,63 @@ nonisolated private enum FirestorePostAPI {
             }
         }
         return result
+    }
+
+    /// 自分の投稿を消す。投稿と目印を同じバッチで消す（他の人の送った記録・通報は、投稿と同じ expireAt で TTL が消す）。
+    /// 目印が無ければ自分の投稿ではない。期限を過ぎて TTL を待っている投稿も、目印があれば消す
+    static func delete(postID: String, uid: String) async throws {
+        let postRef = database.collection(PostDocument.postsCollection).document(postID)
+        let ownRef = ownPosts(uid: uid).document(postID)
+        guard try await ownRef.getDocument(source: .server).exists else {
+            let exists = try await postRef.getDocument(source: .server).exists
+            throw exists ? PostRepositoryError.notOwner : PostRepositoryError.postNotFound
+        }
+        let batch = database.batch()
+        batch.deleteDocument(postRef)
+        batch.deleteDocument(ownRef)
+        try await batch.commit()
+    }
+
+    /// 「すべてのデータを削除」のサーバー側（MyDataDocument のコメント）
+    static func deleteAllMyData(uid: String) async throws {
+        // 自分の投稿。期限で絞らず、2 段目を書けなかった投稿の目印も含めて消す
+        let marks = try await ownPosts(uid: uid).getDocuments(source: .server)
+        // 1 件につき投稿と目印の 2 つを消す
+        for chunk in MyDataDocument.chunked(marks.documents, size: MyDataDocument.batchLimit / 2) {
+            let batch = database.batch()
+            for mark in chunk {
+                batch.deleteDocument(database.collection(PostDocument.postsCollection).document(mark.documentID))
+                batch.deleteDocument(mark.reference)
+            }
+            try await batch.commit()
+        }
+
+        // 送った共感と通報。投稿ごとに、人数を引くのと記録を消すのを同じバッチで書く（途中で止まっても二重に引かない）
+        let sent = try await sentStamps(uid: uid).getDocuments(source: .server)
+        let reported = try await sentReports(uid: uid).getDocuments(source: .server)
+        let withdrawals = MyDataDocument.withdrawals(
+            sentStamps: Dictionary(
+                sent.documents.map { ($0.documentID, PostDocument.sentStamps(from: $0.get(Field.stamps))) }
+            ) { $1 },
+            reportedPostIDs: Set(reported.documents.map(\.documentID))
+        )
+        for withdrawal in withdrawals {
+            try await withdraw(withdrawal, uid: uid)
+        }
+    }
+
+    private static func withdraw(_ withdrawal: MyDataDocument.Withdrawal, uid: String) async throws {
+        let postRef = database.collection(PostDocument.postsCollection).document(withdrawal.postID)
+        let snapshot = try await postRef.getDocument(source: .server)
+        let decrements = MyDataDocument.decrements(post: snapshot.data(), withdrawal: withdrawal)
+        let batch = database.batch()
+        if !decrements.isEmpty {
+            batch.updateData(decrements.mapValues { FieldValue.increment($0) }, forDocument: postRef)
+        }
+        batch.deleteDocument(sentStamps(uid: uid).document(withdrawal.postID))
+        batch.deleteDocument(postRef.collection(ReportDocument.reportsCollection).document(uid))
+        batch.deleteDocument(sentReports(uid: uid).document(withdrawal.postID))
+        try await batch.commit()
     }
 
     /// 1 件読む。消えていたら nil
