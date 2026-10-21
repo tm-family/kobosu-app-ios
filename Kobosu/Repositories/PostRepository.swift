@@ -1,0 +1,57 @@
+//
+//  PostRepository.swift
+//  Kobosu
+//
+//  投稿と共感スタンプの取得・送信。画面はこのプロトコルだけに依存し、
+//  テスト・Preview・撮影モードではインメモリ実装、本番では Firebase の実装を渡す。
+//
+
+import Foundation
+
+protocol PostRepository: AnyObject {
+    /// タイムライン。新しい順に並べ、期限切れ・通報が一定数に達した投稿・「この投稿を表示しない」にした投稿は含めない。
+    /// category が nil ならすべてのカテゴリ
+    func timeline(category: PostCategory?) async throws -> [Post]
+
+    /// 投稿する。本文は前後の空白を除いて 1 文字以上、Post.maxBodyLength 文字以内
+    func submit(body: String, category: PostCategory) async throws -> Post
+
+    /// 自分の投稿（ノートの「共有した」）。新しい順に並べ、期限切れは含めない
+    func myPosts() async throws -> [Post]
+
+    /// 自分の投稿をすぐ消す。共感・通報も一緒に消す
+    func delete(postID: Post.ID) async throws
+
+    /// 共感スタンプを送る。同じ投稿に同じスタンプは 1 人 1 回まで（2 回目は何もしない）。自分の投稿には送れない
+    func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws
+
+    /// その投稿に自分が送ったスタンプ
+    func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp>
+}
+
+protocol ReportRepository: AnyObject {
+    /// 通報する。同じ投稿への通報は 1 人 1 回まで（2 回目は何もしない）。通報は匿名で、投稿者には伝わらない
+    func report(postID: Post.ID, reason: ReportReason) async throws
+
+    /// 「この投稿を表示しない」。この端末のタイムラインにだけ効く
+    func hide(postID: Post.ID) async throws
+}
+
+enum PostRepositoryError: Error, Equatable {
+    /// 本文が空（空白だけ）
+    case emptyBody
+    /// 本文が Post.maxBodyLength 文字を超えている
+    case bodyTooLong
+    /// 投稿が無い（消えた・期限切れ）
+    case postNotFound
+    /// 自分の投稿ではないので消せない
+    case notOwner
+    /// 自分の投稿には共感を送れない
+    case ownPost
+}
+
+/// 通報による自動の非表示
+enum ReportPolicy {
+    /// この人数から通報されたら、タイムラインに出さない（運営の確認に回す）
+    static let autoHideThreshold = 3
+}
