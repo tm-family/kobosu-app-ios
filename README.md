@@ -102,8 +102,13 @@ Archive / Upload ワークフローは App Store Connect API Key で認証しま
 | `APPLE_API_KEY_BASE64` | App Store Connect の API Key（`AuthKey_XXXXXXXXXX.p8`）を `base64 -i AuthKey_XXXXXXXXXX.p8` でエンコードした文字列 |
 | `APPLE_API_KEY_ID` | API Key の Key ID |
 | `APPLE_API_ISSUER_ID` | API Key の Issuer ID |
+| `GOOGLE_SERVICE_INFO_PLIST_BASE64` | Firebase コンソールからダウンロードした `GoogleService-Info.plist` を `base64 -i GoogleService-Info.plist` でエンコードした文字列。Archive / Upload のときに `Kobosu/GoogleService-Info.plist` に書き出してアプリに同梱します。登録しなければ Firebase につながない（ローカルの実装で動く）ビルドになります |
 
 API Key は App Store Connect の「ユーザとアクセス → 統合 → App Store Connect API」で、App Manager 以上の権限で発行します。
+
+`GoogleService-Info.plist` はリポジトリに入れません（`.gitignore` に入っています）。手元で Firebase につないで動かすときは、`Kobosu/GoogleService-Info.plist` に置いてビルドします。テスト（Build ワークフロー）は Firebase につながないので、この Secret を使いません。
+Firebase のプロジェクト・匿名認証・Firestore のルールと TTL の設定は [docs/firebase.md](docs/firebase.md) にまとめています。
+
 ### 5. App Store Connect にアプリを作成する
 
 Bundle ID・証明書・プロビジョニングプロファイルは、Export のときに API Key で自動的に作成されます（`-allowProvisioningUpdates`）。
@@ -213,7 +218,8 @@ App Store のプロダクトページに載せるものは、`AppStore/` の JSO
 ├── Kobosu.xcodeproj # 共有スキーム Kobosu を含む
 ├── AppStore/                # App Store の掲載情報（言語・撮る画面・説明文・クリエイティブアセット）
 ├── Tools/                   # スクリーンショットの撮影と App Store Connect への反映
-├── docs/                    # ExportOptions.plist のサンプル
+├── docs/                    # ExportOptions.plist のサンプル・Firebase の設定の手順（firebase.md）
+├── firebase.json            # Firebase CLI の設定（firestore.rules・firestore.indexes.json を出す）
 ├── scripts/                 # rename.sh
 ├── .swiftlint.yml           # SwiftLint 設定
 └── .github/
@@ -233,7 +239,7 @@ App Store のプロダクトページに載せるものは、`AppStore/` の JSO
 - プロジェクトはフォルダ同期グループ（Xcode 16 以降の形式）で管理しているため、ファイルの追加・削除で pbxproj は変わりません
 - SwiftLint は Build Tool Plugin として全ターゲットに適用され、CI では `swiftlint lint --strict` としても実行されます。ルールは [.swiftlint.yml](.swiftlint.yml) で管理します
 - CI のワークフローは `*.xcodeproj` の名前と同名の共有スキームが存在することを前提にしています
-- [Kobosu/PrivacyInfo.xcprivacy](Kobosu/PrivacyInfo.xcprivacy) はプライバシーマニフェストです。UserDefaults（`@AppStorage`）の利用だけを申告しています。データの収集・トラッキング・ほかの理由の申告が必要な API を足したら、ここと App Store Connect の「App のプライバシー」を更新してください
+- [Kobosu/PrivacyInfo.xcprivacy](Kobosu/PrivacyInfo.xcprivacy) はプライバシーマニフェストです。UserDefaults（`@AppStorage`）の利用と、Firebase に送る投稿の内容（その他のユーザーコンテンツ）・匿名の uid（ユーザ ID）の収集を申告しています（どちらもアプリの機能のためだけで、トラッキングはしない）。データの収集・トラッキング・ほかの理由の申告が必要な API を足したら、ここと App Store Connect の「App のプライバシー」を更新してください
 
 ## License
 

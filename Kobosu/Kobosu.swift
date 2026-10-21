@@ -9,6 +9,27 @@ import SwiftUI
 
 @main
 struct Kobosu: App {
+    @State private var dependencies: AppDependencies
+
+    init() {
+        let arguments = ProcessInfo.processInfo.arguments
+        OnboardingStatus.applyLaunchArguments(arguments, to: .standard)
+        UITestLaunch.applyLaunchArguments(arguments, to: .standard)
+        NavigationBarAppearance.apply()
+        // GoogleService-Info.plist があれば Firebase を設定し、Firestore の実装で動かす（無ければローカルの実装）。
+        // 撮影モードではデモデータで開く
+        let usesFirebase = FirebaseSetup.configureIfAvailable(isScreenshotDemo: ScreenshotDemo.isEnabled)
+        let dependencies: AppDependencies
+        if ScreenshotDemo.isEnabled {
+            dependencies = .demo()
+        } else if usesFirebase {
+            dependencies = .firebase()
+        } else {
+            dependencies = .local(seedsPosts: UITestLaunch.seedsPosts(arguments: arguments))
+        }
+        _dependencies = State(initialValue: dependencies)
+    }
+
     var body: some Scene {
         WindowGroup {
             rootView
@@ -19,7 +40,15 @@ struct Kobosu: App {
     @ViewBuilder private var rootView: some View {
         switch ScreenshotDemo.scene {
         case .home, nil:
-            ContentView()
+            RootView(dependencies: dependencies)
+        case .empathy:
+            MainTabView(dependencies: dependencies, empathyPostID: ScreenshotDemo.empathyPostID)
+        case .compose:
+            MainTabView(dependencies: dependencies, opensComposer: true)
+        case .note:
+            MainTabView(dependencies: dependencies, initialTab: .note)
+        case .welcome:
+            OnboardingView(authenticator: dependencies.appLock, lockSettings: dependencies.lockSettings) {}
         }
     }
 }

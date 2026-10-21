@@ -1,0 +1,140 @@
+//
+//  PostDocument.swift
+//  Kobosu
+//
+//  Firestore に置く投稿の文書の形。Firebase に依存しない部分だけを置き、テストできるようにする。
+//
+//  - posts/{postId}: 本文・カテゴリ・createdAt・expireAt・スタンプの人数。だれでも読めるので、投稿者を特定できる値は置かない
+//  - users/{uid}/ownPosts/{postId}: 自分の投稿の目印（createdAt・expireAt）。本人だけが読める。
+//    トップレベルの posts と名前を分け、ルール・TTL・インデックスがコレクション ID で両方に効かないようにする
+//
+//  - users/{uid}/sentStamps/{postId}: その投稿に自分が送ったスタンプ（stamps・expireAt）。本人だけが読める。
+//    投稿の下には置かないので、投稿者からはだれが送ったか分からない。expireAt は投稿と同じ値にし、TTL で一緒に消す
+//
+//  期限はサーバーの時刻から決める。投稿は 2 段で書く:
+//  1. createdAt と expireAt をどちらも FieldValue.serverTimestamp() にして作る（この時点ではもう期限切れ）
+//  2. サーバーの createdAt を読み、expireAt を createdAt の 24 時間後にする
+//  2 が失敗しても期限切れのままなので、表示から外れ、TTL で消える（消えずに残る投稿を作らない）。
+//  端末の時計がサーバーより遅れていても出さないよう、expireAt が createdAt より後でない文書は読まない。
+//
+
+import Foundation
+
+nonisolated enum PostDocument {
+    static let postsCollection = "posts"
+    static let usersCollection = "users"
+    /// users/{uid} の下の、自分の投稿の目印
+    static let ownPostsCollection = "ownPosts"
+    /// users/{uid} の下の、自分が送ったスタンプ（投稿ごとに 1 つの文書）
+    static let sentStampsCollection = "sentStamps"
+
+    enum Field {
+        static let body = "body"
+        static let category = "category"
+        static let createdAt = "createdAt"
+        static let expireAt = "expireAt"
+        static let stampCounts = "stampCounts"
+        /// 送ったスタンプの rawValue の配列（users/{uid}/sentStamps/{postId}）
+        static let stamps = "stamps"
+    }
+
+    /// 共感を送ってよいか
+    enum StampSendCheck: Equatable {
+        case send
+        /// 同じスタンプは送った（2 回目は何もしない）
+        case alreadySent
+        /// 自分の投稿には送れない
+        case ownPost
+        /// 投稿が無い・期限切れ・書き終わっていない・通報が一定数に達して出さなくなった
+        case postNotFound
+    }
+
+    /// タイムラインで一度に読む件数
+    static let timelineLimit = 100
+
+    /// 投稿の文書の、サーバーの時刻以外の値
+    static func newPostFields(body: String, category: PostCategory) -> [String: Any] {
+        [
+            Field.body: body,
+            Field.category: category.rawValue
+        ]
+    }
+
+    /// 文書の値から投稿を作る。日時（Timestamp）は呼ぶ側で Date にして渡す。
+    /// 形が合わないもの（知らないカテゴリ・サーバーの時刻がまだ入っていないもの）と、
+    /// 2 段目をまだ書いていないもの（expireAt が createdAt より後でない）は nil
+    static func post(id: String, data: [String: Any], createdAt: Date?, expireAt: Date?) -> Post? {
+        guard
+            let body = data[Field.body] as? String,
+            let rawCategory = data[Field.category] as? String,
+            let category = PostCategory(rawValue: rawCategory),
+            let createdAt,
+            let expireAt,
+            expireAt > createdAt
+        else {
+            return nil
+        }
+        return Post(
+            id: id,
+            body: body,
+            category: category,
+            createdAt: createdAt,
+            expireAt: expireAt,
+            stampCounts: stampCounts(from: data[Field.stampCounts])
+        )
+    }
+
+    /// スタンプの人数。知らないスタンプと 0 以下の人数は外す
+    static func stampCounts(from value: Any?) -> [EmpathyStamp: Int] {
+        guard let raw = value as? [String: Any] else {
+            return [:]
+        }
+        var counts: [EmpathyStamp: Int] = [:]
+        for (key, value) in raw {
+            guard let stamp = EmpathyStamp(rawValue: key), let count = (value as? NSNumber)?.intValue, count > 0 else {
+                continue
+            }
+            counts[stamp] = count
+        }
+        return counts
+    }
+
+    /// 共感を送ってよいか。post は文書から作った投稿（無い・形が合わないなら nil）。
+    /// 通報が一定数に達した投稿は、タイムラインと同じく無いものとして扱う（読み込んだ後に達したときのため）
+    static func stampSendCheck(
+        post: Post?,
+        isOwnPost: Bool,
+        isAutoHidden: Bool = false,
+        sentStamps: Set<EmpathyStamp>,
+        stamp: EmpathyStamp,
+        now: Date
+    ) -> StampSendCheck {
+        guard let post, !post.isExpired(at: now), !isAutoHidden else {
+            return .postNotFound
+        }
+        if isOwnPost {
+            return .ownPost
+        }
+        return sentStamps.contains(stamp) ? .alreadySent : .send
+    }
+
+    /// 人数を増やすフィールドのパス（stampCounts.same_here など）
+    static func stampCountFieldPath(_ stamp: EmpathyStamp) -> String {
+        "\(Field.stampCounts).\(stamp.rawValue)"
+    }
+
+    /// 送ったスタンプ。知らないスタンプは外す
+    static func sentStamps(from value: Any?) -> Set<EmpathyStamp> {
+        guard let raw = value as? [Any] else {
+            return []
+        }
+        return Set(raw.compactMap { ($0 as? String).flatMap(EmpathyStamp.init(rawValue:)) })
+    }
+
+    /// 期限内の投稿を新しい順に並べる。Firestore の TTL は消えるまで遅れるので、読み出し条件に加えて端末でも外す
+    static func activePosts(_ posts: [Post], at now: Date) -> [Post] {
+        posts
+            .filter { !$0.isExpired(at: now) }
+            .sorted { $0.createdAt > $1.createdAt }
+    }
+}
