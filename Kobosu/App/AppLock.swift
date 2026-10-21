@@ -111,7 +111,7 @@ final class StubAppLockAuthenticator: AppLockAuthenticating {
 /// アプリロックをオンにしているか。端末内（UserDefaults）にだけ保存する
 final class AppLockSettings {
     /// オンかオフかを保存するキー
-    static let enabledKey = "appLock.isEnabled"
+    nonisolated static let enabledKey = "appLock.isEnabled"
 
     private let defaults: UserDefaults
 

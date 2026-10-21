@@ -28,9 +28,12 @@ struct OnboardingStatusTests {
 
         OnboardingStatus.applyLaunchArguments([OnboardingStatus.skipArgument], to: defaults)
         #expect(defaults.integer(forKey: OnboardingStatus.agreedVersionKey) == PromiseRule.currentVersion)
+        // 同意した状態で起動するときは、アプリロックをオフにする
+        #expect(!AppLockSettings(defaults: defaults).isEnabled)
 
         OnboardingStatus.applyLaunchArguments([OnboardingStatus.resetArgument], to: defaults)
         #expect(defaults.object(forKey: OnboardingStatus.agreedVersionKey) == nil)
+        #expect(defaults.object(forKey: AppLockSettings.enabledKey) == nil)
 
         OnboardingStatus.applyLaunchArguments([], to: defaults)
         #expect(defaults.object(forKey: OnboardingStatus.agreedVersionKey) == nil)
