@@ -8,7 +8,7 @@
 
 import Foundation
 
-nonisolated enum RemainingTime: Equatable {
+nonisolated enum RemainingTime: Equatable, Sendable {
     case hours(Int)
     case minutes(Int)
 

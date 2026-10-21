@@ -59,6 +59,38 @@ struct TimelineViewModelTests {
     }
 
     @Test
+    func selectingSameCategoryDoesNotReload() async {
+        let repository = CountingPostRepository()
+        let model = TimelineViewModel(repository: repository)
+        await model.select(.money)
+        await model.select(.money)
+        #expect(repository.timelineCalls == 1)
+    }
+
+    /// 更新に失敗しても、表示中の一覧は残す
+    @Test
+    func failedRefreshKeepsPosts() async {
+        let repository = CountingPostRepository()
+        let model = TimelineViewModel(repository: repository)
+        await model.load()
+        #expect(model.posts.count == 1)
+        repository.fails = true
+        await model.load()
+        #expect(model.state == .loaded)
+        #expect(model.posts.count == 1)
+    }
+
+    /// 取り消されたときは、失敗として出さない
+    @Test
+    func cancelledLoadIsNotFailure() async {
+        let repository = CountingPostRepository()
+        repository.error = CancellationError()
+        let model = TimelineViewModel(repository: repository)
+        await model.load()
+        #expect(model.state != .failed)
+    }
+
+    @Test
     func failedLoadShowsFailure() async {
         let model = TimelineViewModel(repository: FailingPostRepository())
         await model.load()
@@ -98,4 +130,30 @@ private final class FailingPostRepository: PostRepository {
     func delete(postID: Post.ID) async throws { throw Failure() }
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws { throw Failure() }
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> { throw Failure() }
+}
+
+/// 呼ばれた回数を数え、失敗させることもできる Repository
+private final class CountingPostRepository: PostRepository {
+    struct Failure: Error {}
+
+    var timelineCalls = 0
+    var fails = false
+    var error: (any Error)?
+
+    func timeline(category: PostCategory?) async throws -> [Post] {
+        timelineCalls += 1
+        if let error {
+            throw error
+        }
+        if fails {
+            throw Failure()
+        }
+        return [Post(id: "a", body: "本文", category: category ?? .other, createdAt: Date())]
+    }
+
+    func submit(body: String, category: PostCategory) async throws -> Post { throw Failure() }
+    func myPosts() async throws -> [Post] { [] }
+    func delete(postID: Post.ID) async throws {}
+    func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {}
+    func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> { [] }
 }
