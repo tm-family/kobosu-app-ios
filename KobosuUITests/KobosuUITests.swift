@@ -44,6 +44,26 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
     }
 
+    /// 撮影モードのデモデータで、投稿に共感を送る
+    @MainActor
+    func testSendingStampFromTimeline() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-screenshot-demo", "-screenshot-scene", "home"]
+        app.launch()
+
+        let post = app.buttons["post.preview-0"]
+        XCTAssertTrue(post.waitForExistence(timeout: 5))
+        post.tap()
+        let stamp = app.buttons["empathy.understand"]
+        XCTAssertTrue(stamp.waitForExistence(timeout: 5))
+        XCTAssertTrue(stamp.isEnabled)
+        stamp.tap()
+        // 送ったスタンプは 2 回送れない
+        let predicate = NSPredicate(format: "isEnabled == false")
+        expectation(for: predicate, evaluatedWith: stamp)
+        waitForExpectations(timeout: 5)
+    }
+
     @MainActor
     func testOnboardingRequiresAgreement() throws {
         let app = XCUIApplication()

@@ -87,7 +87,35 @@ struct TimelineViewModelTests {
         repository.error = CancellationError()
         let model = TimelineViewModel(repository: repository)
         await model.load()
-        #expect(model.state != .failed)
+        #expect(model.state == .idle)
+    }
+
+    @Test
+    func sendUpdatesCountAndSentStampsAtOnce() async throws {
+        let model = TimelineViewModel(repository: makeRepository())
+        await model.load()
+        let post = try #require(model.post(id: "money"))
+        try await model.send(.sameHere, to: post)
+        // 2 回目は何もしない
+        try await model.send(.sameHere, to: post)
+        let updated = try #require(model.post(id: "money"))
+        #expect(updated.sameHereCount == 1)
+        #expect(model.sentStamps(for: updated) == [.sameHere])
+    }
+
+    @Test
+    func ownPostIsMarkedAndCannotReceiveStamp() async throws {
+        let repository = makeRepository()
+        let mine = try await repository.submit(body: "本文", category: .partner)
+        let model = TimelineViewModel(repository: repository)
+        await model.load()
+        let post = try #require(model.post(id: mine.id))
+        #expect(model.isMine(post))
+        #expect(!model.isMine(try #require(model.post(id: "money"))))
+        await #expect(throws: PostRepositoryError.ownPost) {
+            try await model.send(.understand, to: post)
+        }
+        #expect(model.sentStamps(for: post).isEmpty)
     }
 
     @Test
