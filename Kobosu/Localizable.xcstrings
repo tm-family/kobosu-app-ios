@@ -1633,19 +1633,19 @@
         }
       }
     },
-    "共有した投稿・送った共感・下書き・設定と、この端末の匿名 ID を消します。もとには戻せません。" : {
+    "共有した投稿・送った共感・通報・下書き・設定と、この端末の匿名 ID を消します。もとには戻せません。" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This deletes your shared posts, the empathy you sent, drafts, settings, and this device's anonymous ID. This can't be undone."
+            "value" : "This deletes your shared posts, the empathy you sent, your reports, drafts, settings, and this device's anonymous ID. This can't be undone."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "共有した投稿・送った共感・下書き・設定と、この端末の匿名 ID を消します。もとには戻せません。"
+            "value" : "共有した投稿・送った共感・通報・下書き・設定と、この端末の匿名 ID を消します。もとには戻せません。"
           }
         }
       }
