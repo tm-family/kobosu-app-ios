@@ -147,13 +147,20 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
 
 extension InMemoryPostRepository {
     /// Preview・撮影モード用。他の人の投稿をいくつか置いたもの（実在の人名・地名は書かない）。
+    /// 撮影は言語ごとに行うので、本文は String Catalog から表示の言語で読む。
     /// 時計は呼び出した時刻で止めるので、Repository の中では期限切れにならない（画面の表示は実際の時刻で外れていく）
     static func preview(now: Date = Date(), identity: AnonymousIDStore = InMemoryAnonymousIDStore()) -> InMemoryPostRepository {
         let repository = InMemoryPostRepository(identity: identity, now: { now })
-        func post(_ index: Int, _ body: String, _ category: PostCategory, hoursAgo: Double, _ counts: [EmpathyStamp: Int]) -> Post {
+        func post(
+            _ index: Int,
+            _ body: String.LocalizationValue,
+            _ category: PostCategory,
+            hoursAgo: Double,
+            _ counts: [EmpathyStamp: Int]
+        ) -> Post {
             Post(
                 id: "preview-\(index)",
-                body: body,
+                body: String(localized: body),
                 category: category,
                 createdAt: now.addingTimeInterval(-hoursAgo * 60 * 60),
                 stampCounts: counts
