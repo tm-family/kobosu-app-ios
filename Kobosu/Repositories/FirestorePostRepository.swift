@@ -12,7 +12,7 @@ import Foundation
 nonisolated enum FirestoreRepositoryError: Error, Equatable {
     /// 作った投稿にサーバーの時刻が入っていない
     case missingServerTimestamp
-    /// Firestore ではまだ使えない（共感はタスク 20、削除はタスク 22 で実装する）
+    /// Firestore ではまだ使えない（共感はタスク 20、通報はタスク 21、削除はタスク 22 で実装する）
     case notSupportedYet
 }
 
@@ -65,6 +65,17 @@ final class FirestorePostRepository: PostRepository {
         let uid = try await auth.userID()
         try identity.replaceID(with: uid)
         return uid
+    }
+}
+
+/// ReportRepository の Firestore の実装（タスク 21 で作る）。それまでは、通報を黙って捨てずに「まだ使えない」を返す
+final class FirestoreReportRepository: ReportRepository {
+    func report(postID: Post.ID, reason: ReportReason) async throws {
+        throw FirestoreRepositoryError.notSupportedYet
+    }
+
+    func hide(postID: Post.ID) async throws {
+        throw FirestoreRepositoryError.notSupportedYet
     }
 }
 
