@@ -233,7 +233,8 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['expireAt'])
         && resource.data.expireAt == resource.data.createdAt
         && request.resource.data.expireAt == resource.data.createdAt + lifetime();
-      allow delete: if isMe(uid);
+      // 投稿と同じ書き込みで消すか、投稿がもう無いときだけ（目印だけ消して自分の投稿に共感・通報できないように）
+      allow delete: if isMe(uid) && !existsAfter(postPath(postId));
     }
 
     match /users/{uid}/sentStamps/{postId} {
