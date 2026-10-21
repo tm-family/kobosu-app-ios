@@ -18,6 +18,23 @@
         }
       }
     },
+    "URL" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        }
+      }
+    },
     "いま、どんな気持ち？" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -256,6 +273,40 @@
         }
       }
     },
+    "メールアドレス" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email address"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアドレス"
+          }
+        }
+      }
+    },
+    "人の名前" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "人の名前"
+          }
+        }
+      }
+    },
     "介護" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -290,6 +341,23 @@
         }
       }
     },
+    "住所" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "住所"
+          }
+        }
+      }
+    },
     "危険を感じる内容がある" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -307,6 +375,23 @@
         }
       }
     },
+    "地名" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地名"
+          }
+        }
+      }
+    },
     "子育て" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -320,6 +405,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "子育て"
+          }
+        }
+      }
+    },
+    "学校や会社などの名前" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "School or company"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "学校や会社などの名前"
           }
         }
       }
@@ -439,6 +541,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "誰かを強く攻撃している"
+          }
+        }
+      }
+    },
+    "郵便番号" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postal code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "郵便番号"
+          }
+        }
+      }
+    },
+    "電話番号" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone number"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "電話番号"
           }
         }
       }
