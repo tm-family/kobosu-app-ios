@@ -46,11 +46,24 @@ struct RootView: View {
                     // ロック中は、中身を VoiceOver にも読ませない
                     .accessibilityHidden(lock.isLocked)
             }
-            if lock.isLocked {
-                LockScreenView(controller: lock)
-                    .transition(.opacity)
-            } else if scenePhase != .active, !ScreenshotDemo.isEnabled {
-                PrivacyCoverView()
+            // 起動した最初のフレーム用の重ね。操作と VoiceOver は LockWindow の側で受ける（同じボタンを 2 つ読ませない）
+            Group {
+                if lock.isLocked {
+                    LockScreenView(controller: lock)
+                        .transition(.opacity)
+                } else if scenePhase != .active, !ScreenshotDemo.isEnabled {
+                    PrivacyCoverView()
+                }
+            }
+            .accessibilityHidden(true)
+        }
+        .background {
+            WindowSceneReader { scene in
+                // ビューの更新の途中でウインドウを触らないよう、次の回で行う
+                Task {
+                    lockWindow.scene = scene
+                    updateLockWindow()
+                }
             }
         }
         .animation(.easeOut(duration: 0.2), value: lock.isLocked)

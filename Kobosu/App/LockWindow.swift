@@ -5,6 +5,7 @@
 //  ロック画面と、中身を覆う画面を出す、いちばん上のウインドウ。
 //  シート（投稿・共感・通報）や確認のダイアログは RootView より上に出るので、同じ画面の中に重ねるだけでは隠せない。
 //  別のウインドウをアラートより上に出し、シートを開いたままロックしても中身が見えない・さわれない・VoiceOver にも読まれないようにする。
+//  キーボードはこのウインドウより上に出るので、出すときに入力のフォーカスを外して閉じる。
 //
 
 import SwiftUI
@@ -17,6 +18,9 @@ final class LockWindow {
         var isCovered = false
     }
 
+    /// RootView が置かれたシーン。iPad で複数のウインドウを開いても、それぞれのシーンに出す
+    weak var scene: UIWindowScene?
+
     private var window: UIWindow?
     private let state = State()
 
@@ -27,12 +31,22 @@ final class LockWindow {
         if isVisible, window == nil {
             window = makeWindow(controller: controller)
         }
-        window?.isHidden = !isVisible
+        guard let window else {
+            return
+        }
+        if isVisible {
+            // キーボード（下書きの続きの予測変換を含む）を閉じ、ロック中に見えない画面へ入力できないようにする
+            window.windowScene?.windows.forEach { $0.endEditing(true) }
+        }
+        window.isHidden = !isVisible
+        // 下のウインドウ（シートを含む）を VoiceOver に読ませない
+        for other in window.windowScene?.windows ?? [] where other !== window {
+            other.accessibilityElementsHidden = isVisible
+        }
     }
 
     private func makeWindow(controller: AppLockController) -> UIWindow? {
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        guard let scene = scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first else {
+        guard let scene else {
             return nil
         }
         let window = UIWindow(windowScene: scene)
@@ -40,7 +54,6 @@ final class LockWindow {
         window.backgroundColor = .clear
         let host = UIHostingController(rootView: LockOverlayView(controller: controller, state: state))
         host.view.backgroundColor = .clear
-        // 下のウインドウ（シートを含む）を VoiceOver に読ませない
         host.view.accessibilityViewIsModal = true
         window.rootViewController = host
         return window
@@ -57,6 +70,30 @@ private struct LockOverlayView: View {
             LockScreenView(controller: controller)
         } else if state.isCovered {
             PrivacyCoverView()
+        }
+    }
+}
+
+/// 置かれたビューのシーンを知らせる（LockWindow をそのシーンに出すため）
+struct WindowSceneReader: UIViewRepresentable {
+    let onChange: (UIWindowScene?) -> Void
+
+    func makeUIView(context: Context) -> SceneReportingView {
+        let view = SceneReportingView()
+        view.onChange = onChange
+        return view
+    }
+
+    func updateUIView(_ uiView: SceneReportingView, context: Context) {
+        uiView.onChange = onChange
+    }
+
+    final class SceneReportingView: UIView {
+        var onChange: ((UIWindowScene?) -> Void)?
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            onChange?(window?.windowScene)
         }
     }
 }
