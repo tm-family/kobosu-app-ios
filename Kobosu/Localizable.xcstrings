@@ -137,6 +137,23 @@
         }
       }
     },
+    "Face ID で開く" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open with Face ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID で開く"
+          }
+        }
+      }
+    },
     "Optic ID でロック" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -154,6 +171,23 @@
         }
       }
     },
+    "Optic ID で開く" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open with Optic ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optic ID で開く"
+          }
+        }
+      }
+    },
     "Touch ID でロック" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -167,6 +201,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touch ID でロック"
+          }
+        }
+      }
+    },
+    "Touch ID で開く" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open with Touch ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID で開く"
           }
         }
       }
@@ -528,6 +579,23 @@
         }
       }
     },
+    "こぼすを開くために、本人か確かめます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify it's you to open Kobosu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "こぼすを開くために、本人か確かめます"
+          }
+        }
+      }
+    },
     "しんどいね" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -847,6 +915,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パスコードでロック"
+          }
+        }
+      }
+    },
+    "パスコードで開く" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open with passcode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスコードで開く"
           }
         }
       }
