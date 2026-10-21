@@ -2,13 +2,16 @@
 //  OnboardingView.swift
 //  Kobosu
 //
-//  初回起動の流れ。ようこそ → やさしさの約束。同意したら onFinish を呼ぶ。
-//  アプリロックの設定（デザイン案 07）はタスク 15 で、この流れの最後に足す。
+//  初回起動の流れ。ようこそ → やさしさの約束 → アプリロックの設定。
+//  アプリロックを決めたら onFinish を呼ぶ（約束に同意したことも、このとき保存する）。
+//  途中でアプリを閉じたら、次に開いたときにもう一度はじめから出す。
 //
 
 import SwiftUI
 
 struct OnboardingView: View {
+    let authenticator: any AppLockAuthenticating
+    let lockSettings: AppLockSettings
     let onFinish: () -> Void
 
     @State private var step = Step.welcome
@@ -16,6 +19,7 @@ struct OnboardingView: View {
     private enum Step {
         case welcome
         case promise
+        case appLock
     }
 
     var body: some View {
@@ -28,7 +32,14 @@ struct OnboardingView: View {
                     }
                 }
             case .promise:
-                PromiseView(onAgree: onFinish)
+                PromiseView {
+                    withAnimation {
+                        step = .appLock
+                    }
+                }
+                .transition(.move(edge: .trailing))
+            case .appLock:
+                AppLockSetupView(authenticator: authenticator, settings: lockSettings, onFinish: onFinish)
                     .transition(.move(edge: .trailing))
             }
         }
@@ -36,5 +47,5 @@ struct OnboardingView: View {
 }
 
 #Preview {
-    OnboardingView {}
+    OnboardingView(authenticator: StubAppLockAuthenticator(), lockSettings: AppLockSettings(defaults: .init())) {}
 }
