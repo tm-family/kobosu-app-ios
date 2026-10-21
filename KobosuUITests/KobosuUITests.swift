@@ -102,7 +102,8 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["settings.erase"].waitForExistence(timeout: 5))
         app.buttons["settings.license"].tap()
         XCTAssertTrue(app.staticTexts["Zen Maru Gothic"].waitForExistence(timeout: 5))
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        // シートの下のノートの画面にも戻るボタンは無いので、戻るボタン（BackButton）は 1 つだけ
+        app.navigationBars.buttons["BackButton"].tap()
         let close = app.buttons["settings.close"]
         XCTAssertTrue(close.waitForExistence(timeout: 5))
         close.tap()
