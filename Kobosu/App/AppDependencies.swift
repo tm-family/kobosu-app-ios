@@ -15,6 +15,8 @@ final class AppDependencies {
     let drafts: any ComposeDraftStore
     let appLock: any AppLockAuthenticating
     let lockSettings: AppLockSettings
+    /// 約束に同意した版などを置く UserDefaults（「すべてのデータを削除」で消す）
+    let settingsDefaults: UserDefaults
 
     init(
         identity: any AnonymousIDStore,
@@ -22,7 +24,8 @@ final class AppDependencies {
         reports: any ReportRepository,
         drafts: any ComposeDraftStore,
         appLock: any AppLockAuthenticating,
-        lockSettings: AppLockSettings
+        lockSettings: AppLockSettings,
+        settingsDefaults: UserDefaults = .standard
     ) {
         self.identity = identity
         self.posts = posts
@@ -30,11 +33,12 @@ final class AppDependencies {
         self.drafts = drafts
         self.appLock = appLock
         self.lockSettings = lockSettings
+        self.settingsDefaults = settingsDefaults
     }
 
     /// 「すべてのデータを削除」
     func makeEraser() -> DataEraser {
-        DataEraser(posts: posts, identity: identity, drafts: drafts, lockSettings: lockSettings)
+        DataEraser(posts: posts, identity: identity, drafts: drafts, lockSettings: lockSettings, defaults: settingsDefaults)
     }
 
     /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する
@@ -68,18 +72,22 @@ final class AppDependencies {
         )
     }
 
-    /// 撮影モード・Preview。デモデータをメモリ上にだけ置く（実データと混ぜない）
+    /// 撮影モード・Preview。デモデータをメモリ上にだけ置く（実データと混ぜない）。
+    /// ノートに出す自分の投稿と、投稿の画面に出す書きかけの下書きも用意する
     static func demo() -> AppDependencies {
-        let identity = InMemoryAnonymousIDStore()
+        let identity = InMemoryAnonymousIDStore(id: ScreenshotDemo.myID)
         let repository = InMemoryPostRepository.preview(identity: identity)
+        repository.seed(ScreenshotDemo.myPost(), authorID: ScreenshotDemo.myID)
+        // 撮影モードの設定は、ふだんの設定と混ぜない（「すべてのデータを削除」を押しても、ふだんの同意の記録は消さない）
+        let defaults = UserDefaults(suiteName: "screenshot-demo") ?? .standard
         return AppDependencies(
             identity: identity,
             posts: repository,
             reports: repository,
-            drafts: InMemoryComposeDraftStore(),
+            drafts: InMemoryComposeDraftStore(draft: ScreenshotDemo.draft()),
             appLock: StubAppLockAuthenticator(),
-            // 撮影モードの設定は、ふだんの設定と混ぜない
-            lockSettings: AppLockSettings(defaults: UserDefaults(suiteName: "screenshot-demo") ?? .standard)
+            lockSettings: AppLockSettings(defaults: defaults),
+            settingsDefaults: defaults
         )
     }
 }

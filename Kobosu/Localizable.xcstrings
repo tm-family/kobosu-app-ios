@@ -477,6 +477,23 @@
         }
       }
     },
+    "お義母さんからの電話、今日で 3 回目。鳴るたびに体がこわばる。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The third call from my mother-in-law today. I tense up every time it rings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お義母さんからの電話、今日で 3 回目。鳴るたびに体がこわばる。"
+          }
+        }
+      }
+    },
     "お金" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -949,6 +966,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "はじめる"
+          }
+        }
+      }
+    },
+    "ほんとは「ありがとう」って、ひとこと言ってほしかっただけ。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All I really wanted was a simple “thank you.”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほんとは「ありがとう」って、ひとこと言ってほしかっただけ。"
           }
         }
       }
