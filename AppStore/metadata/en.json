@@ -4,12 +4,21 @@
     "アプリ名とカテゴリ名はもともと検索対象なので keywords に入れなくてよい。",
     "promotionalText は省略できる（省略すると App Store Connect 側の値をそのまま残す）。",
     "whatsNew は「このバージョンの最新情報」。{\"version\": \"1.1.0\", \"text\": \"…\"} の形で書き、version が反映先のバージョンと一致するときだけ書き込む。",
-    "最初のバージョン（1.0.0）には最新情報の欄が無いので、2 つ目のバージョンから足す。",
-    "TODO: テンプレートの仮の文言。アプリを作ったら書き換える（Metadata/App Store は既定で dry-run）。"
+    "最初のバージョン（1.0.0）には最新情報の欄が無いので、2 つ目のバージョンから足す。"
   ],
-  "promotionalText": "TODO: One line about why people will love this app (up to 170 characters).",
-  "description": "TODO: App description. What the app does, its key features, and how to get started.\n\n■ Key features\n• Feature 1\n• Feature 2\n• Feature 3",
+  "promotionalText": "Your in-laws, the stress at home—write it down without your name. Only empathy stamps come back, and posts disappear in 24 hours. It's okay to let it out.",
+  "description": "It's okay to let it out.\n\nKobosu is a place to write down what weighs on you at home—your in-laws, misunderstandings with your partner, the frustrations of parenting and housework—without using your name. The only thing that comes back is empathy stamps. Posts disappear automatically after 24 hours.\n\n■ Three promises\n• A place without names — No sign-up, no profiles, no followers. Nothing shows who wrote a post.\n• Only empathy comes back — There's no comment section. You receive four stamps: \"I get it,\" \"That's rough,\" \"Same here,\" and \"You're doing great.\"\n• Nothing stays behind — Posts disappear automatically after 24 hours. You can also delete them right away.\n\n■ What you can do\n• Listen: Filter by category—in-laws, partner, parenting, housework, money, your parents, siblings and relatives, caregiving, work and family, and more—and read how others feel. Each post shows how long until it disappears.\n• Let it out: Write up to 400 characters. When Kobosu finds names, places, schools or workplaces, or phone numbers, you choose whether to mask them. Drafts stay on your device.\n• Notes: See how many people said \"Same here\" to your posts, and the breakdown of stamps.\n• App lock: Lock the app with Face ID or your passcode. Its contents stay hidden when you switch apps.\n• Report and hide: Report a post anonymously by choosing one reason, or quietly step away with \"Don't show this post.\"\n\n■ For moments when\n• You want to talk, but can't tell the people close to you\n• You'd rather hear \"I get it\" than advice\n• You want to write it down and feel a little lighter\n\n\"Delete all data\" in Settings removes your shared posts, the empathy you sent, and your device's anonymous ID all at once.",
   "keywords": [
-    "TODO: keyword"
+    "vent",
+    "in-laws",
+    "family",
+    "parenting",
+    "partner",
+    "housework",
+    "caregiving",
+    "anonymous",
+    "empathy",
+    "stress",
+    "journal"
   ]
 }
