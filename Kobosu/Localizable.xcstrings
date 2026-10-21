@@ -7,13 +7,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@, %2$lld people"
+            "value" : "%1$@: %2$lld"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@、%lld人"
+          }
+        }
+      }
+    },
+    "%@、%lld人、送りました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$lld, sent by you"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@、%lld人、送りました"
           }
         }
       }
@@ -48,6 +65,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "URL"
+          }
+        }
+      }
+    },
+    "あなたが「うちも同じ」を送りました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You said “Same here”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたが「うちも同じ」を送りました"
           }
         }
       }

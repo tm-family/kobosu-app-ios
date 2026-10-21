@@ -29,8 +29,14 @@ struct PostCard: View {
                 .fixedSize(horizontal: false, vertical: true)
             stamps
             if sentStamps.contains(.sameHere) {
-                Text("あなたを含む\(post.sameHereCount)人が「うちも同じ」")
-                    .kobosuMetaLabel()
+                Group {
+                    if post.sameHereCount > 1 {
+                        Text("あなたを含む\(post.sameHereCount)人が「うちも同じ」")
+                    } else {
+                        Text("あなたが「うちも同じ」を送りました")
+                    }
+                }
+                .kobosuMetaLabel()
             }
         }
         .kobosuCard()

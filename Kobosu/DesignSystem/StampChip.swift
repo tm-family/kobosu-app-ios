@@ -35,8 +35,10 @@ struct StampChip: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(String(localized: stamp.title))、\(count)人"))
-        .accessibilityAddTraits(isSent ? .isSelected : [])
+        // カードの中でまとめて読まれても伝わるよう、送ったかどうかは文で伝える
+        .accessibilityLabel(
+            isSent ? Text("\(String(localized: stamp.title))、\(count)人、送りました") : Text("\(String(localized: stamp.title))、\(count)人")
+        )
     }
 }
 
