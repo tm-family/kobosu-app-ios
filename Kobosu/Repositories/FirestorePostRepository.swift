@@ -63,7 +63,14 @@ final class FirestorePostRepository: PostRepository {
 
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         let uid = try await userID()
-        switch try await FirestorePostAPI.sendStamp(stamp, to: postID, uid: uid, now: now()) {
+        let check = try await FirestorePostAPI.sendStamp(
+            stamp,
+            to: postID,
+            uid: uid,
+            now: now(),
+            autoHideThreshold: ReportPolicy.autoHideThreshold
+        )
+        switch check {
         case .send, .alreadySent:
             return
         case .ownPost:
@@ -220,7 +227,8 @@ nonisolated private enum FirestorePostAPI {
         _ stamp: EmpathyStamp,
         to postID: String,
         uid: String,
-        now: Date
+        now: Date,
+        autoHideThreshold: Int
     ) async throws -> PostDocument.StampSendCheck {
         let postRef = database.collection(PostDocument.postsCollection).document(postID)
         let sentRef = sentStamps(uid: uid).document(postID)
@@ -230,6 +238,7 @@ nonisolated private enum FirestorePostAPI {
         let check = PostDocument.stampSendCheck(
             post: postSnapshot.data().flatMap { post(id: postID, data: $0) },
             isOwnPost: isOwnPost,
+            isAutoHidden: ReportDocument.isAutoHidden(post: postSnapshot.data() ?? [:], threshold: autoHideThreshold),
             sentStamps: PostDocument.sentStamps(from: sentSnapshot.get(Field.stamps)),
             stamp: stamp,
             now: now

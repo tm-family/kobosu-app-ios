@@ -45,7 +45,7 @@ nonisolated enum PostDocument {
         case alreadySent
         /// 自分の投稿には送れない
         case ownPost
-        /// 投稿が無い・期限切れ・書き終わっていない
+        /// 投稿が無い・期限切れ・書き終わっていない・通報が一定数に達して出さなくなった
         case postNotFound
     }
 
@@ -99,15 +99,17 @@ nonisolated enum PostDocument {
         return counts
     }
 
-    /// 共感を送ってよいか。post は文書から作った投稿（無い・形が合わないなら nil）
+    /// 共感を送ってよいか。post は文書から作った投稿（無い・形が合わないなら nil）。
+    /// 通報が一定数に達した投稿は、タイムラインと同じく無いものとして扱う（読み込んだ後に達したときのため）
     static func stampSendCheck(
         post: Post?,
         isOwnPost: Bool,
+        isAutoHidden: Bool = false,
         sentStamps: Set<EmpathyStamp>,
         stamp: EmpathyStamp,
         now: Date
     ) -> StampSendCheck {
-        guard let post, !post.isExpired(at: now) else {
+        guard let post, !post.isExpired(at: now), !isAutoHidden else {
             return .postNotFound
         }
         if isOwnPost {
