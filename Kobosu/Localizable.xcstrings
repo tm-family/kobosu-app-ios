@@ -35,6 +35,23 @@
         }
       }
     },
+    "%lld 文字をこえています。いまは %lld 文字" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over %1$lld characters. Now %2$lld characters"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 文字をこえています。いまは %lld 文字"
+          }
+        }
+      }
+    },
     "%lld 文字中 %lld 文字" : {
       "extractionState" : "manual",
       "localizations" : {
