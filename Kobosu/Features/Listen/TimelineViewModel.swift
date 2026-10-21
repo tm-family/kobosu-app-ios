@@ -22,6 +22,8 @@ final class TimelineViewModel {
     private(set) var posts: [Post] = []
     /// 投稿ごとに自分が送ったスタンプ
     private(set) var sentStamps: [Post.ID: Set<EmpathyStamp>] = [:]
+    /// 自分の投稿の ID。自分の投稿には共感を送れない
+    private(set) var myPostIDs: Set<Post.ID> = []
     private(set) var state = LoadState.idle
 
     private let repository: any PostRepository
@@ -41,6 +43,7 @@ final class TimelineViewModel {
         }
         do {
             let posts = try await repository.timeline(category: category)
+            let myPostIDs = Set(try await repository.myPosts().map(\.id))
             var sentStamps: [Post.ID: Set<EmpathyStamp>] = [:]
             for post in posts {
                 // 読み込みのあいだに消えた投稿があっても、一覧は出す
@@ -51,10 +54,13 @@ final class TimelineViewModel {
             }
             self.posts = posts
             self.sentStamps = sentStamps
+            self.myPostIDs = myPostIDs
             state = .loaded
         } catch is CancellationError {
-            // 画面を離れて取り消されたときは、表示を変えない
-            return
+            // 画面を離れて取り消されたときは、読み込み中の表示だけ元に戻す
+            if loadID == latestLoad, state == .loading {
+                state = .idle
+            }
         } catch {
             guard loadID == latestLoad else {
                 return
@@ -81,5 +87,26 @@ final class TimelineViewModel {
 
     func sentStamps(for post: Post) -> Set<EmpathyStamp> {
         sentStamps[post.id] ?? []
+    }
+
+    func isMine(_ post: Post) -> Bool {
+        myPostIDs.contains(post.id)
+    }
+
+    /// 共感スタンプを送り、送った人数をすぐ一覧に反映する。送れなかったら throw する
+    func send(_ stamp: EmpathyStamp, to post: Post) async throws {
+        guard !sentStamps(for: post).contains(stamp) else {
+            return
+        }
+        try await repository.sendStamp(stamp, to: post.id)
+        sentStamps[post.id, default: []].insert(stamp)
+        if let index = posts.firstIndex(where: { $0.id == post.id }) {
+            posts[index].stampCounts[stamp, default: 0] += 1
+        }
+    }
+
+    /// 一覧の中の最新の投稿（シートで人数を出すため）
+    func post(id: Post.ID) -> Post? {
+        posts.first { $0.id == id }
     }
 }

@@ -239,6 +239,23 @@
         }
       }
     },
+    "この投稿は、もう消えています。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This post has already disappeared."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この投稿は、もう消えています。"
+          }
+        }
+      }
+    },
     "こぼす" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -613,6 +630,23 @@
         }
       }
     },
+    "共感を送る画面を開きます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens a sheet to send empathy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共感を送る画面を開きます"
+          }
+        }
+      }
+    },
     "危険を感じる内容がある" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -834,6 +868,23 @@
         }
       }
     },
+    "気持ちを送る" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send your feelings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "気持ちを送る"
+          }
+        }
+      }
+    },
     "特定の人が分かる情報がある" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -983,6 +1034,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "返ってくるのは共感だけ"
+          }
+        }
+      }
+    },
+    "送りました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送りました"
+          }
+        }
+      }
+    },
+    "送れませんでした。少し時間をおいて、もう一度どうぞ。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t send. Please try again in a little while."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送れませんでした。少し時間をおいて、もう一度どうぞ。"
+          }
+        }
+      }
+    },
+    "送れるのは共感のスタンプだけです" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can only send empathy stamps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送れるのは共感のスタンプだけです"
           }
         }
       }

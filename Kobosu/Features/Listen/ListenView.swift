@@ -4,12 +4,15 @@
 //
 //  「きく」タブのタイムライン（デザイン案 SCREEN 01）。カテゴリで絞り込んで、他の人の投稿を読む。
 //  開いたままでも 1 分ごとに残り時間を更新し、期限を過ぎた投稿は表示から外す。
+//  他の人の投稿をタップすると、共感を送るハーフシートを開く。
 //
 
 import SwiftUI
 
 struct ListenView: View {
     @State private var model: TimelineViewModel
+    /// 共感を送るシートで開いている投稿
+    @State private var selectedPost: Post?
 
     init(repository: any PostRepository) {
         _model = State(initialValue: TimelineViewModel(repository: repository))
@@ -34,6 +37,11 @@ struct ListenView: View {
             }
             .task {
                 await model.load()
+            }
+            .sheet(item: $selectedPost) { post in
+                EmpathySheet(post: model.post(id: post.id) ?? post, sentStamps: model.sentStamps(for: post)) { stamp in
+                    try await model.send(stamp, to: post)
+                }
             }
         }
     }
@@ -70,11 +78,28 @@ struct ListenView: View {
                 } else {
                     LazyVStack(spacing: 12) {
                         ForEach(posts) { post in
-                            PostCard(post: post, sentStamps: model.sentStamps(for: post), now: context.date)
+                            card(post, now: context.date)
                         }
                     }
                 }
             }
+        }
+    }
+
+    /// 他の人の投稿はタップで共感を送るシートを開く。自分の投稿には送れないので開かない
+    @ViewBuilder private func card(_ post: Post, now: Date) -> some View {
+        let card = PostCard(post: post, sentStamps: model.sentStamps(for: post), now: now)
+        if model.isMine(post) {
+            card
+        } else {
+            Button {
+                selectedPost = post
+            } label: {
+                card
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text("共感を送る画面を開きます"))
+            .accessibilityIdentifier("post.\(post.id)")
         }
     }
 
