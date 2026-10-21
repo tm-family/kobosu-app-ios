@@ -6,6 +6,8 @@
 //  初回の画面はアプリロックの設定まで進んでから閉じる（約束に同意した版は、アプリロックを決めたときに保存する）。
 //  アプリロックがオンなら、2 回目以降の起動とアプリ切り替えのたびにロック解除の画面を出す（撮影モードでは出さない）。
 //  前に出ていないとき（アプリスイッチャー・コントロールセンター）は中身を覆い、スナップショットにも本文を映さない。
+//  シートを開いたままでも隠せるよう、ロック画面と覆う画面は LockWindow（いちばん上のウインドウ）にも出す。
+//  この画面の中にも重ねるのは、起動した最初のフレームで中身が見えないようにするため。
 //  同意した約束の版は端末内（UserDefaults）にだけ保存する。撮影モードでは初回の画面を飛ばす。
 //
 
@@ -17,6 +19,7 @@ struct RootView: View {
     @AppStorage(OnboardingStatus.agreedVersionKey) private var agreedPromiseVersion = 0
     @Environment(\.scenePhase) private var scenePhase
     @State private var lock: AppLockController
+    @State private var lockWindow = LockWindow()
 
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
@@ -60,7 +63,15 @@ struct RootView: View {
             default:
                 break
             }
+            updateLockWindow()
         }
+        .onChange(of: lock.isLocked) {
+            updateLockWindow()
+        }
+    }
+
+    private func updateLockWindow() {
+        lockWindow.update(controller: lock, isCovered: scenePhase != .active && !ScreenshotDemo.isEnabled)
     }
 }
 
