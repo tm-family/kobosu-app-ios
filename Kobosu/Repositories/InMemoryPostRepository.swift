@@ -133,8 +133,8 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
 
 extension InMemoryPostRepository {
     /// Preview 用。他の人の投稿をいくつか置いたもの（実在の人名・地名は書かない）
-    static func preview(now: Date = Date()) -> InMemoryPostRepository {
-        let repository = InMemoryPostRepository(now: { now })
+    static func preview(now: Date = Date(), identity: AnonymousIDStore = InMemoryAnonymousIDStore()) -> InMemoryPostRepository {
+        let repository = InMemoryPostRepository(identity: identity, now: { now })
         func post(_ index: Int, _ body: String, _ category: PostCategory, hoursAgo: Double, _ counts: [EmpathyStamp: Int]) -> Post {
             Post(
                 id: "preview-\(index)",

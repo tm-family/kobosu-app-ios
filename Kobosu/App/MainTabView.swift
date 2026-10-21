@@ -14,12 +14,14 @@ enum MainTab: Hashable {
 }
 
 struct MainTabView: View {
+    let dependencies: AppDependencies
+
     @State private var selection: MainTab = .listen
     @State private var isComposing = false
 
     var body: some View {
         TabView(selection: $selection) {
-            ListenView()
+            ListenView(repository: dependencies.posts)
                 .toolbar(.hidden, for: .tabBar)
                 .tag(MainTab.listen)
             NoteView()
@@ -38,5 +40,5 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView()
+    MainTabView(dependencies: .demo())
 }
