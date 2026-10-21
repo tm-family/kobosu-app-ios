@@ -59,7 +59,8 @@ struct NoteView: View {
                             MyPostCard(
                                 post: post,
                                 now: context.date,
-                                isDeleting: model.deleting == post.id,
+                                // どれかを消している間は、ほかの投稿の「消す」も押せなくする
+                                isDeleting: model.deleting != nil,
                                 deletionFailed: model.failedDeletion == post.id
                             ) {
                                 Task { await model.delete(post) }

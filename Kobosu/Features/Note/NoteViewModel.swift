@@ -22,7 +22,7 @@ final class NoteViewModel {
     private(set) var state = LoadState.idle
     /// 消せなかった投稿。消せなかったことをその投稿のカードで伝える
     private(set) var failedDeletion: Post.ID?
-    /// 消している途中の投稿
+    /// 消している途中の投稿。消している間は、ほかの投稿も消せない
     private(set) var deleting: Post.ID?
 
     private let repository: any PostRepository
@@ -47,6 +47,8 @@ final class NoteViewModel {
                 return
             }
             self.posts = posts.filter { !deletedIDs.contains($0.id) }
+            // 読み直したら、前に消せなかったことの表示は消す
+            failedDeletion = nil
             state = .loaded
         } catch is CancellationError {
             // タブを離れて取り消されたときは、一覧を変えない（読み込み中の表示だけ戻す）

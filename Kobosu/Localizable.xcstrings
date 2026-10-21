@@ -92,7 +92,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld said \"Same here\""
+            "value" : "%lld said “Same here”"
           }
         },
         "ja" : {
@@ -143,7 +143,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When someone says \"Same here\", the count shows up here"
+            "value" : "When someone says “Same here”, the count shows up here"
           }
         },
         "ja" : {
@@ -721,7 +721,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " said \"Same here\""
+            "value" : " said “Same here”"
           }
         },
         "ja" : {

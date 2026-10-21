@@ -11,6 +11,7 @@ import SwiftUI
 struct MyPostCard: View {
     let post: Post
     let now: Date
+    /// 投稿を消している途中か（この投稿に限らない）。途中は「この投稿を消す」を押せない
     let isDeleting: Bool
     let deletionFailed: Bool
     let onDelete: () -> Void
