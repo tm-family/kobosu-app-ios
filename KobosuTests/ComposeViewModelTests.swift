@@ -213,20 +213,27 @@ struct ComposeViewModelTests {
         #expect(model.canSubmitReview)
     }
 
-    /// 候補を探している途中・送信中は、もう一度押しても投稿しない
-    @Test
-    func secondSubmitWhileBusyDoesNothing() async throws {
-        let repository = makeRepository()
+    /// 送信中は、もう一度押しても投稿しない。送信の途中で下書きを保存しても、送信中のままにする
+    @Test(.timeLimit(.minutes(1)))
+    func secondSubmitWhileSubmittingDoesNothing() async throws {
+        let repository = FlakyPostRepository(base: makeRepository())
         let model = ComposeViewModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
         model.body = "本文"
         model.category = .money
+        repository.holdsSubmit = true
 
         let first = Task { await model.submit() }
-        while !model.isBusy {
+        // 送信を止めているあいだは、送信中のまま変わらない
+        while !repository.isHoldingSubmit {
             await Task.yield()
         }
+        #expect(model.state == .submitting)
         #expect(!model.canSubmit)
         #expect(await model.submit() == nil)
+        model.saveDraft()
+        #expect(model.state == .submitting)
+
+        repository.releaseSubmit()
         #expect(await first.value != nil)
         #expect(try await repository.myPosts().count == 1)
     }
@@ -249,15 +256,27 @@ struct ComposeViewModelTests {
     }
 }
 
-/// 投稿を失敗させられる Repository。それ以外は base に任せる
+/// 投稿を失敗させたり、止めたりできる Repository。それ以外は base に任せる
 private final class FlakyPostRepository: PostRepository {
     struct Failure: Error {}
 
     let base: InMemoryPostRepository
     var failsSubmit = false
+    /// true のあいだ、submit は releaseSubmit() されるまで返さない
+    var holdsSubmit = false
+    private var heldSubmit: CheckedContinuation<Void, Never>?
 
     init(base: InMemoryPostRepository) {
         self.base = base
+    }
+
+    var isHoldingSubmit: Bool {
+        heldSubmit != nil
+    }
+
+    func releaseSubmit() {
+        heldSubmit?.resume()
+        heldSubmit = nil
     }
 
     func timeline(category: PostCategory?) async throws -> [Post] {
@@ -267,6 +286,9 @@ private final class FlakyPostRepository: PostRepository {
     func submit(body: String, category: PostCategory) async throws -> Post {
         if failsSubmit {
             throw Failure()
+        }
+        if holdsSubmit {
+            await withCheckedContinuation { heldSubmit = $0 }
         }
         return try await base.submit(body: body, category: category)
     }
