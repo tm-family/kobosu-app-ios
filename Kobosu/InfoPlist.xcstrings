@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "NSFaceIDUsageDescription" : {
+      "comment" : "Face ID の許可を求めるときの説明",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID is used to unlock Kobosu so others using this device can't read it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリを開くときに Face ID でロックを解除し、家族など端末を使うほかの人に見られないようにします。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
