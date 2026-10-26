@@ -4,7 +4,7 @@
 //
 //  投稿画面のカテゴリの行（デザイン案 6 枚目）。✦・カテゴリのタグ（紫の線の角丸）・選ばれ方の文言・右端の「変更」。
 //  行全体が 1 つのボタンで、押すとカテゴリを選ぶシート（CategorySheet）を開く。VoiceOver では 1 つの要素として読む。
-//  文字が大きいときは、選ばれ方の文言を 2 行目に下げる。
+//  文字が大きいときは、選ばれ方の文言を 2 行目に下げ、それでも収まらなければ「変更」も下げてタグを折り返す。
 //
 
 import SwiftUI
@@ -53,6 +53,14 @@ struct ComposeCategoryRow: View {
                     }
                     status
                 }
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        sparkle
+                        wrappingTag
+                    }
+                    status
+                    changeLabel
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -67,6 +75,8 @@ struct ComposeCategoryRow: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityHint(Text("カテゴリを変更します"))
+        // 音声コントロールで、画面に出ている「変更」と言っても押せるように
+        .accessibilityInputLabels([Text("変更"), Text("カテゴリ")])
         .accessibilityIdentifier("compose.category.change")
     }
 
@@ -78,18 +88,29 @@ struct ComposeCategoryRow: View {
     }
 
     private var tag: some View {
+        tagLabel
+            .lineLimit(1)
+            .fixedSize()
+    }
+
+    /// とても大きい文字のときのタグ。幅に収まらなければ折り返す
+    private var wrappingTag: some View {
+        tagLabel
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var tagLabel: some View {
         Text(category.title)
             .font(.zenMaruGothic(.bold, size: 13, relativeTo: .callout))
             .foregroundStyle(Palette.accentDeep)
-            .lineLimit(1)
             .padding(.horizontal, 12)
+            .padding(.vertical, 4)
             .frame(minHeight: tagHeight)
             .background {
-                Capsule()
+                RoundedRectangle(cornerRadius: tagHeight / 2, style: .continuous)
                     .fill(Palette.card)
                     .stroke(Palette.accent, lineWidth: 1.5)
             }
-            .fixedSize()
     }
 
     private var status: some View {

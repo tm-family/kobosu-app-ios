@@ -23,8 +23,11 @@ struct ComposeView: View {
     @State private var posted: Post?
     /// カテゴリを選ぶシートを出しているか
     @State private var isChoosingCategory = false
-    /// 入力欄の高さ（デザイン案 6 枚目のように大きくとる）
-    @ScaledMetric(relativeTo: .body) private var textAreaHeight: CGFloat = 280
+    /// 入力欄の高さ（デザイン案 6 枚目のように大きくとる）。とても大きい文字でも、カテゴリの行が隠れすぎないよう上限を設ける
+    @ScaledMetric(relativeTo: .body) private var scaledTextAreaHeight: CGFloat = 280
+    private var textAreaHeight: CGFloat {
+        min(scaledTextAreaHeight, 420)
+    }
 
     init(
         repository: any PostRepository,
