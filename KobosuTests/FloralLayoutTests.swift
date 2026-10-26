@@ -8,8 +8,16 @@ import CoreGraphics
 import Testing
 
 struct FloralLayoutTests {
-    /// 大きな花の花びらの先までの半径（素材の 250×250 のうち、中心から 120pt）
-    private static let petalRadius: CGFloat = 120
+    /// 大きな花の、中心から端の方向に花びらが届く長さ（素材の 250×250 の pt。倍率 1 のとき）。
+    /// 花びらは 6 枚の楕円（中心 60・長半径 60・短半径 34）なので、向きによって届く長さが違う。
+    /// 回す角度ごとに計算した値より少し短くとる（ピンク 0 度: 上 120・右 106.7、ラベンダー 20 度: 左 118.5、ブルー 10 度: 右 113.9・下 118.5）
+    private enum Reach {
+        static let pinkUp: CGFloat = 118
+        static let pinkRight: CGFloat = 105
+        static let lavenderLeft: CGFloat = 116
+        static let blueRight: CGFloat = 112
+        static let blueDown: CGFloat = 116
+    }
 
     /// 確かめる画面の大きさ（iPhone SE・17 Pro・Pro Max・iPhone の横向き・iPad 13 インチの縦と横）
     nonisolated private static let screenSizes: [CGSize] = [
@@ -53,18 +61,15 @@ struct FloralLayoutTests {
         let pink = try #require(placements.first { $0.part == .flowerPink })
         let lavender = try #require(placements.first { $0.part == .flowerLavender })
         let blue = try #require(placements.first { $0.part == .flowerBlue })
-        func radius(_ placement: FloralPlacement) -> CGFloat {
-            Self.petalRadius * placement.scale
-        }
         // 右上の角: 右端と上端の両方に花びらがかかる
-        #expect(size.width - pink.center.x < radius(pink))
-        #expect(pink.center.y < radius(pink))
+        #expect(size.width - pink.center.x < Reach.pinkRight * pink.scale)
+        #expect(pink.center.y < Reach.pinkUp * pink.scale)
         // 左の端: 左端に花びらがかかり、花の中心は画面の高さの中にある
-        #expect(lavender.center.x < radius(lavender))
+        #expect(lavender.center.x < Reach.lavenderLeft * lavender.scale)
         #expect((0...size.height).contains(lavender.center.y))
         // 右下の角: 右端と下端の両方に花びらがかかる
-        #expect(size.width - blue.center.x < radius(blue))
-        #expect(size.height - blue.center.y < radius(blue))
+        #expect(size.width - blue.center.x < Reach.blueRight * blue.scale)
+        #expect(size.height - blue.center.y < Reach.blueDown * blue.scale)
     }
 
     /// 小花と葉は画面の中に置く（端の外に出て見えなくならない）

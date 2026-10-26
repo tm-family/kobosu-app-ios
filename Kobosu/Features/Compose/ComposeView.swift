@@ -77,7 +77,7 @@ struct ComposeView: View {
             .padding(16)
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(Palette.paper)
+        .floralBackground()
         .navigationTitle(Text("こぼす"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

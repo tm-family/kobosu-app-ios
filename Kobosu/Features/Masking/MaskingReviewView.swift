@@ -29,7 +29,7 @@ struct MaskingReviewView: View {
                 .padding(16)
             }
         }
-        .background(Palette.paper)
+        .floralBackground()
         .navigationTitle(Text("伏せ字の確認"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(model.isBusy)

@@ -50,7 +50,7 @@ struct WelcomeView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 16)
         }
-        .background(Palette.paper)
+        .floralBackground()
     }
 
     private func promise(_ text: LocalizedStringResource) -> some View {

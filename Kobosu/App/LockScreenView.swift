@@ -43,7 +43,7 @@ struct LockScreenView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Palette.paper)
+        .floralBackground()
     }
 
     /// システムの確認の画面に出す理由
@@ -70,7 +70,7 @@ struct PrivacyCoverView: View {
     var body: some View {
         AppMark()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Palette.paper)
+            .floralBackground()
             .accessibilityHidden(true)
     }
 }
