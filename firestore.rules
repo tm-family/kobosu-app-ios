@@ -51,7 +51,7 @@ service cloud.firestore {
     // PostCategory の rawValue
     function categoryIDs() {
       return [
-        'in_laws', 'partner', 'parenting', 'housework', 'money', 'other'
+        'in_laws', 'partner', 'parenting', 'housework', 'money', 'other', 'uncategorized'
       ];
     }
 
