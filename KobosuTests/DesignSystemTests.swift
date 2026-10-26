@@ -61,13 +61,14 @@ struct DesignSystemTests {
         #expect(actual == hex, "\(name): \(String(actual, radix: 16)) != \(String(hex, radix: 16))")
     }
 
-    /// 花柄の部品は、ライトとダークの両方で素材の大きさのまま読み込め、ダークはライトと違う色で描かれる
+    /// 花柄の部品は、ライトとダークの両方で素材の大きさのまま読み込め、ダークはライトと違う色で描かれる。
+    /// FloralPart.image から読むので、部品と画像の対応の誤りにも気づける
     @Test(arguments: FloralPart.allCases)
     func floralPartExistsInLightAndDark(part: FloralPart) throws {
-        let name = try #require(Self.floralImageNames[part])
-        func rendered(_ style: UIUserInterfaceStyle) throws -> Data {
+        let asset = try #require(UIImage(resource: part.image).imageAsset, "\(part) の画像が Asset Catalog に無い")
+        func rendered(_ style: UIUserInterfaceStyle) -> Data {
             let traits = UITraitCollection(userInterfaceStyle: style)
-            let image = try #require(UIImage(named: name, in: .main, compatibleWith: traits), "\(name) が Asset Catalog に無い")
+            let image = asset.image(with: traits)
             #expect(image.size == part.size)
             let format = UIGraphicsImageRendererFormat(for: traits)
             format.scale = 1
@@ -75,18 +76,19 @@ struct DesignSystemTests {
                 image.draw(in: CGRect(origin: .zero, size: part.size))
             }
         }
-        #expect(try rendered(.light) != rendered(.dark), "\(name) にダークモードの画像が無い")
+        #expect(rendered(.light) != rendered(.dark), "\(part) にダークモードの画像が無い")
     }
 
-    /// アセットカタログの名前（FloralPart.image と同じ画像）
-    nonisolated private static let floralImageNames: [FloralPart: String] = [
-        .flowerPink: "FlowerPink",
-        .flowerLavender: "FlowerLavender",
-        .flowerBlue: "FlowerBlue",
-        .budPink: "BudPink",
-        .budLavender: "BudLavender",
-        .leaf: "Leaf"
-    ]
+    /// 部品ごとに別の画像を使う（ほかの部品と同じ画像を返していない）
+    @Test
+    func floralPartsUseDistinctImages() {
+        let rendered = FloralPart.allCases.map { part in
+            UIGraphicsImageRenderer(size: CGSize(width: 50, height: 50)).pngData { _ in
+                UIImage(resource: part.image).draw(in: CGRect(x: 0, y: 0, width: 50, height: 50))
+            }
+        }
+        #expect(Set(rendered).count == FloralPart.allCases.count)
+    }
 
     nonisolated private static let colorNames = [
         "Paper", "Card", "Ink", "InkSecondary", "AccentColor", "AccentDeep", "Lavender", "Caution", "Line",
