@@ -245,4 +245,32 @@ struct ComposeViewModelCategoryTests {
         #expect(post.category == .inLaws)
         #expect(post.body == "義母の〇〇さんに、また言われた。")
     }
+
+    /// 投稿完了の画面でカテゴリを付けてから「続けてこぼす」で戻ると、付けたカテゴリ（前回のカテゴリ）を初期値にする
+    @Test
+    func returnFromCompleteUsesAssignedCategory() async throws {
+        let lastCategories = InMemoryLastCategoryStore()
+        let model = makeModel(repository: makeRepository(), lastCategories: lastCategories)
+        model.body = "今日はなんだか疲れた。"
+        _ = try #require(await model.submit())
+        #expect(model.category == .uncategorized)
+
+        // 投稿完了の画面で付けた（PostCompleteViewModel が前回のカテゴリにする）
+        lastCategories.save(.money)
+        model.returnFromComplete()
+        #expect(model.category == .money)
+        #expect(model.categorySource == .previous)
+    }
+
+    /// 本人が選んだカテゴリは、「続けてこぼす」で戻っても変えない
+    @Test
+    func returnFromCompleteKeepsChosenCategory() {
+        let lastCategories = InMemoryLastCategoryStore()
+        let model = makeModel(repository: makeRepository(), lastCategories: lastCategories)
+        model.choose(.parenting)
+        lastCategories.save(.money)
+        model.returnFromComplete()
+        #expect(model.category == .parenting)
+        #expect(model.categorySource == .chosen)
+    }
 }

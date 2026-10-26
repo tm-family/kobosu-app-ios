@@ -443,6 +443,23 @@
         }
       }
     },
+    "いまはカテゴリを付けられませんでした。このままでも、「すべて」には届いています。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't add a category right now. It still shows up in All."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いまはカテゴリを付けられませんでした。このままでも、「すべて」には届いています。"
+          }
+        }
+      }
+    },
     "うちも同じ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1191,6 +1208,57 @@
         }
       }
     },
+    "カテゴリを付けました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category added"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを付けました"
+          }
+        }
+      }
+    },
+    "カテゴリを付ける" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a category"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを付ける"
+          }
+        }
+      }
+    },
+    "カテゴリを付けると、近い悩みの人に届きやすくなります" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding a category helps it reach people with similar worries"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを付けると、近い悩みの人に届きやすくなります"
+          }
+        }
+      }
+    },
     "カテゴリを変更します" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1527,6 +1595,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今日も黙って洗い物をした。"
+          }
+        }
+      }
+    },
+    "付けなくても、「すべて」には届いています" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Even without one, it already shows up in All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "付けなくても、「すべて」には届いています"
           }
         }
       }
@@ -2166,7 +2251,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Disappears in"
+            "value" : "When it disappears"
           }
         },
         "ja" : {

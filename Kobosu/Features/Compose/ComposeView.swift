@@ -16,6 +16,9 @@ import SwiftUI
 struct ComposeView: View {
     /// 投稿できたときに呼ぶ
     let onPosted: (Post) -> Void
+    /// 投稿完了の画面で、未分類の投稿にカテゴリを付けるのに使う
+    private let repository: any PostRepository
+    private let lastCategories: any LastCategoryStore
 
     @Environment(\.dismiss) private var dismiss
     @State private var model: ComposeViewModel
@@ -38,16 +41,22 @@ struct ComposeView: View {
         onPosted: @escaping (Post) -> Void
     ) {
         self.onPosted = onPosted
+        self.repository = repository
+        self.lastCategories = lastCategories
         _model = State(initialValue: ComposeViewModel(repository: repository, drafts: drafts, lastCategories: lastCategories))
     }
 
     var body: some View {
         NavigationStack {
             if let posted {
-                PostCompleteView(post: posted) {
+                PostCompleteView(post: posted, repository: repository, lastCategories: lastCategories) {
                     dismiss()
                 } onContinue: {
                     self.posted = nil
+                    model.returnFromComplete()
+                } onCategoryAssigned: { post in
+                    // 投稿したときと同じく、タイムラインを読み直す
+                    onPosted(post)
                 }
             } else {
                 editor
@@ -73,6 +82,7 @@ struct ComposeView: View {
                     PostSettingsRow {
                         isShowingSettings = true
                     }
+                    .disabled(model.isBusy)
                 }
                 if model.state == .failed {
                     note("投稿できませんでした。時間をおいて、もう一度ためせます。")

@@ -98,6 +98,41 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["compose.submit"].exists)
     }
 
+    /// 未分類で投稿すると、投稿完了の画面でカテゴリを付けるよう問いかけ、付けると問いかけが消える。
+    /// カテゴリありで投稿したときは問いかけない
+    @MainActor
+    func testAssigningCategoryFromComplete() throws {
+        let app = Self.launchAfterOnboarding()
+
+        // 推定できない本文・前回のカテゴリなし → 未分類で投稿する
+        app.buttons["tab.compose"].tap()
+        let body = app.textViews.firstMatch
+        XCTAssertTrue(body.waitForExistence(timeout: 5))
+        body.tap()
+        body.typeText("UI test")
+        app.buttons["compose.submit"].tap()
+        let assign = app.buttons["complete.assign"]
+        XCTAssertTrue(assign.waitForExistence(timeout: 5))
+        assign.tap()
+        // 付けるときは未分類を出さない
+        let money = app.buttons["compose.category.money"]
+        XCTAssertTrue(money.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["compose.category.uncategorized"].exists)
+        money.tap()
+        XCTAssertTrue(assign.waitForNonExistence(timeout: 5))
+
+        // 続けてこぼす → 前回のカテゴリ（付けたお金）が初期値になり、それで投稿するので、問いかけない
+        app.buttons["complete.continue"].tap()
+        XCTAssertTrue(body.waitForExistence(timeout: 5))
+        let row = app.buttons["compose.category.change"]
+        XCTAssertTrue(row.label.contains("お金") || row.label.contains("Money"), row.label)
+        body.tap()
+        body.typeText("UI test 2")
+        app.buttons["compose.submit"].tap()
+        XCTAssertTrue(app.buttons["complete.back"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["complete.assign"].exists)
+    }
+
     /// 伏せ字の候補（電話番号）があると確認の画面に進み、伏せ字にした本文を見てから投稿できる
     @MainActor
     func testPostingThroughMaskingReview() throws {
