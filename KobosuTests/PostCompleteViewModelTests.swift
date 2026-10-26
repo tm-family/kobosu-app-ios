@@ -94,4 +94,74 @@ struct PostCompleteViewModelTests {
         #expect(model.post.category == .housework)
         #expect(model.assignState == .idle)
     }
+
+    /// 付けている途中にもう一度付けても、書き込まない（1 回だけ）
+    @Test(.timeLimit(.minutes(1)))
+    func secondAssignWhileAssigningDoesNothing() async throws {
+        let base = makeRepository()
+        let post = try await base.submit(body: "本文", category: .uncategorized)
+        let repository = HeldAssignRepository(base: base)
+        let model = PostCompleteViewModel(post: post, repository: repository, lastCategories: InMemoryLastCategoryStore())
+
+        let first = Task { await model.assign(.partner) }
+        while !repository.isHolding {
+            await Task.yield()
+        }
+        #expect(model.isAssigning)
+        #expect(await !model.assign(.money))
+        repository.release()
+        #expect(await first.value)
+        #expect(repository.assignCount == 1)
+        #expect(model.post.category == .partner)
+    }
+}
+
+/// カテゴリを付ける書き込みを、release() されるまで止める Repository。それ以外は base に任せる
+private final class HeldAssignRepository: PostRepository {
+    let base: InMemoryPostRepository
+    private(set) var assignCount = 0
+    private var held: CheckedContinuation<Void, Never>?
+
+    init(base: InMemoryPostRepository) {
+        self.base = base
+    }
+
+    var isHolding: Bool {
+        held != nil
+    }
+
+    func release() {
+        held?.resume()
+        held = nil
+    }
+
+    func timeline(category: PostCategory?) async throws -> [Post] {
+        try await base.timeline(category: category)
+    }
+
+    func submit(body: String, category: PostCategory) async throws -> Post {
+        try await base.submit(body: body, category: category)
+    }
+
+    func myPosts() async throws -> [Post] {
+        try await base.myPosts()
+    }
+
+    func delete(postID: Post.ID) async throws {
+        try await base.delete(postID: postID)
+    }
+
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        assignCount += 1
+        await withCheckedContinuation { held = $0 }
+        return try await base.assignCategory(category, toPostID: postID)
+    }
+
+    func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
+        try await base.sendStamp(stamp, to: postID)
+    }
+
+    func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> {
+        try await base.sentStamps(for: postID)
+    }
 }

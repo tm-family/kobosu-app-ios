@@ -85,6 +85,8 @@ struct PostCompleteView: View {
                 .buttonStyle(.kobosuText)
                 .accessibilityIdentifier("complete.continue")
             }
+            // カテゴリを付けている途中は閉じさせない（付けられたかどうか分からなくなるため。数秒で終わる）
+            .disabled(model.isAssigning)
             .padding(.horizontal, 24)
             .padding(.bottom, 16)
         }
@@ -98,8 +100,13 @@ struct PostCompleteView: View {
                     Text("閉じる")
                 }
                 .foregroundStyle(Palette.inkSecondary)
+                .disabled(model.isAssigning)
                 .accessibilityIdentifier("complete.close")
             }
+        }
+        .interactiveDismissDisabled(model.isAssigning)
+        .onChange(of: model.assignState) { _, state in
+            announce(state)
         }
         .sheet(isPresented: $isChoosingCategory) {
             // 付けるときは 6 つから選ぶ（未分類には戻せない）
@@ -140,14 +147,34 @@ struct PostCompleteView: View {
             Button {
                 isChoosingCategory = true
             } label: {
-                Text("カテゴリを付ける")
-                    .frame(maxWidth: .infinity)
+                HStack(spacing: 8) {
+                    if model.isAssigning {
+                        ProgressView()
+                            .tint(Palette.accentDeep)
+                    }
+                    Text("カテゴリを付ける")
+                }
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(.kobosuTonal)
             .disabled(model.isAssigning)
             .accessibilityIdentifier("complete.assign")
         }
         .kobosuCard()
+    }
+
+    /// 付けられたか・付けられなかったかを VoiceOver で知らせる（問いかけが消える・文が出るだけでは伝わらないため）
+    private func announce(_ state: PostCompleteViewModel.AssignState) {
+        let message: LocalizedStringResource
+        switch state {
+        case .assigned:
+            message = "カテゴリを付けました"
+        case .failed:
+            message = "いまはカテゴリを付けられませんでした。このままでも、「すべて」には届いています。"
+        case .idle, .assigning:
+            return
+        }
+        AccessibilityNotification.Announcement(String(localized: message)).post()
     }
 
     /// 投稿した内容（伏せ字にした後の本文）。カテゴリを付けたら、付けたカテゴリのタグを出す

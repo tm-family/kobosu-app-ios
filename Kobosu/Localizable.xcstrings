@@ -1208,6 +1208,23 @@
         }
       }
     },
+    "カテゴリを付けました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category added"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを付けました"
+          }
+        }
+      }
+    },
     "カテゴリを付ける" : {
       "extractionState" : "manual",
       "localizations" : {
