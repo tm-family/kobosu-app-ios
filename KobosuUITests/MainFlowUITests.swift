@@ -112,7 +112,7 @@ final class MainFlowUITests: XCTestCase {
         XCTAssertTrue(text.waitForExistence(timeout: 5))
         text.tap()
         text.typeText(body)
-        app.buttons["compose.category.\(category)"].tap()
+        UITestApp.chooseCategory(category, in: app)
         app.buttons["compose.submit"].tap()
         let back = app.buttons["complete.back"]
         XCTAssertTrue(back.waitForExistence(timeout: 5))
