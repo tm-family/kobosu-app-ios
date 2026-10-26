@@ -246,6 +246,7 @@ private final class FailingDeleteRepository: PostRepository {
         [Post(id: "mine", body: "本文", category: .money, createdAt: Date())]
     }
     func delete(postID: Post.ID) async throws { throw Failure() }
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post { throw Failure() }
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {}
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> { [] }
 }

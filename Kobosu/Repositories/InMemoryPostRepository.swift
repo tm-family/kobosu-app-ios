@@ -84,6 +84,17 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
         records[postID] = nil
     }
 
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        var record = try activeRecord(postID)
+        let myID = try identity.currentID()
+        guard record.authorID == myID else {
+            throw PostRepositoryError.notOwner
+        }
+        record.post = try record.post.assigningCategory(category)
+        records[postID] = record
+        return record.post
+    }
+
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         var record = try activeRecord(postID)
         let myID = try identity.currentID()

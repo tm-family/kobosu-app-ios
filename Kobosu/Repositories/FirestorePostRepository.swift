@@ -61,6 +61,11 @@ final class FirestorePostRepository: PostRepository {
         try await FirestorePostAPI.delete(postID: postID, uid: uid)
     }
 
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        let uid = try await userID()
+        return try await FirestorePostAPI.assignCategory(category, toPostID: postID, uid: uid, now: now())
+    }
+
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         let uid = try await userID()
         let check = try await FirestorePostAPI.sendStamp(
@@ -302,6 +307,23 @@ nonisolated private enum FirestorePostAPI {
         batch.deleteDocument(postRef)
         batch.deleteDocument(ownRef)
         try await batch.commit()
+    }
+
+    /// 未分類の自分の投稿にカテゴリを付ける。書き換えるのは category だけ（ルールで、前が未分類・期限内・自分の目印があるときだけ許す）
+    static func assignCategory(_ category: PostCategory, toPostID postID: String, uid: String, now: Date) async throws -> Post {
+        let postRef = database.collection(PostDocument.postsCollection).document(postID)
+        guard try await ownPosts(uid: uid).document(postID).getDocument(source: .server).exists else {
+            let exists = try await postRef.getDocument(source: .server).exists
+            throw exists ? PostRepositoryError.notOwner : PostRepositoryError.postNotFound
+        }
+        let snapshot = try await postRef.getDocument(source: .server)
+        guard let current = snapshot.data().flatMap({ post(id: postID, data: $0) }),
+              PostDocument.activePosts([current], at: now).contains(current) else {
+            throw PostRepositoryError.postNotFound
+        }
+        let assigned = try current.assigningCategory(category)
+        try await postRef.updateData([Field.category: category.rawValue])
+        return assigned
     }
 
     /// 「すべてのデータを削除」のサーバー側（MyDataDocument のコメント）

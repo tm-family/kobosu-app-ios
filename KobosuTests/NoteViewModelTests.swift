@@ -219,6 +219,10 @@ private final class GatedPostRepository: PostRepository {
         try await base.delete(postID: postID)
     }
 
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        try await base.assignCategory(category, toPostID: postID)
+    }
+
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         try await base.sendStamp(stamp, to: postID)
     }
