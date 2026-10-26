@@ -3,7 +3,7 @@
 //  Kobosu
 //
 //  タブバー中央の「こぼす」ボタンから開く投稿画面（デザイン案 SCREEN 02）。
-//  本文（最大 400 字）・書き始めのヒント・カテゴリを 1 つ選ぶ・24 時間で消えることを伝える。
+//  本文（最大 400 字）・書き始めのヒント・カテゴリ（本文から先に選んでおき、違うときだけ選び直す）・24 時間で消えることを伝える。
 //  ナビゲーションバーは左が取り消し・中央がタイトル・右が投稿（COMPONENTS 3/3）。
 //  書いている途中の本文とカテゴリは端末に下書きとして残し、キャンセルや引いて閉じても続きから書ける。
 //  公開範囲は今回「みんなに共有」だけ、消える期間は 24 時間だけなので、選ぶ UI は出さない。
@@ -22,9 +22,14 @@ struct ComposeView: View {
     /// 投稿できた投稿。あれば投稿完了の画面を出す
     @State private var posted: Post?
 
-    init(repository: any PostRepository, drafts: any ComposeDraftStore, onPosted: @escaping (Post) -> Void) {
+    init(
+        repository: any PostRepository,
+        drafts: any ComposeDraftStore,
+        lastCategories: any LastCategoryStore,
+        onPosted: @escaping (Post) -> Void
+    ) {
         self.onPosted = onPosted
-        _model = State(initialValue: ComposeViewModel(repository: repository, drafts: drafts))
+        _model = State(initialValue: ComposeViewModel(repository: repository, drafts: drafts, lastCategories: lastCategories))
     }
 
     var body: some View {
@@ -95,7 +100,7 @@ struct ComposeView: View {
             }
         }
         .onChange(of: model.body) {
-            model.saveDraft()
+            model.bodyDidChange()
         }
         .onChange(of: model.category) {
             model.saveDraft()
@@ -116,11 +121,7 @@ struct ComposeView: View {
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: 4) {
             sectionTitle("カテゴリ")
-            CategoryPicker(selection: $model.category)
-            if model.category == nil, model.bodyLength > 0 {
-                Text("カテゴリを 1 つえらぶと、投稿できます")
-                    .kobosuMetaLabel()
-            }
+            CategoryPicker(selection: $model.pickerSelection)
         }
     }
 
@@ -181,7 +182,11 @@ struct ComposeView: View {
 }
 
 #Preview {
-    ComposeView(repository: InMemoryPostRepository.preview(), drafts: InMemoryComposeDraftStore()) { _ in }
+    ComposeView(
+        repository: InMemoryPostRepository.preview(),
+        drafts: InMemoryComposeDraftStore(),
+        lastCategories: InMemoryLastCategoryStore()
+    ) { _ in }
 }
 
 #Preview("下書きあり") {
@@ -189,6 +194,7 @@ struct ComposeView: View {
         repository: InMemoryPostRepository.preview(),
         drafts: InMemoryComposeDraftStore(
             draft: ComposeDraft(body: "「手伝おうか」って言われるたびにモヤっとする。二人の家のことなのに。", category: .partner)
-        )
+        ),
+        lastCategories: InMemoryLastCategoryStore()
     ) { _ in }
 }

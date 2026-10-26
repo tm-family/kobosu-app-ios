@@ -76,8 +76,11 @@ struct CategoryEstimatorTests {
         #expect(CategoryEstimator.estimate(text) == expected)
     }
 
-    /// 「大丈夫」「工夫」の「夫」はパートナーとして数えない
-    @Test(arguments: ["大丈夫、なんとかなる。", "工夫してみたけど、だめだった。"])
+    /// 言葉の一覧の言葉を含むが、そのカテゴリの話ではない言い回しは数えない
+    @Test(arguments: [
+        "大丈夫、なんとかなる。", "工夫してみたけど、だめだった。", "夫人会の集まり", "稲妻がすごい", "責任転嫁された",
+        "姑息な手を使われた", "ドラマの主人公が", "ふだんならできるのに", "ドローンを飛ばした", "クローンの話"
+    ])
     func ignoresPhrasesContainingKeywords(text: String) {
         #expect(CategoryEstimator.estimate(text) == nil)
     }
@@ -89,6 +92,34 @@ struct CategoryEstimatorTests {
         for words in CategoryEstimator.keywords.values {
             #expect(!words.isEmpty)
             #expect(!words.contains(""))
+        }
+    }
+
+    /// 長音の「ー」は、カタカナでもひらがなでも同じにそろう
+    @Test
+    func normalizesLongVowelMarkConsistently() {
+        #expect(CategoryEstimator.normalized("ローン") == CategoryEstimator.normalized("ろーん"))
+        #expect(CategoryEstimator.normalized("ﾊﾟｰﾄﾅｰ") == CategoryEstimator.normalized("パートナー"))
+    }
+
+    /// どの言葉も、それだけを推定すると自分のカテゴリになる（あとから足した言葉が別のカテゴリの言葉を含んでいたら気づける）
+    @Test
+    func eachKeywordAloneEstimatesItsCategory() {
+        for (category, words) in CategoryEstimator.keywords {
+            for word in words {
+                #expect(CategoryEstimator.estimate(word) == category, "\(word) が \(category) にならない")
+            }
+        }
+    }
+
+    /// どの言葉も、別のカテゴリの言葉を一部に含まない
+    @Test
+    func keywordsDoNotContainOtherCategoriesKeywords() {
+        for (category, words) in CategoryEstimator.keywords {
+            let others = CategoryEstimator.keywords.filter { $0.key != category }.values.flatMap { $0 }.map(CategoryEstimator.normalized)
+            for word in words.map(CategoryEstimator.normalized) {
+                #expect(!others.contains { word.contains($0) }, "\(word) が別のカテゴリの言葉を含む")
+            }
         }
     }
 

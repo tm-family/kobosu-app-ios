@@ -8,9 +8,11 @@
 
 import Foundation
 
-/// 書きかけの本文と、選んだカテゴリ
+/// 書きかけの本文と、本人が選んだカテゴリ
 nonisolated struct ComposeDraft: Codable, Equatable, Sendable {
     var body: String
+    /// 本人が選んだカテゴリ。nil なら本人は選んでいない（推定・前回のカテゴリは保存せず、開き直したときに本文から選び直す）。
+    /// 前の形の下書きのカテゴリも、本人が選んだもの（カテゴリを選ばないと投稿できなかったため）
     var category: PostCategory?
 
     /// 本文が空白だけで、カテゴリも選んでいない

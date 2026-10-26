@@ -34,7 +34,7 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.listen"].exists)
     }
 
-    /// 本文を書いてカテゴリを選ぶと投稿でき、投稿するとモーダルが閉じる
+    /// 本文を書くだけで投稿でき（カテゴリは選ばなくてよい）、投稿するとモーダルが閉じる
     @MainActor
     func testPostingFromCompose() throws {
         let app = Self.launchAfterOnboarding()
@@ -48,9 +48,7 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(body.waitForExistence(timeout: 5))
         body.tap()
         body.typeText("UI test")
-        // カテゴリを選ぶまでは投稿できない
-        XCTAssertFalse(submit.isEnabled)
-        app.buttons["compose.category.housework"].tap()
+        // カテゴリを選ばなくても、本文だけで投稿できる
         XCTAssertTrue(submit.isEnabled)
 
         submit.tap()
