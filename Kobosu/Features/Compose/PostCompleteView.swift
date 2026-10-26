@@ -65,7 +65,7 @@ struct PostCompleteView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 16)
         }
-        .background(Palette.paper)
+        .floralBackground()
         .navigationTitle(Text("こぼす"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()

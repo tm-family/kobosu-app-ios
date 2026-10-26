@@ -23,7 +23,7 @@ struct LicenseView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
         }
-        .background(Palette.paper)
+        .floralBackground()
         .navigationTitle(Text("ライセンス"))
         .navigationBarTitleDisplayMode(.inline)
     }

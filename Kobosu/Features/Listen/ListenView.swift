@@ -38,7 +38,7 @@ struct ListenView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 24)
             }
-            .background(Palette.paper)
+            .floralBackground()
             .navigationTitle(Text("きく"))
             .refreshable {
                 await model.load()

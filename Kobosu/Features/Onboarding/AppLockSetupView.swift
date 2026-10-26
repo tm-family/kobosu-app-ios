@@ -74,7 +74,7 @@ struct AppLockSetupView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 16)
         }
-        .background(Palette.paper)
+        .floralBackground()
     }
 
     @ViewBuilder private var lockToggle: some View {
