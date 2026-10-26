@@ -84,7 +84,9 @@ struct PostCompleteView: View {
     private var postCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                CategoryTag(title: post.category.title)
+                if let tagTitle = post.category.tagTitle {
+                    CategoryTag(title: tagTitle)
+                }
                 Spacer(minLength: 8)
                 Text(RemainingTime(post.remainingTime(at: .now)).text)
                     .kobosuMetaLabel()

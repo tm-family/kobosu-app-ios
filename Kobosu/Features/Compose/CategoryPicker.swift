@@ -3,7 +3,7 @@
 //  Kobosu
 //
 //  投稿画面のカテゴリ選択（デザイン案 SCREEN 02）。カテゴリを 1 つだけ選ぶ。
-//  選んだものは淡い紫の面と紫の線、それ以外はカードの面と線。並びは PostCategory の case の順。
+//  選んだものは淡い紫の面と紫の線、それ以外はカードの面と線。並びは PostCategory の case の順（未分類は出さない）。
 //
 
 import SwiftUI
@@ -14,7 +14,7 @@ struct CategoryPicker: View {
     var body: some View {
         // チップはタップ領域（44pt）が見た目（30pt）より大きく、それが行の間隔になるので、行の間隔は足さない
         FlowLayout(lineSpacing: 0) {
-            ForEach(PostCategory.allCases) { category in
+            ForEach(PostCategory.filterable) { category in
                 CategoryChoiceChip(title: category.title, isSelected: selection == category) {
                     selection = category
                 }

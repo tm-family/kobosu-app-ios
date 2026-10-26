@@ -12,15 +12,24 @@ struct ModelTests {
     @Test
     func categoryRawValuesAreStable() {
         #expect(PostCategory.allCases.map(\.rawValue) == [
-            "in_laws", "partner", "parenting", "housework", "money", "other"
+            "in_laws", "partner", "parenting", "housework", "money", "other", "uncategorized"
         ])
     }
 
-    /// 絞り込みの先頭は「義理の親」、末尾は「その他」にする
+    /// 絞り込みは未分類を除く 6 つで、先頭は「義理の親」、末尾は「その他」にする
     @Test
-    func categoryOrderStartsWithInLawsAndEndsWithOther() {
-        #expect(PostCategory.allCases.first == .inLaws)
-        #expect(PostCategory.allCases.last == .other)
+    func filterableCategoriesExcludeUncategorized() {
+        #expect(PostCategory.filterable == [.inLaws, .partner, .parenting, .housework, .money, .other])
+        #expect(!PostCategory.filterable.contains(.uncategorized))
+    }
+
+    /// 未分類の投稿のカードにはタグを出さない。それ以外は表示名をタグにする
+    @Test
+    func uncategorizedHasNoTag() {
+        #expect(PostCategory.uncategorized.tagTitle == nil)
+        for category in PostCategory.filterable {
+            #expect(category.tagTitle == category.title)
+        }
     }
 
     @Test

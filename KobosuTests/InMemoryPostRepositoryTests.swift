@@ -67,6 +67,18 @@ struct InMemoryPostRepositoryTests {
         #expect(try await repository.timeline(category: .parenting).isEmpty)
     }
 
+    /// 未分類の投稿は「すべて」にだけ出て、どのカテゴリの絞り込みにも出ない
+    @Test
+    func uncategorizedPostAppearsOnlyInAll() async throws {
+        let repository = makeRepository()
+        repository.seed(otherPost(id: "a", category: .uncategorized, hoursAgo: 2))
+        repository.seed(otherPost(id: "b", category: .money, hoursAgo: 1))
+        #expect(try await repository.timeline(category: nil).map(\.id) == ["b", "a"])
+        for category in PostCategory.filterable {
+            #expect(try await !repository.timeline(category: category).map(\.id).contains("a"))
+        }
+    }
+
     // MARK: - 投稿
 
     @Test
