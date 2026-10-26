@@ -60,6 +60,28 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tab.listen"].isSelected)
     }
 
+    /// カテゴリの行の「変更」でシートを開き、選ぶと行に反映される。未分類も選べる
+    @MainActor
+    func testChangingCategoryFromRow() throws {
+        let app = Self.launchAfterOnboarding()
+
+        app.buttons["tab.compose"].tap()
+        let row = app.buttons["compose.category.change"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        // 最初は推定も前回のカテゴリも無いので未分類
+        XCTAssertTrue(row.label.contains("未分類") || row.label.contains("Uncategorized"), row.label)
+
+        UITestApp.chooseCategory("money", in: app)
+        XCTAssertTrue(row.label.contains("お金") || row.label.contains("Money"), row.label)
+
+        // シートには未分類も出る。閉じるだけなら変わらない
+        row.tap()
+        XCTAssertTrue(app.buttons["compose.category.uncategorized"].waitForExistence(timeout: 5))
+        app.buttons["category.sheet.close"].tap()
+        XCTAssertTrue(app.buttons["compose.category.uncategorized"].waitForNonExistence(timeout: 5))
+        XCTAssertTrue(row.label.contains("お金") || row.label.contains("Money"), row.label)
+    }
+
     /// 伏せ字の候補（電話番号）があると確認の画面に進み、伏せ字にした本文を見てから投稿できる
     @MainActor
     func testPostingThroughMaskingReview() throws {
@@ -70,7 +92,7 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(body.waitForExistence(timeout: 5))
         body.tap()
         body.typeText("call 090-1234-5678")
-        app.buttons["compose.category.other"].tap()
+        UITestApp.chooseCategory("other", in: app)
         app.buttons["compose.submit"].tap()
 
         let submit = app.buttons["masking.submit"]

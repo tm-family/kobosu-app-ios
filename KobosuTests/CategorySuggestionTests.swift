@@ -35,4 +35,28 @@ struct CategorySuggestionTests {
         #expect(CategorySuggestion.suggest(for: "", lastCategory: .inLaws).source == .previous)
         #expect(CategorySuggestion.suggest(for: "", lastCategory: nil).source == .uncategorized)
     }
+
+    /// 行の文言: 推定のときだけ「自動で選びました」。前回のカテゴリのときは別の文言にする（Q3）
+    @Test
+    func statusTextDependsOnSource() {
+        func japanese(_ source: CategorySource) -> String {
+            var resource = source.statusText
+            resource.locale = Locale(identifier: "ja")
+            return String(localized: resource)
+        }
+        #expect(japanese(.estimated) == "自動で選びました")
+        #expect(japanese(.previous) == "前回と同じ")
+        let texts = [CategorySource.estimated, .previous, .chosen, .uncategorized].map(japanese)
+        #expect(Set(texts).count == texts.count)
+    }
+
+    /// 行の文言は String Catalog に ja / en の両方がある
+    @Test(arguments: [CategorySource.estimated, .previous, .chosen, .uncategorized])
+    func statusTextIsLocalized(source: CategorySource) {
+        var japanese = source.statusText
+        japanese.locale = Locale(identifier: "ja")
+        var english = source.statusText
+        english.locale = Locale(identifier: "en")
+        #expect(String(localized: japanese) != String(localized: english))
+    }
 }

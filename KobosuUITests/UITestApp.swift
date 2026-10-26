@@ -28,6 +28,18 @@ enum UITestApp {
         return app
     }
 
+    /// 投稿画面のカテゴリの行の「変更」からシートを開き、category（PostCategory の rawValue）を選ぶ。選ぶとシートは閉じる
+    @MainActor
+    static func chooseCategory(_ category: String, in app: XCUIApplication) {
+        let change = app.buttons["compose.category.change"]
+        XCTAssertTrue(change.waitForExistence(timeout: 5))
+        change.tap()
+        let chip = app.buttons["compose.category.\(category)"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
+        chip.tap()
+        XCTAssertTrue(chip.waitForNonExistence(timeout: 5))
+    }
+
     /// 撮影モードの scene で起動する（ScreenshotDemo.Scene の rawValue）
     @MainActor
     static func launchScreenshotScene(_ scene: String) -> XCUIApplication {
