@@ -60,7 +60,7 @@ nonisolated struct FlowLayout: Layout {
 
 #Preview {
     FlowLayout {
-        ForEach(PostCategory.allCases) { category in
+        ForEach(PostCategory.filterable) { category in
             CategoryTag(title: category.title)
         }
     }
