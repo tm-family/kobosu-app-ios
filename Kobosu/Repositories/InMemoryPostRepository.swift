@@ -84,6 +84,17 @@ final class InMemoryPostRepository: PostRepository, ReportRepository {
         records[postID] = nil
     }
 
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        var record = try activeRecord(postID)
+        let myID = try identity.currentID()
+        guard record.authorID == myID else {
+            throw PostRepositoryError.notOwner
+        }
+        record.post = try record.post.assigningCategory(category)
+        records[postID] = record
+        return record.post
+    }
+
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         var record = try activeRecord(postID)
         let myID = try identity.currentID()
@@ -171,7 +182,7 @@ extension InMemoryPostRepository {
             post(1, "帰省のたびに「まだなの？」と聞かれる。笑ってかわすのにもう疲れた。", .inLaws, hoursAgo: 3, [.sameHere: 18, .hardDay: 9]),
             post(2, "寝かしつけに 2 時間。気づいたら自分の夕飯を食べそびれていた。", .parenting, hoursAgo: 5, [.wellDone: 12, .sameHere: 7]),
             post(3, "今日も黙って洗い物をした。", .partner, hoursAgo: 9, [.understand: 5]),
-            post(4, "通院の付き添いで仕事を早退。誰にも言えないけど、正直しんどい。", .caregiving, hoursAgo: 20, [:])
+            post(4, "通院の付き添いで仕事を早退。誰にも言えないけど、正直しんどい。", .other, hoursAgo: 20, [:])
         ]
         .forEach { repository.seed($0) }
         return repository

@@ -40,6 +40,10 @@ final class ScreenshotSceneUITests: XCTestCase {
         XCTAssertTrue(submit.waitForExistence(timeout: 5))
         // 下書きの本文とカテゴリが入っているので、そのまま投稿できる
         XCTAssertTrue(submit.isEnabled)
+        // 下書きのカテゴリ（本人が選んだパートナー）がカテゴリの行に出る
+        let row = app.buttons["compose.category.change"]
+        XCTAssertTrue(row.exists)
+        XCTAssertTrue(row.label.contains("パートナー") || row.label.contains("Partner"), row.label)
     }
 
     /// ノート: 自分の投稿が出ている

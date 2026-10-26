@@ -64,7 +64,19 @@ struct InMemoryPostRepositoryTests {
         repository.seed(otherPost(id: "c", category: .inLaws, hoursAgo: 1))
         #expect(try await repository.timeline(category: nil).map(\.id) == ["c", "b", "a"])
         #expect(try await repository.timeline(category: .inLaws).map(\.id) == ["c", "a"])
-        #expect(try await repository.timeline(category: .caregiving).isEmpty)
+        #expect(try await repository.timeline(category: .parenting).isEmpty)
+    }
+
+    /// 未分類の投稿は「すべて」にだけ出て、どのカテゴリの絞り込みにも出ない
+    @Test
+    func uncategorizedPostAppearsOnlyInAll() async throws {
+        let repository = makeRepository()
+        repository.seed(otherPost(id: "a", category: .uncategorized, hoursAgo: 2))
+        repository.seed(otherPost(id: "b", category: .money, hoursAgo: 1))
+        #expect(try await repository.timeline(category: nil).map(\.id) == ["b", "a"])
+        for category in PostCategory.filterable {
+            #expect(try await !repository.timeline(category: category).map(\.id).contains("a"))
+        }
     }
 
     // MARK: - 投稿
@@ -114,6 +126,79 @@ struct InMemoryPostRepositoryTests {
         try await repository.delete(postID: mine.id)
         #expect(try await repository.myPosts().isEmpty)
         #expect(try await repository.timeline(category: nil).map(\.id) == ["other"])
+    }
+
+    // MARK: - カテゴリを付ける
+
+    /// 未分類の自分の投稿に 1 回だけ付けられ、タイムラインとノートにも反映される
+    @Test
+    func assignCategoryToOwnUncategorizedPost() async throws {
+        let repository = makeRepository()
+        let post = try await repository.submit(body: "本文", category: .uncategorized)
+        let assigned = try await repository.assignCategory(.partner, toPostID: post.id)
+        #expect(assigned.category == .partner)
+        #expect(assigned.id == post.id)
+        #expect(assigned.body == post.body)
+        #expect(assigned.createdAt == post.createdAt)
+        #expect(assigned.expireAt == post.expireAt)
+        #expect(try await repository.timeline(category: .partner).map(\.id) == [post.id])
+        #expect(try await repository.myPosts().map(\.category) == [.partner])
+
+        // 2 回目は付けられない（付け直せない）
+        await #expect(throws: PostRepositoryError.alreadyCategorized) {
+            try await repository.assignCategory(.money, toPostID: post.id)
+        }
+        #expect(try await repository.myPosts().map(\.category) == [.partner])
+    }
+
+    /// 最初からカテゴリのある投稿には付けられない
+    @Test
+    func cannotAssignCategoryToCategorizedPost() async throws {
+        let repository = makeRepository()
+        let post = try await repository.submit(body: "本文", category: .housework)
+        await #expect(throws: PostRepositoryError.alreadyCategorized) {
+            try await repository.assignCategory(.money, toPostID: post.id)
+        }
+        #expect(try await repository.myPosts().map(\.category) == [.housework])
+    }
+
+    /// 未分類には戻せない（未分類を付けることもできない）
+    @Test
+    func cannotAssignUncategorized() async throws {
+        let repository = makeRepository()
+        let post = try await repository.submit(body: "本文", category: .uncategorized)
+        await #expect(throws: PostRepositoryError.invalidCategory) {
+            try await repository.assignCategory(.uncategorized, toPostID: post.id)
+        }
+        #expect(try await repository.myPosts().map(\.category) == [.uncategorized])
+    }
+
+    /// 他の人の投稿・期限切れの投稿・無い投稿には付けられない
+    @Test
+    func cannotAssignCategoryToOthersOrExpiredPost() async throws {
+        let repository = makeRepository()
+        repository.seed(otherPost(id: "others", category: .uncategorized, hoursAgo: 1))
+        await #expect(throws: PostRepositoryError.notOwner) {
+            try await repository.assignCategory(.money, toPostID: "others")
+        }
+        #expect(try await repository.timeline(category: nil).first { $0.id == "others" }?.category == .uncategorized)
+
+        let mine = try await repository.submit(body: "本文", category: .uncategorized)
+        clock.advance(hours: 24)
+        await #expect(throws: PostRepositoryError.postNotFound) {
+            try await repository.assignCategory(.money, toPostID: mine.id)
+        }
+        await #expect(throws: PostRepositoryError.postNotFound) {
+            try await repository.assignCategory(.money, toPostID: "missing")
+        }
+    }
+
+    /// 付けられるのは未分類以外の 6 つ。スタンプの人数は変えない
+    @Test(arguments: PostCategory.filterable)
+    func assigningKeepsOtherValues(category: PostCategory) throws {
+        let post = Post(id: "a", body: "本文", category: .uncategorized, createdAt: clock.now, stampCounts: [.sameHere: 3])
+        let assigned = try post.assigningCategory(category)
+        #expect(assigned == Post(id: "a", body: "本文", category: category, createdAt: clock.now, stampCounts: [.sameHere: 3]))
     }
 
     // MARK: - 共感

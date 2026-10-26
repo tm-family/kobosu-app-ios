@@ -25,11 +25,22 @@ struct ComposeViewModelTests {
         InMemoryPostRepository(identity: InMemoryAnonymousIDStore(id: "me"), now: { [now] in now })
     }
 
+    /// 推定し直すまでの間は 0 にする（間をおいて推定し直すことは pendingEstimate を待って確かめる）
+    private func makeModel(
+        repository: any PostRepository,
+        drafts: any ComposeDraftStore = InMemoryComposeDraftStore(),
+        lastCategories: any LastCategoryStore = InMemoryLastCategoryStore(),
+        detect: @escaping @Sendable (String) -> [MaskingCandidate] = Self.noCandidates
+    ) -> ComposeViewModel {
+        ComposeViewModel(repository: repository, drafts: drafts, lastCategories: lastCategories, detect: detect, estimateDelay: .zero)
+    }
+
     @Test
     func startsEmptyWithoutDraft() {
-        let model = ComposeViewModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
+        let model = makeModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
         #expect(model.body.isEmpty)
-        #expect(model.category == nil)
+        #expect(model.category == .uncategorized)
+        #expect(model.categorySource == .uncategorized)
         #expect(!model.canSubmit)
     }
 
@@ -37,28 +48,29 @@ struct ComposeViewModelTests {
     @Test
     func restoresDraft() {
         let drafts = InMemoryComposeDraftStore(draft: ComposeDraft(body: "書きかけ", category: .partner))
-        let model = ComposeViewModel(repository: makeRepository(), drafts: drafts, detect: Self.noCandidates)
+        let model = makeModel(repository: makeRepository(), drafts: drafts, detect: Self.noCandidates)
         #expect(model.body == "書きかけ")
         #expect(model.category == .partner)
+        #expect(model.categorySource == .chosen)
         #expect(model.canSubmit)
     }
 
     @Test
     func saveDraftKeepsBodyAndCategory() {
         let drafts = InMemoryComposeDraftStore()
-        let model = ComposeViewModel(repository: makeRepository(), drafts: drafts, detect: Self.noCandidates)
+        let model = makeModel(repository: makeRepository(), drafts: drafts, detect: Self.noCandidates)
         model.body = "モヤっとした。"
-        model.category = .inLaws
+        model.choose(.inLaws)
         model.saveDraft()
         #expect(drafts.load() == ComposeDraft(body: "モヤっとした。", category: .inLaws))
     }
 
+    /// 投稿に要るのは本文だけ（カテゴリを選ばなくても投稿できる）
     @Test
-    func needsBodyAndCategoryToSubmit() {
-        let model = ComposeViewModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
-        model.body = "本文"
+    func bodyIsEnoughToSubmit() {
+        let model = makeModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
         #expect(!model.canSubmit)
-        model.category = .money
+        model.body = "本文"
         #expect(model.canSubmit)
         model.body = " \n "
         #expect(!model.canSubmit)
@@ -67,8 +79,8 @@ struct ComposeViewModelTests {
     /// 上限は前後の空白を除いた文字数で判定する
     @Test
     func cannotSubmitOverLimit() {
-        let model = ComposeViewModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
-        model.category = .other
+        let model = makeModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
+        model.choose(.other)
         model.body = String(repeating: "あ", count: Post.maxBodyLength) + "\n"
         #expect(model.bodyLength == Post.maxBodyLength)
         #expect(!model.isOverLimit)
@@ -83,9 +95,9 @@ struct ComposeViewModelTests {
     func submitClearsDraft() async throws {
         let repository = makeRepository()
         let drafts = InMemoryComposeDraftStore()
-        let model = ComposeViewModel(repository: repository, drafts: drafts, detect: Self.noCandidates)
+        let model = makeModel(repository: repository, drafts: drafts, detect: Self.noCandidates)
         model.body = "  今日も黙って洗い物をした。\n"
-        model.category = .housework
+        model.choose(.housework)
         model.saveDraft()
 
         let post = try #require(await model.submit())
@@ -95,7 +107,9 @@ struct ComposeViewModelTests {
         #expect(try await repository.myPosts().map(\.id) == [post.id])
         #expect(drafts.load() == nil)
         #expect(model.body.isEmpty)
-        #expect(model.category == nil)
+        // 次の投稿は、今投稿したカテゴリが初期値になる
+        #expect(model.category == .housework)
+        #expect(model.categorySource == .previous)
         #expect(model.state == .editing)
     }
 
@@ -103,9 +117,9 @@ struct ComposeViewModelTests {
     @Test
     func failedSubmitKeepsDraft() async {
         let drafts = InMemoryComposeDraftStore()
-        let model = ComposeViewModel(repository: FailingPostRepository(), drafts: drafts, detect: Self.noCandidates)
+        let model = makeModel(repository: FailingPostRepository(), drafts: drafts, detect: Self.noCandidates)
         model.body = "本文"
-        model.category = .parenting
+        model.choose(.parenting)
         model.saveDraft()
 
         #expect(await model.submit() == nil)
@@ -123,20 +137,30 @@ struct ComposeViewModelTests {
     @Test
     func submitDoesNothingWhenNotReady() async throws {
         let repository = makeRepository()
-        let model = ComposeViewModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
-        model.body = "本文"
+        let model = makeModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
+        model.body = " \n "
         #expect(await model.submit() == nil)
         #expect(try await repository.myPosts().isEmpty)
         #expect(model.state == .editing)
+    }
+
+    /// 投稿できなかったら、前回のカテゴリは変えない
+    @Test
+    func failedSubmitKeepsLastCategory() async {
+        let lastCategories = InMemoryLastCategoryStore(category: .money)
+        let model = makeModel(repository: FailingPostRepository(), lastCategories: lastCategories)
+        model.body = "寝かしつけに 2 時間かかった。"
+        #expect(await model.submit() == nil)
+        #expect(lastCategories.load() == .money)
     }
 
     /// 伏せ字の候補が見つかったら投稿せずに確認を出し、最初はすべて伏せる
     @Test
     func submitShowsReviewWhenCandidatesFound() async throws {
         let repository = makeRepository()
-        let model = ComposeViewModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.findsTanaka)
+        let model = makeModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.findsTanaka)
         model.body = " 田中さんにまた言われた。"
-        model.category = .inLaws
+        model.choose(.inLaws)
 
         #expect(await model.submit() == nil)
         let review = try #require(model.review)
@@ -152,9 +176,9 @@ struct ComposeViewModelTests {
     func submitReviewPostsMaskedText() async throws {
         let repository = makeRepository()
         let drafts = InMemoryComposeDraftStore()
-        let model = ComposeViewModel(repository: repository, drafts: drafts, detect: Self.findsTanaka)
+        let model = makeModel(repository: repository, drafts: drafts, detect: Self.findsTanaka)
         model.body = "田中さんにまた言われた。"
-        model.category = .inLaws
+        model.choose(.inLaws)
         model.saveDraft()
         _ = await model.submit()
 
@@ -168,9 +192,9 @@ struct ComposeViewModelTests {
     /// 「そのまま」を選んだ候補は伏せずに投稿する
     @Test
     func submitReviewKeepsUnmaskedCandidates() async throws {
-        let model = ComposeViewModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.findsTanaka)
+        let model = makeModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.findsTanaka)
         model.body = "田中さんにまた言われた。"
-        model.category = .inLaws
+        model.choose(.inLaws)
         _ = await model.submit()
         model.setMasked(false, at: 0)
         #expect(model.review?.result == "田中さんにまた言われた。")
@@ -182,9 +206,9 @@ struct ComposeViewModelTests {
     /// 「自分で書き直す」で確認を閉じたら、書き直してもう一度投稿できる
     @Test
     func closingReviewReturnsToEditing() async throws {
-        let model = ComposeViewModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.findsTanaka)
+        let model = makeModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: Self.findsTanaka)
         model.body = "田中さんにまた言われた。"
-        model.category = .inLaws
+        model.choose(.inLaws)
         _ = await model.submit()
         model.review = nil
         #expect(!model.canSubmitReview)
@@ -201,9 +225,9 @@ struct ComposeViewModelTests {
         let findsHayashi: @Sendable (String) -> [MaskingCandidate] = { text in
             text.range(of: "林").map { [MaskingCandidate(kind: .personName, range: $0, text: "林")] } ?? []
         }
-        let model = ComposeViewModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: findsHayashi)
+        let model = makeModel(repository: makeRepository(), drafts: InMemoryComposeDraftStore(), detect: findsHayashi)
         model.body = String(repeating: "あ", count: Post.maxBodyLength - 1) + "林"
-        model.category = .other
+        model.choose(.other)
         _ = await model.submit()
         #expect(model.review?.isOverLimit == true)
         #expect(!model.canSubmitReview)
@@ -217,9 +241,9 @@ struct ComposeViewModelTests {
     @Test(.timeLimit(.minutes(1)))
     func secondSubmitWhileSubmittingDoesNothing() async throws {
         let repository = FlakyPostRepository(base: makeRepository())
-        let model = ComposeViewModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
+        let model = makeModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
         model.body = "本文"
-        model.category = .money
+        model.choose(.money)
         repository.holdsSubmit = true
 
         let first = Task { await model.submit() }
@@ -242,9 +266,9 @@ struct ComposeViewModelTests {
     @Test
     func retryAfterFailureSucceeds() async throws {
         let repository = FlakyPostRepository(base: makeRepository())
-        let model = ComposeViewModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
+        let model = makeModel(repository: repository, drafts: InMemoryComposeDraftStore(), detect: Self.noCandidates)
         model.body = "本文"
-        model.category = .money
+        model.choose(.money)
         repository.failsSubmit = true
         #expect(await model.submit() == nil)
         #expect(model.state == .failed)
@@ -301,6 +325,10 @@ private final class FlakyPostRepository: PostRepository {
         try await base.delete(postID: postID)
     }
 
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        try await base.assignCategory(category, toPostID: postID)
+    }
+
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         try await base.sendStamp(stamp, to: postID)
     }
@@ -327,6 +355,10 @@ private final class FailingPostRepository: PostRepository {
     }
 
     func delete(postID: Post.ID) async throws {
+        throw Failure()
+    }
+
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
         throw Failure()
     }
 

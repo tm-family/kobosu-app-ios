@@ -18,6 +18,12 @@ final class KobosuUITestsLaunchTests: XCTestCase {
 
     @MainActor
     func testLaunch() throws {
+        // 構成ごとの実行では横向きにもするので、あとのテストが横向きのまま始まらないよう縦向きに戻す
+        // （横向きでキーボードが出ると、投稿画面のカテゴリの行が画面の外になって押せない）
+        addTeardownBlock { @MainActor in
+            XCUIDevice.shared.orientation = .portrait
+        }
+
         // Firebase につながずに起動する
         let app = UITestApp.launch()
 

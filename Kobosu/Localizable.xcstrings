@@ -137,19 +137,36 @@
         }
       }
     },
-    "24時間たつと、自動で消えます" : {
+    "24時間たつと、自動で消えます。あとから延ばすことはできません。" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It disappears automatically after 24 hours"
+            "value" : "It disappears automatically after 24 hours. It can't be extended."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "24時間たつと、自動で消えます"
+            "value" : "24時間たつと、自動で消えます。あとから延ばすことはできません。"
+          }
+        }
+      }
+    },
+    "24時間で消える" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gone in 24 hours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24時間で消える"
           }
         }
       }
@@ -409,6 +426,40 @@
         }
       }
     },
+    "いまは、この設定で投稿します。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your post uses these settings for now."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いまは、この設定で投稿します。"
+          }
+        }
+      }
+    },
+    "いまはカテゴリを付けられませんでした。このままでも、「すべて」には届いています。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't add a category right now. It still shows up in All."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いまはカテゴリを付けられませんでした。このままでも、「すべて」には届いています。"
+          }
+        }
+      }
+    },
     "うちも同じ" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -541,23 +592,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "きくに戻る"
-          }
-        }
-      }
-    },
-    "きょうだい・親戚" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Siblings & relatives"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "きょうだい・親戚"
           }
         }
       }
@@ -919,6 +953,23 @@
         }
       }
     },
+    "だれでも読めます。名前やアカウントは出ません。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone can read it. Your name and account are never shown."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "だれでも読めます。名前やアカウントは出ません。"
+          }
+        }
+      }
+    },
     "つらいときは、窓口も頼っていい" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -953,6 +1004,23 @@
         }
       }
     },
+    "なしでも投稿できます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can post without one"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "なしでも投稿できます"
+          }
+        }
+      }
+    },
     "はじめる" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -983,6 +1051,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ほんとは「ありがとう」って、ひとこと言ってほしかっただけ。"
+          }
+        }
+      }
+    },
+    "みんなに共有" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared with everyone"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "みんなに共有"
+          }
+        }
+      }
+    },
+    "みんなに共有 · 24時間で消える" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared with everyone · Gone in 24 hours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "みんなに共有 · 24時間で消える"
           }
         }
       }
@@ -1106,19 +1208,70 @@
         }
       }
     },
-    "カテゴリを 1 つえらぶと、投稿できます" : {
+    "カテゴリを付けました" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose one category to post"
+            "value" : "Category added"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カテゴリを 1 つえらぶと、投稿できます"
+            "value" : "カテゴリを付けました"
+          }
+        }
+      }
+    },
+    "カテゴリを付ける" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a category"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを付ける"
+          }
+        }
+      }
+    },
+    "カテゴリを付けると、近い悩みの人に届きやすくなります" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding a category helps it reach people with similar worries"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを付けると、近い悩みの人に届きやすくなります"
+          }
+        }
+      }
+    },
+    "カテゴリを変更します" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the category"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリを変更します"
           }
         }
       }
@@ -1446,36 +1599,19 @@
         }
       }
     },
-    "介護" : {
+    "付けなくても、「すべて」には届いています" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Caregiving"
+            "value" : "Even without one, it already shows up in All"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "介護"
-          }
-        }
-      }
-    },
-    "仕事と家庭" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Work & family"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "仕事と家庭"
+            "value" : "付けなくても、「すべて」には届いています"
           }
         }
       }
@@ -1561,6 +1697,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "住所"
+          }
+        }
+      }
+    },
+    "公開範囲" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Who can read"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開範囲"
+          }
+        }
+      }
+    },
+    "公開範囲と消えるまでの説明を開きます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows who can read it and when it disappears"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開範囲と消えるまでの説明を開きます"
           }
         }
       }
@@ -1684,6 +1854,23 @@
         }
       }
     },
+    "前回と同じ" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as last time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前回と同じ"
+          }
+        }
+      }
+    },
     "危険を感じる内容がある" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1752,6 +1939,23 @@
         }
       }
     },
+    "変更" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変更"
+          }
+        }
+      }
+    },
     "子育て" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1782,23 +1986,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "学校や会社などの名前"
-          }
-        }
-      }
-    },
-    "実の親" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "My parents"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "実の親"
           }
         }
       }
@@ -1939,6 +2126,23 @@
         }
       }
     },
+    "投稿の設定" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投稿の設定"
+          }
+        }
+      }
+    },
     "投稿は24時間で消える" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1952,6 +2156,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "投稿は24時間で消える"
+          }
+        }
+      }
+    },
+    "未分類" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uncategorized"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未分類"
           }
         }
       }
@@ -2030,7 +2251,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Disappears in"
+            "value" : "When it disappears"
           }
         },
         "ja" : {
@@ -2228,6 +2449,23 @@
         }
       }
     },
+    "自動で選びました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Picked for you"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動で選びました"
+          }
+        }
+      }
+    },
     "設定" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2309,6 +2547,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "身バレにつながる言葉があります"
+          }
+        }
+      }
+    },
+    "近いものを 1 つえらんでね" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick the one that feels closest"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近いものを 1 つえらんでね"
           }
         }
       }
@@ -2462,6 +2717,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運営への連絡"
+          }
+        }
+      }
+    },
+    "選びました" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your pick"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選びました"
           }
         }
       }

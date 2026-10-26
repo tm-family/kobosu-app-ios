@@ -9,7 +9,7 @@
 import Foundation
 
 nonisolated enum UITestLaunch {
-    /// 起動時に下書きを消す（前のテストで書いた下書きが残らないように）
+    /// 起動時に下書きと前回のカテゴリを消す（前のテストで書いた下書き・選んだカテゴリが残らないように）
     static let clearDraftArgument = "-uitest-clear-draft"
     /// ローカルの実装に、他の人の投稿（Preview と同じデモデータ）を置いて起動する
     static let seedPostsArgument = "-uitest-seed-posts"
@@ -18,6 +18,7 @@ nonisolated enum UITestLaunch {
     static func applyLaunchArguments(_ arguments: [String], to defaults: UserDefaults) {
         if arguments.contains(clearDraftArgument) {
             defaults.removeObject(forKey: UserDefaultsComposeDraftStore.key)
+            defaults.removeObject(forKey: UserDefaultsLastCategoryStore.key)
         }
     }
 

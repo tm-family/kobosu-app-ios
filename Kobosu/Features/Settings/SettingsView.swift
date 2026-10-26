@@ -30,7 +30,7 @@ struct SettingsView: View {
                 aboutSection
             }
             .scrollContentBackground(.hidden)
-            .background(Palette.paper)
+            .floralBackground()
             .font(.kobosuBody)
             .foregroundStyle(Palette.ink)
             .navigationTitle(Text("設定"))

@@ -13,6 +13,8 @@ final class AppDependencies {
     let posts: any PostRepository
     let reports: any ReportRepository
     let drafts: any ComposeDraftStore
+    /// 前回の投稿で使ったカテゴリ（推定できなかったときの初期値）
+    let lastCategories: any LastCategoryStore
     let appLock: any AppLockAuthenticating
     let lockSettings: AppLockSettings
     /// 約束に同意した版などを置く UserDefaults（「すべてのデータを削除」で消す）
@@ -25,6 +27,7 @@ final class AppDependencies {
         posts: any PostRepository,
         reports: any ReportRepository,
         drafts: any ComposeDraftStore,
+        lastCategories: any LastCategoryStore,
         appLock: any AppLockAuthenticating,
         lockSettings: AppLockSettings,
         settingsDefaults: UserDefaults = .standard,
@@ -34,6 +37,7 @@ final class AppDependencies {
         self.posts = posts
         self.reports = reports
         self.drafts = drafts
+        self.lastCategories = lastCategories
         self.appLock = appLock
         self.lockSettings = lockSettings
         self.settingsDefaults = settingsDefaults
@@ -46,13 +50,14 @@ final class AppDependencies {
             posts: posts,
             identity: identity,
             drafts: drafts,
+            lastCategories: lastCategories,
             lockSettings: lockSettings,
             hiddenPosts: hiddenPosts,
             defaults: settingsDefaults
         )
     }
 
-    /// ふだんの起動。匿名 ID は Keychain に、下書きとアプリロックの設定は UserDefaults に保存する。
+    /// ふだんの起動。匿名 ID は Keychain に、下書き・前回のカテゴリ・アプリロックの設定は UserDefaults に保存する。
     /// seedsPosts は UI テスト用で、他の人の投稿（Preview と同じデモデータ）を置いて開く
     static func local(seedsPosts: Bool = false) -> AppDependencies {
         let identity = KeychainAnonymousIDStore()
@@ -64,6 +69,7 @@ final class AppDependencies {
             posts: repository,
             reports: repository,
             drafts: UserDefaultsComposeDraftStore(),
+            lastCategories: UserDefaultsLastCategoryStore(),
             appLock: LocalAuthenticationAppLock(),
             lockSettings: AppLockSettings()
         )
@@ -81,6 +87,7 @@ final class AppDependencies {
             posts: FirestorePostRepository(identity: identity, auth: auth, hiddenPosts: hiddenPosts),
             reports: FirestoreReportRepository(identity: identity, auth: auth, hiddenPosts: hiddenPosts),
             drafts: UserDefaultsComposeDraftStore(),
+            lastCategories: UserDefaultsLastCategoryStore(),
             appLock: LocalAuthenticationAppLock(),
             lockSettings: AppLockSettings(),
             hiddenPosts: hiddenPosts
@@ -100,6 +107,7 @@ final class AppDependencies {
             posts: repository,
             reports: repository,
             drafts: InMemoryComposeDraftStore(draft: ScreenshotDemo.draft()),
+            lastCategories: InMemoryLastCategoryStore(),
             appLock: StubAppLockAuthenticator(),
             lockSettings: AppLockSettings(defaults: defaults),
             settingsDefaults: defaults

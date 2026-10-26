@@ -22,7 +22,9 @@ struct MyPostCard: View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
-                    CategoryTag(title: post.category.title)
+                    if let tagTitle = post.category.tagTitle {
+                        CategoryTag(title: tagTitle)
+                    }
                     Spacer(minLength: 8)
                     Text(RemainingTime(post.remainingTime(at: now)).text)
                         .kobosuMetaLabel()

@@ -51,8 +51,7 @@ service cloud.firestore {
     // PostCategory の rawValue
     function categoryIDs() {
       return [
-        'in_laws', 'partner', 'parenting', 'housework', 'money',
-        'own_parents', 'relatives', 'caregiving', 'work_and_family', 'other'
+        'in_laws', 'partner', 'parenting', 'housework', 'money', 'other', 'uncategorized'
       ];
     }
 
@@ -103,6 +102,19 @@ service cloud.firestore {
       return after.diff(before).affectedKeys().hasOnly(['expireAt'])
         && before.expireAt == before.createdAt
         && after.expireAt == before.createdAt + lifetime()
+        && exists(ownPostPath(postId));
+    }
+
+    // カテゴリを付ける: 本人が、期限内の未分類の投稿に 1 回だけ、未分類以外のカテゴリを付ける（投稿完了画面から）。
+    // 書き換えるのは category だけ。付けたあとは未分類ではなくなるので、付け直せない
+    function assignsCategory(postId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return after.diff(before).affectedKeys().hasOnly(['category'])
+        && before.category == 'uncategorized'
+        && after.category in categoryIDs()
+        && after.category != 'uncategorized'
+        && isLive(before)
         && exists(ownPostPath(postId));
     }
 
@@ -180,7 +192,7 @@ service cloud.firestore {
       allow get, list: if signedIn();
       allow create: if signedIn() && createsPost(postId);
       allow update: if signedIn()
-        && (finishesPost(postId) || addsStamp(postId) || addsReport(postId) || withdraws(postId));
+        && (finishesPost(postId) || addsStamp(postId) || addsReport(postId) || withdraws(postId) || assignsCategory(postId));
       // 自分の投稿だけ。目印は同じ書き込みで消すので、書き込みの前の状態（exists）で見る
       allow delete: if signedIn() && exists(ownPostPath(postId));
 

@@ -66,7 +66,7 @@ struct MainTabView: View {
             )
         }
         .sheet(isPresented: $isComposing) {
-            ComposeView(repository: dependencies.posts, drafts: dependencies.drafts) { _ in
+            ComposeView(repository: dependencies.posts, drafts: dependencies.drafts, lastCategories: dependencies.lastCategories) { _ in
                 postedCount += 1
                 selection = .listen
             }

@@ -22,6 +22,10 @@ protocol PostRepository: AnyObject {
     /// 自分の投稿をすぐ消す。共感・通報も一緒に消す
     func delete(postID: Post.ID) async throws
 
+    /// 未分類の自分の投稿にカテゴリを付ける（投稿完了画面から 1 回だけ）。カテゴリを付けた投稿を返す。
+    /// 付けられるのは期限内・今が未分類のときだけで、付けるカテゴリは未分類以外。未分類には戻せない
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post
+
     /// 共感スタンプを送る。同じ投稿に同じスタンプは 1 人 1 回まで（2 回目は何もしない）。自分の投稿には送れない
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws
 
@@ -87,6 +91,10 @@ enum PostRepositoryError: Error, Equatable {
     case notOwner
     /// 自分の投稿には共感を送れない・通報できない
     case ownPost
+    /// もうカテゴリが付いている（カテゴリを付けられるのは未分類の投稿に 1 回だけ）
+    case alreadyCategorized
+    /// 付けようとしたカテゴリが未分類（未分類には戻せない）
+    case invalidCategory
 }
 
 extension Post {
@@ -100,6 +108,17 @@ extension Post {
             throw PostRepositoryError.bodyTooLong
         }
         return trimmed
+    }
+
+    /// 未分類の投稿に category を付けた投稿。今が未分類でない・category が未分類なら投げる
+    nonisolated func assigningCategory(_ category: PostCategory) throws -> Post {
+        guard category != .uncategorized else {
+            throw PostRepositoryError.invalidCategory
+        }
+        guard self.category == .uncategorized else {
+            throw PostRepositoryError.alreadyCategorized
+        }
+        return Post(id: id, body: body, category: category, createdAt: createdAt, expireAt: expireAt, stampCounts: stampCounts)
     }
 }
 

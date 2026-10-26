@@ -38,7 +38,7 @@ struct ListenView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 24)
             }
-            .background(Palette.paper)
+            .floralBackground()
             .navigationTitle(Text("きく"))
             .refreshable {
                 await model.load()
@@ -73,7 +73,7 @@ struct ListenView: View {
                 FilterChip(title: "すべて", isSelected: model.selectedCategory == nil) {
                     Task { await model.select(nil) }
                 }
-                ForEach(PostCategory.allCases) { category in
+                ForEach(PostCategory.filterable) { category in
                     FilterChip(title: category.title, isSelected: model.selectedCategory == category) {
                         Task { await model.select(category) }
                     }

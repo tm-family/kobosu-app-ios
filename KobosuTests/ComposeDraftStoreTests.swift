@@ -43,15 +43,41 @@ struct ComposeDraftStoreTests {
         #expect(store.load() == ComposeDraft(body: "", category: .money))
     }
 
-    /// 読めないデータ（知らないカテゴリなど）は、下書きが無いものとして扱う
+    /// 読めないデータ（形が合わないもの）は、下書きが無いものとして扱う
     @Test
     func unreadableDraftIsIgnored() throws {
         let suiteName = "ComposeDraftStoreTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        defaults.set(Data(#"{"body":"本文","category":"unknown"}"#.utf8), forKey: UserDefaultsComposeDraftStore.key)
+        defaults.set(Data(#"{"category":"partner"}"#.utf8), forKey: UserDefaultsComposeDraftStore.key)
         #expect(UserDefaultsComposeDraftStore(defaults: defaults).load() == nil)
+        defaults.set(Data("not json".utf8), forKey: UserDefaultsComposeDraftStore.key)
+        #expect(UserDefaultsComposeDraftStore(defaults: defaults).load() == nil)
+    }
+
+    /// 知らないカテゴリ・外したカテゴリの下書きは、本文を残してカテゴリだけ無しとして読む
+    @Test(arguments: ["unknown", "own_parents", "relatives", "caregiving", "work_and_family"])
+    func draftWithUnknownCategoryKeepsBody(rawCategory: String) throws {
+        let suiteName = "ComposeDraftStoreTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        defaults.set(Data(#"{"body":"本文","category":"\#(rawCategory)"}"#.utf8), forKey: UserDefaultsComposeDraftStore.key)
+        #expect(UserDefaultsComposeDraftStore(defaults: defaults).load() == ComposeDraft(body: "本文", category: nil))
+    }
+
+    /// カテゴリの無い下書き・残す 6 種類のカテゴリの下書きは、そのまま読む
+    @Test
+    func draftWithoutOrWithKnownCategoryIsRead() throws {
+        let suiteName = "ComposeDraftStoreTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        defaults.set(Data(#"{"body":"本文"}"#.utf8), forKey: UserDefaultsComposeDraftStore.key)
+        #expect(UserDefaultsComposeDraftStore(defaults: defaults).load() == ComposeDraft(body: "本文", category: nil))
+        defaults.set(Data(#"{"body":"本文","category":"in_laws"}"#.utf8), forKey: UserDefaultsComposeDraftStore.key)
+        #expect(UserDefaultsComposeDraftStore(defaults: defaults).load() == ComposeDraft(body: "本文", category: .inLaws))
     }
 
     @Test
