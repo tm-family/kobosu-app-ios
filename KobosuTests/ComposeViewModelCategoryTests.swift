@@ -198,6 +198,33 @@ struct ComposeViewModelCategoryTests {
         #expect(post.category == .uncategorized)
     }
 
+    /// 今と同じカテゴリを選んでも、本人が選んだものとして下書きに残す（開き直しても推定で上書きしない）
+    @Test
+    func choosingSameCategoryIsSavedAsChosen() async {
+        let drafts = InMemoryComposeDraftStore()
+        let model = makeModel(repository: makeRepository(), drafts: drafts)
+        model.body = "帰省のたびに義母に言われる。"
+        model.bodyDidChange()
+        await model.pendingEstimate?.value
+        #expect(model.category == .inLaws)
+        #expect(drafts.load()?.category == nil)
+
+        model.choose(.inLaws)
+        #expect(drafts.load() == ComposeDraft(body: "帰省のたびに義母に言われる。", category: .inLaws))
+        let reopened = makeModel(repository: makeRepository(), drafts: drafts)
+        #expect(reopened.categorySource == .chosen)
+    }
+
+    /// 開いた直後の未分類のまま「未分類」を選んでも、本人が選んだものとして下書きに残す
+    @Test
+    func choosingUncategorizedWithoutChangeIsSaved() {
+        let drafts = InMemoryComposeDraftStore()
+        let model = makeModel(repository: makeRepository(), drafts: drafts)
+        model.body = "今日はなんだか疲れた。"
+        model.choose(.uncategorized)
+        #expect(drafts.load() == ComposeDraft(body: "今日はなんだか疲れた。", category: .uncategorized))
+    }
+
     /// 伏せ字の確認を通るときも、推定したカテゴリで送る
     @Test
     func reviewSubmitsEstimatedCategory() async throws {

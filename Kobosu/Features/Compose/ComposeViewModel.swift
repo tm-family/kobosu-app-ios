@@ -102,6 +102,8 @@ final class ComposeViewModel {
         pendingEstimate = nil
         self.category = category
         categorySource = .chosen
+        // 今と同じカテゴリを選んだときは category が変わらず、画面の onChange で保存されないので、ここで保存する
+        saveDraft()
     }
 
     /// 本文が変わったとき。下書きを保存し、本人が選んでいなければ、少し間をおいてカテゴリを選び直す
