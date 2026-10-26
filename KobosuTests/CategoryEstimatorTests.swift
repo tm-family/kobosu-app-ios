@@ -79,7 +79,8 @@ struct CategoryEstimatorTests {
     /// 言葉の一覧の言葉を含むが、そのカテゴリの話ではない言い回しは数えない
     @Test(arguments: [
         "大丈夫、なんとかなる。", "工夫してみたけど、だめだった。", "夫人会の集まり", "稲妻がすごい", "責任転嫁された",
-        "姑息な手を使われた", "ドラマの主人公が", "ふだんならできるのに", "ドローンを飛ばした", "クローンの話"
+        "姑息な手を使われた", "ドラマの主人公が", "ふだんならできるのに", "だんだんなれてきた", "ゆだんならない",
+        "しゅうとくした", "ドローンを飛ばした", "クローンの話"
     ])
     func ignoresPhrasesContainingKeywords(text: String) {
         #expect(CategoryEstimator.estimate(text) == nil)
