@@ -61,6 +61,33 @@ struct DesignSystemTests {
         #expect(actual == hex, "\(name): \(String(actual, radix: 16)) != \(String(hex, radix: 16))")
     }
 
+    /// 花柄の部品は、ライトとダークの両方で素材の大きさのまま読み込め、ダークはライトと違う色で描かれる
+    @Test(arguments: FloralPart.allCases)
+    func floralPartExistsInLightAndDark(part: FloralPart) throws {
+        let name = try #require(Self.floralImageNames[part])
+        func rendered(_ style: UIUserInterfaceStyle) throws -> Data {
+            let traits = UITraitCollection(userInterfaceStyle: style)
+            let image = try #require(UIImage(named: name, in: .main, compatibleWith: traits), "\(name) が Asset Catalog に無い")
+            #expect(image.size == part.size)
+            let format = UIGraphicsImageRendererFormat(for: traits)
+            format.scale = 1
+            return UIGraphicsImageRenderer(size: part.size, format: format).pngData { _ in
+                image.draw(in: CGRect(origin: .zero, size: part.size))
+            }
+        }
+        #expect(try rendered(.light) != rendered(.dark), "\(name) にダークモードの画像が無い")
+    }
+
+    /// アセットカタログの名前（FloralPart.image と同じ画像）
+    nonisolated private static let floralImageNames: [FloralPart: String] = [
+        .flowerPink: "FlowerPink",
+        .flowerLavender: "FlowerLavender",
+        .flowerBlue: "FlowerBlue",
+        .budPink: "BudPink",
+        .budLavender: "BudLavender",
+        .leaf: "Leaf"
+    ]
+
     nonisolated private static let colorNames = [
         "Paper", "Card", "Ink", "InkSecondary", "AccentColor", "AccentDeep", "Lavender", "Caution", "Line",
         "DisabledSurface", "DisabledInk", "SegmentSurface", "GradientPink", "GradientMagenta", "GradientViolet", "GradientBlue"
