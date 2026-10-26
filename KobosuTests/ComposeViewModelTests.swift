@@ -301,6 +301,10 @@ private final class FlakyPostRepository: PostRepository {
         try await base.delete(postID: postID)
     }
 
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
+        try await base.assignCategory(category, toPostID: postID)
+    }
+
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {
         try await base.sendStamp(stamp, to: postID)
     }
@@ -327,6 +331,10 @@ private final class FailingPostRepository: PostRepository {
     }
 
     func delete(postID: Post.ID) async throws {
+        throw Failure()
+    }
+
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post {
         throw Failure()
     }
 

@@ -243,6 +243,7 @@ private final class FailingPostRepository: PostRepository {
     func submit(body: String, category: PostCategory) async throws -> Post { throw Failure() }
     func myPosts() async throws -> [Post] { throw Failure() }
     func delete(postID: Post.ID) async throws { throw Failure() }
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post { throw Failure() }
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws { throw Failure() }
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> { throw Failure() }
 }
@@ -277,6 +278,7 @@ private final class CountingPostRepository: PostRepository {
     func submit(body: String, category: PostCategory) async throws -> Post { throw Failure() }
     func myPosts() async throws -> [Post] { [] }
     func delete(postID: Post.ID) async throws {}
+    func assignCategory(_ category: PostCategory, toPostID postID: Post.ID) async throws -> Post { throw Failure() }
     func sendStamp(_ stamp: EmpathyStamp, to postID: Post.ID) async throws {}
     func sentStamps(for postID: Post.ID) async throws -> Set<EmpathyStamp> { [] }
 }
