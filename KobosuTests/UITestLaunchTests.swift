@@ -24,6 +24,22 @@ struct UITestLaunchTests {
         #expect(store.load() == nil)
     }
 
+    /// 下書きを消す引数で、前回のカテゴリも消す（前のテストで選んだカテゴリが初期値に残らないように）
+    @Test
+    func clearDraftArgumentRemovesLastCategory() throws {
+        let suiteName = "UITestLaunchTests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let store = UserDefaultsLastCategoryStore(defaults: defaults)
+        store.save(.money)
+
+        UITestLaunch.applyLaunchArguments([], to: defaults)
+        #expect(store.load() == .money)
+
+        UITestLaunch.applyLaunchArguments([UITestLaunch.clearDraftArgument], to: defaults)
+        #expect(store.load() == nil)
+    }
+
     @Test
     func seedPostsArgumentIsDetected() {
         #expect(UITestLaunch.seedsPosts(arguments: [UITestLaunch.seedPostsArgument]))
