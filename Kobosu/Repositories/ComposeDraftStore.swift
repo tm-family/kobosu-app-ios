@@ -19,6 +19,22 @@ nonisolated struct ComposeDraft: Codable, Equatable, Sendable {
     }
 }
 
+nonisolated extension ComposeDraft {
+    private enum CodingKeys: String, CodingKey {
+        case body
+        case category
+    }
+
+    /// 知らないカテゴリ（6 種類に減らしたときに外したものなど）は、カテゴリを選んでいないものとして読む。
+    /// 本文は書きかけのまま残す
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        body = try container.decode(String.self, forKey: .body)
+        let rawCategory = try container.decodeIfPresent(String.self, forKey: .category)
+        category = rawCategory.flatMap(PostCategory.init(rawValue:))
+    }
+}
+
 protocol ComposeDraftStore: AnyObject {
     /// 保存した下書き。無ければ nil
     func load() -> ComposeDraft?
@@ -43,7 +59,7 @@ final class UserDefaultsComposeDraftStore: ComposeDraftStore {
         guard let data = defaults.data(forKey: Self.key) else {
             return nil
         }
-        // 読めない（知らないカテゴリなど）ときは、下書きが無いものとして扱う
+        // 読めない（形が合わないなど）ときは、下書きが無いものとして扱う
         return try? JSONDecoder().decode(ComposeDraft.self, from: data)
     }
 
