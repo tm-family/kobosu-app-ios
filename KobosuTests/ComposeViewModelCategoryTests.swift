@@ -42,7 +42,6 @@ struct ComposeViewModelCategoryTests {
         await model.pendingEstimate?.value
         #expect(model.category == .inLaws)
         #expect(model.categorySource == .estimated)
-        #expect(model.pickerSelection == .inLaws)
     }
 
     /// 推定できなければ前回のカテゴリ、前回も無ければ未分類になる
@@ -63,7 +62,6 @@ struct ComposeViewModelCategoryTests {
         await withoutPrevious.pendingEstimate?.value
         #expect(withoutPrevious.category == .uncategorized)
         #expect(withoutPrevious.categorySource == .uncategorized)
-        #expect(withoutPrevious.pickerSelection == nil)
     }
 
     /// 本文を消すと、推定したカテゴリから前回のカテゴリ（無ければ未分類）に戻る
@@ -85,7 +83,7 @@ struct ComposeViewModelCategoryTests {
     @Test
     func chosenCategoryIsNotOverwrittenByEstimate() async throws {
         let model = makeModel(repository: makeRepository())
-        model.pickerSelection = .money
+        model.choose(.money)
         #expect(model.categorySource == .chosen)
         model.body = "帰省のたびに義母に言われる。"
         model.bodyDidChange()
@@ -182,5 +180,42 @@ struct ComposeViewModelCategoryTests {
         await model.pendingEstimate?.value
         #expect(try await repository.timeline(category: nil).isEmpty)
         #expect(try await repository.myPosts().isEmpty)
+    }
+
+    /// 「変更」から未分類を選ぶこともでき、本人が選んだものとして下書きに残り、未分類で投稿する
+    @Test
+    func canChooseUncategorized() async throws {
+        let drafts = InMemoryComposeDraftStore()
+        let model = makeModel(repository: makeRepository(), drafts: drafts, lastCategories: InMemoryLastCategoryStore(category: .money))
+        model.body = "帰省のたびに義母に言われる。"
+        model.choose(.uncategorized)
+        model.bodyDidChange()
+        await model.pendingEstimate?.value
+        #expect(model.category == .uncategorized)
+        #expect(model.categorySource == .chosen)
+        #expect(drafts.load() == ComposeDraft(body: "帰省のたびに義母に言われる。", category: .uncategorized))
+        let post = try #require(await model.submit())
+        #expect(post.category == .uncategorized)
+    }
+
+    /// 伏せ字の確認を通るときも、推定したカテゴリで送る
+    @Test
+    func reviewSubmitsEstimatedCategory() async throws {
+        let findsTanaka: @Sendable (String) -> [MaskingCandidate] = { text in
+            text.range(of: "田中").map { [MaskingCandidate(kind: .personName, range: $0, text: "田中")] } ?? []
+        }
+        let model = ComposeViewModel(
+            repository: makeRepository(),
+            drafts: InMemoryComposeDraftStore(),
+            lastCategories: InMemoryLastCategoryStore(),
+            detect: findsTanaka,
+            estimateDelay: .zero
+        )
+        model.body = "義母の田中さんに、また言われた。"
+        #expect(await model.submit() == nil)
+        #expect(model.review != nil)
+        let post = try #require(await model.submitReview())
+        #expect(post.category == .inLaws)
+        #expect(post.body == "義母の〇〇さんに、また言われた。")
     }
 }

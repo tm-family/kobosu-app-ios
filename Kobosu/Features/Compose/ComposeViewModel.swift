@@ -39,8 +39,8 @@ final class ComposeViewModel {
     /// 伏せ字の候補を探す。テストでは差し替える
     private let detect: @Sendable (String) -> [MaskingCandidate]
     private let estimateDelay: Duration
-    /// 間をおいて推定し直す処理。本文が変わるたびに前のものを取り消す（テストでは終わるのを待つ）
-    private(set) var pendingEstimate: Task<Void, Never>?
+    /// 間をおいて推定し直す処理。本文が変わるたびに前のものを取り消す（テストでは終わるのを待つ）。画面からは読まない
+    @ObservationIgnored private(set) var pendingEstimate: Task<Void, Never>?
 
     init(
         repository: any PostRepository,
@@ -96,19 +96,7 @@ final class ComposeViewModel {
         return !review.isOverLimit && !isBusy
     }
 
-    /// カテゴリの選択肢で選ばれているもの。未分類のときは何も選んでいない。選ぶと本人が選んだことになる
-    var pickerSelection: PostCategory? {
-        get {
-            category == .uncategorized ? nil : category
-        }
-        set {
-            if let newValue {
-                choose(newValue)
-            }
-        }
-    }
-
-    /// 本人がカテゴリを選ぶ。以後は本文を変えても推定で上書きしない
+    /// 本人がカテゴリを選ぶ（未分類も選べる）。以後は本文を変えても推定で上書きしない
     func choose(_ category: PostCategory) {
         pendingEstimate?.cancel()
         pendingEstimate = nil

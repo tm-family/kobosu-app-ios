@@ -3,7 +3,7 @@
 //  Kobosu
 //
 //  タブバー中央の「こぼす」ボタンから開く投稿画面（デザイン案 SCREEN 02）。
-//  本文（最大 400 字）・書き始めのヒント・カテゴリ（本文から先に選んでおき、違うときだけ選び直す）・24 時間で消えることを伝える。
+//  本文（最大 400 字）・書き始めのヒント・カテゴリの行（本文から先に選んでおき、違うときだけ「変更」で選び直す）・24 時間で消えることを伝える。
 //  ナビゲーションバーは左が取り消し・中央がタイトル・右が投稿（COMPONENTS 3/3）。
 //  書いている途中の本文とカテゴリは端末に下書きとして残し、キャンセルや引いて閉じても続きから書ける。
 //  公開範囲は今回「みんなに共有」だけ、消える期間は 24 時間だけなので、選ぶ UI は出さない。
@@ -21,6 +21,10 @@ struct ComposeView: View {
     @State private var model: ComposeViewModel
     /// 投稿できた投稿。あれば投稿完了の画面を出す
     @State private var posted: Post?
+    /// カテゴリを選ぶシートを出しているか
+    @State private var isChoosingCategory = false
+    /// 入力欄の高さ（デザイン案 6 枚目のように大きくとる）
+    @ScaledMetric(relativeTo: .body) private var textAreaHeight: CGFloat = 280
 
     init(
         repository: any PostRepository,
@@ -51,14 +55,17 @@ struct ComposeView: View {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 12) {
                     PostTextArea(text: $model.body, limit: Post.maxBodyLength, count: model.bodyLength)
+                        .frame(minHeight: textAreaHeight)
                         .disabled(model.isBusy)
                     if model.isOverLimit {
                         note("\(Post.maxBodyLength) 文字までにすると、投稿できます")
                     }
                     hint
-                }
-                categorySection
+                    ComposeCategoryRow(category: model.category, source: model.categorySource) {
+                        isChoosingCategory = true
+                    }
                     .disabled(model.isBusy)
+                }
                 lifetimeSection
                 if model.state == .failed {
                     note("投稿できませんでした。時間をおいて、もう一度ためせます。")
@@ -105,6 +112,12 @@ struct ComposeView: View {
         .onChange(of: model.category) {
             model.saveDraft()
         }
+        .sheet(isPresented: $isChoosingCategory) {
+            // 投稿画面では、未分類も選べる（カテゴリなしで投稿する）
+            CategorySheet(categories: PostCategory.allCases, selection: model.category) { category in
+                model.choose(category)
+            }
+        }
     }
 
     /// 書き始めのヒント。相手を責める文より、自分の気持ちを書くほうがやさしい反応が集まる
@@ -116,13 +129,6 @@ struct ComposeView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(Palette.lavender, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
-    private var categorySection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            sectionTitle("カテゴリ")
-            CategoryPicker(selection: $model.pickerSelection)
-        }
     }
 
     private var lifetimeSection: some View {
