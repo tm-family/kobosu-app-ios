@@ -3,10 +3,10 @@
 //  Kobosu
 //
 //  タブバー中央の「こぼす」ボタンから開く投稿画面（デザイン案 SCREEN 02）。
-//  本文（最大 400 字）・書き始めのヒント・カテゴリの行（本文から先に選んでおき、違うときだけ「変更」で選び直す）・24 時間で消えることを伝える。
+//  本文（最大 400 字）・書き始めのヒント・カテゴリの行（本文から先に選んでおき、違うときだけ「変更」で選び直す）・公開範囲と消えるまでの 1 行。
 //  ナビゲーションバーは左が取り消し・中央がタイトル・右が投稿（COMPONENTS 3/3）。
 //  書いている途中の本文とカテゴリは端末に下書きとして残し、キャンセルや引いて閉じても続きから書ける。
-//  公開範囲は今回「みんなに共有」だけ、消える期間は 24 時間だけなので、選ぶ UI は出さない。
+//  公開範囲は今回「みんなに共有」だけ、消える期間は 24 時間だけなので、選ぶ UI は出さず、1 行を押すと説明のシートを開く。
 //  「投稿」を押すと伏せ字の候補を探し、見つかったら伏せ字の確認（MaskingReviewView）に進む。
 //  投稿できたら投稿完了（PostCompleteView）に切り替え、「きくに戻る」で閉じる・「続けてこぼす」で空の投稿画面に戻る。
 //
@@ -23,6 +23,8 @@ struct ComposeView: View {
     @State private var posted: Post?
     /// カテゴリを選ぶシートを出しているか
     @State private var isChoosingCategory = false
+    /// 公開範囲と消えるまでの説明のシートを出しているか
+    @State private var isShowingSettings = false
     /// 入力欄の高さ（デザイン案 6 枚目のように大きくとる）。とても大きい文字でも、カテゴリの行が隠れすぎないよう上限を設ける
     @ScaledMetric(relativeTo: .body) private var scaledTextAreaHeight: CGFloat = 280
     private var textAreaHeight: CGFloat {
@@ -68,8 +70,10 @@ struct ComposeView: View {
                         isChoosingCategory = true
                     }
                     .disabled(model.isBusy)
+                    PostSettingsRow {
+                        isShowingSettings = true
+                    }
                 }
-                lifetimeSection
                 if model.state == .failed {
                     note("投稿できませんでした。時間をおいて、もう一度ためせます。")
                 }
@@ -115,6 +119,9 @@ struct ComposeView: View {
         .onChange(of: model.category) {
             model.saveDraft()
         }
+        .sheet(isPresented: $isShowingSettings) {
+            PostSettingsSheet()
+        }
         .sheet(isPresented: $isChoosingCategory) {
             // 投稿画面では、未分類も選べる（カテゴリなしで投稿する）
             CategorySheet(categories: PostCategory.allCases, selection: model.category) { category in
@@ -132,30 +139,6 @@ struct ComposeView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(Palette.lavender, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
-    private var lifetimeSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionTitle("消えるまで")
-            Label {
-                Text("24時間たつと、自動で消えます")
-                    .font(.kobosuBody)
-                    .foregroundStyle(Palette.ink)
-            } icon: {
-                Image(systemName: "clock")
-                    .foregroundStyle(Palette.accent)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .kobosuCard(padding: 14)
-            .accessibilityElement(children: .combine)
-        }
-    }
-
-    private func sectionTitle(_ title: LocalizedStringResource) -> some View {
-        Text(title)
-            .font(.zenMaruGothic(.bold, size: 12, relativeTo: .caption))
-            .foregroundStyle(Palette.inkSecondary)
-            .accessibilityAddTraits(.isHeader)
     }
 
     /// 投稿できないわけを伝える（注意の色。赤は使わない）
