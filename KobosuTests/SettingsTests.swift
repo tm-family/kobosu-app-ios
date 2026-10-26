@@ -68,7 +68,7 @@ struct SettingsTests {
         #expect(after.contains { $0.id == "reported" })
     }
 
-    /// すべて消すと、下書き・アプリロックの設定・約束の同意・匿名 ID もなくなる
+    /// すべて消すと、下書き・前回のカテゴリ・アプリロックの設定・約束の同意・匿名 ID もなくなる
     @Test
     func eraseAllDeletesEverything() async throws {
         let isolated = try IsolatedDefaults()
@@ -76,6 +76,7 @@ struct SettingsTests {
         let identity = InMemoryAnonymousIDStore(id: "me")
         let repository = try await makeRepository(identity: identity)
         let drafts = InMemoryComposeDraftStore(draft: ComposeDraft(body: "下書き", category: .money))
+        let lastCategories = InMemoryLastCategoryStore(category: .partner)
         let lockSettings = AppLockSettings(defaults: isolated.defaults)
         lockSettings.isEnabled = false
         isolated.defaults.set(PromiseRule.currentVersion, forKey: OnboardingStatus.agreedVersionKey)
@@ -85,6 +86,7 @@ struct SettingsTests {
             posts: repository,
             identity: identity,
             drafts: drafts,
+            lastCategories: lastCategories,
             lockSettings: lockSettings,
             hiddenPosts: hiddenPosts,
             defaults: isolated.defaults
@@ -93,6 +95,7 @@ struct SettingsTests {
         try await eraser.eraseAll()
         #expect(try await repository.myPosts().isEmpty)
         #expect(drafts.load() == nil)
+        #expect(lastCategories.load() == nil)
         #expect(lockSettings.isEnabled)
         #expect(isolated.defaults.object(forKey: OnboardingStatus.agreedVersionKey) == nil)
         #expect(hiddenPosts.hiddenPostIDs().isEmpty)
@@ -110,6 +113,7 @@ struct SettingsTests {
             posts: InMemoryPostRepository(identity: identity),
             identity: identity,
             drafts: InMemoryComposeDraftStore(),
+            lastCategories: InMemoryLastCategoryStore(),
             lockSettings: lockSettings,
             defaults: isolated.defaults
         )
@@ -131,6 +135,7 @@ struct SettingsTests {
         defer { isolated.clear() }
         let identity = InMemoryAnonymousIDStore(id: "me")
         let drafts = InMemoryComposeDraftStore(draft: ComposeDraft(body: "下書き", category: .money))
+        let lastCategories = InMemoryLastCategoryStore(category: .partner)
         let lockSettings = AppLockSettings(defaults: isolated.defaults)
         lockSettings.isEnabled = false
         isolated.defaults.set(PromiseRule.currentVersion, forKey: OnboardingStatus.agreedVersionKey)
@@ -140,6 +145,7 @@ struct SettingsTests {
             posts: FailingDeleteRepository(),
             identity: identity,
             drafts: drafts,
+            lastCategories: lastCategories,
             lockSettings: lockSettings,
             hiddenPosts: hiddenPosts,
             defaults: isolated.defaults
@@ -153,6 +159,7 @@ struct SettingsTests {
         await model.eraseAll()
         #expect(model.eraseState == .failed)
         #expect(drafts.load() != nil)
+        #expect(lastCategories.load() == .partner)
         #expect(identity.currentID() == "me")
         #expect(!lockSettings.isEnabled)
         #expect(isolated.defaults.object(forKey: OnboardingStatus.agreedVersionKey) != nil)
@@ -171,6 +178,7 @@ struct SettingsTests {
             posts: InMemoryPostRepository(),
             identity: InMemoryAnonymousIDStore(),
             drafts: InMemoryComposeDraftStore(),
+            lastCategories: InMemoryLastCategoryStore(),
             lockSettings: settings,
             defaults: isolated.defaults
         )
@@ -203,6 +211,7 @@ struct SettingsTests {
             posts: InMemoryPostRepository(),
             identity: InMemoryAnonymousIDStore(),
             drafts: InMemoryComposeDraftStore(),
+            lastCategories: InMemoryLastCategoryStore(),
             lockSettings: settings,
             defaults: isolated.defaults
         )

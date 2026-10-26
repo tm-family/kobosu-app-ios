@@ -2,7 +2,7 @@
 //  DataEraser.swift
 //  Kobosu
 //
-//  「すべてのデータを削除」。サーバー上の自分の投稿・共感・通報を消してから、端末の中の下書き・設定・「表示しない」・匿名 ID を破棄する。
+//  「すべてのデータを削除」。サーバー上の自分の投稿・共感・通報を消してから、端末の中の下書き・前回のカテゴリ・設定・「表示しない」・匿名 ID を破棄する。
 //  サーバーを消せなかったときは、端末の中も消さずに止める（先に ID を消すと、サーバーに残った自分の投稿を消せなくなる）。
 //
 
@@ -12,6 +12,7 @@ final class DataEraser {
     private let posts: any PostRepository
     private let identity: any AnonymousIDStore
     private let drafts: any ComposeDraftStore
+    private let lastCategories: any LastCategoryStore
     private let lockSettings: AppLockSettings
     /// 「この投稿を表示しない」を端末に保存しているとき（Firebase の構成）。インメモリの構成では Repository が持つので nil
     private let hiddenPosts: (any HiddenPostStore)?
@@ -21,6 +22,7 @@ final class DataEraser {
         posts: any PostRepository,
         identity: any AnonymousIDStore,
         drafts: any ComposeDraftStore,
+        lastCategories: any LastCategoryStore,
         lockSettings: AppLockSettings,
         hiddenPosts: (any HiddenPostStore)? = nil,
         defaults: UserDefaults = .standard
@@ -28,6 +30,7 @@ final class DataEraser {
         self.posts = posts
         self.identity = identity
         self.drafts = drafts
+        self.lastCategories = lastCategories
         self.lockSettings = lockSettings
         self.hiddenPosts = hiddenPosts
         self.defaults = defaults
@@ -39,6 +42,7 @@ final class DataEraser {
         // ID を消せなかったら、端末の中の設定も残して止める（もう一度ためせば、ID から消し直せる）
         try identity.deleteID()
         drafts.clear()
+        lastCategories.clear()
         lockSettings.reset()
         hiddenPosts?.clear()
         defaults.removeObject(forKey: OnboardingStatus.agreedVersionKey)
