@@ -1089,23 +1089,6 @@
         }
       }
     },
-    "カテゴリを 1 つえらぶと、投稿できます" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose one category to post"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カテゴリを 1 つえらぶと、投稿できます"
-          }
-        }
-      }
-    },
     "キャンセル" : {
       "extractionState" : "manual",
       "localizations" : {

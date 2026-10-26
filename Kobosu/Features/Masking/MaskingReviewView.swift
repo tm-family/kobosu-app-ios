@@ -199,7 +199,8 @@ struct MaskingReviewView: View {
         repository: InMemoryPostRepository.preview(),
         drafts: InMemoryComposeDraftStore(
             draft: ComposeDraft(body: "義母の山田さんが、また勝手に家に来て冷蔵庫を整理していった。電話は 090-1234-5678。", category: .inLaws)
-        )
+        ),
+        lastCategories: InMemoryLastCategoryStore()
     )
     return NavigationStack {
         MaskingReviewView(model: model) { _ in }
