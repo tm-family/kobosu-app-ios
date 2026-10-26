@@ -39,9 +39,14 @@ struct CategorySuggestionTests {
     /// 行の文言: 推定のときだけ「自動で選びました」。前回のカテゴリのときは別の文言にする（Q3）
     @Test
     func statusTextDependsOnSource() {
-        #expect(String(localized: CategorySource.estimated.statusText) == "自動で選びました")
-        #expect(String(localized: CategorySource.previous.statusText) == "前回と同じ")
-        let texts = [CategorySource.estimated, .previous, .chosen, .uncategorized].map { String(localized: $0.statusText) }
+        func japanese(_ source: CategorySource) -> String {
+            var resource = source.statusText
+            resource.locale = Locale(identifier: "ja")
+            return String(localized: resource)
+        }
+        #expect(japanese(.estimated) == "自動で選びました")
+        #expect(japanese(.previous) == "前回と同じ")
+        let texts = [CategorySource.estimated, .previous, .chosen, .uncategorized].map(japanese)
         #expect(Set(texts).count == texts.count)
     }
 
