@@ -12,8 +12,7 @@ struct ModelTests {
     @Test
     func categoryRawValuesAreStable() {
         #expect(PostCategory.allCases.map(\.rawValue) == [
-            "in_laws", "partner", "parenting", "housework", "money",
-            "own_parents", "relatives", "caregiving", "work_and_family", "other"
+            "in_laws", "partner", "parenting", "housework", "money", "other"
         ])
     }
 
@@ -112,7 +111,7 @@ struct ModelTests {
         let post = Post(
             id: "post",
             body: "本文",
-            category: .workAndFamily,
+            category: .money,
             createdAt: Date(timeIntervalSince1970: 1_000_000),
             stampCounts: [.wellDone: 3]
         )

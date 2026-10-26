@@ -48,6 +48,14 @@ struct PostDocumentTests {
         #expect(PostDocument.post(id: "a", data: noBody, createdAt: createdAt, expireAt: expireAt) == nil)
     }
 
+    /// 6 種類に減らしたときに外したカテゴリの投稿は読まない（タイムラインに出ない。24 時間で消える）
+    @Test(arguments: ["own_parents", "relatives", "caregiving", "work_and_family"])
+    func skipsRemovedCategories(rawCategory: String) {
+        let data: [String: Any] = [PostDocument.Field.body: "本文", PostDocument.Field.category: rawCategory]
+        let expireAt = createdAt.addingTimeInterval(Post.lifetime)
+        #expect(PostDocument.post(id: "a", data: data, createdAt: createdAt, expireAt: expireAt) == nil)
+    }
+
     /// 2 段目を書けなかった投稿（expireAt が createdAt のまま）は、端末の時計がサーバーより遅れていても読まない
     @Test
     func skipsUnfinishedDocumentsEvenWithSlowDeviceClock() {

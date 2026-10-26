@@ -64,7 +64,7 @@ struct InMemoryPostRepositoryTests {
         repository.seed(otherPost(id: "c", category: .inLaws, hoursAgo: 1))
         #expect(try await repository.timeline(category: nil).map(\.id) == ["c", "b", "a"])
         #expect(try await repository.timeline(category: .inLaws).map(\.id) == ["c", "a"])
-        #expect(try await repository.timeline(category: .caregiving).isEmpty)
+        #expect(try await repository.timeline(category: .parenting).isEmpty)
     }
 
     // MARK: - 投稿

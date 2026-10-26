@@ -545,23 +545,6 @@
         }
       }
     },
-    "きょうだい・親戚" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Siblings & relatives"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "きょうだい・親戚"
-          }
-        }
-      }
-    },
     "ここを、安心できる場所にするために。" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1446,40 +1429,6 @@
         }
       }
     },
-    "介護" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Caregiving"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "介護"
-          }
-        }
-      }
-    },
-    "仕事と家庭" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Work & family"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "仕事と家庭"
-          }
-        }
-      }
-    },
     "伏せる言葉" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1782,23 +1731,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "学校や会社などの名前"
-          }
-        }
-      }
-    },
-    "実の親" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "My parents"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "実の親"
           }
         }
       }

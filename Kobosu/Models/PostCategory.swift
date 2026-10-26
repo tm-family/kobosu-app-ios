@@ -19,14 +19,6 @@ nonisolated enum PostCategory: String, CaseIterable, Codable, Hashable, Identifi
     case housework
     /// 家計や出費、お金の価値観の違い
     case money
-    /// 自分の親との関わり、過干渉、距離のとり方
-    case ownParents = "own_parents"
-    /// きょうだい・親戚とのつきあい、冠婚葬祭、お盆やお正月の集まり
-    case relatives
-    /// 親や義父母の介護、通院の付き添い、介護の分担
-    case caregiving
-    /// 仕事と家庭の両立、時間が足りない
-    case workAndFamily = "work_and_family"
     /// どれにも当てはまらないもの
     case other
 
@@ -45,14 +37,6 @@ nonisolated enum PostCategory: String, CaseIterable, Codable, Hashable, Identifi
             "家事分担"
         case .money:
             "お金"
-        case .ownParents:
-            "実の親"
-        case .relatives:
-            "きょうだい・親戚"
-        case .caregiving:
-            "介護"
-        case .workAndFamily:
-            "仕事と家庭"
         case .other:
             "その他"
         }
