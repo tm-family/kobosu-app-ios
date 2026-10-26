@@ -48,6 +48,16 @@ struct PostDocumentTests {
         #expect(PostDocument.post(id: "a", data: noBody, createdAt: createdAt, expireAt: expireAt) == nil)
     }
 
+    /// 未分類の投稿も読める
+    @Test
+    func readsUncategorizedPost() throws {
+        let data: [String: Any] = [PostDocument.Field.body: "本文", PostDocument.Field.category: "uncategorized"]
+        let expireAt = createdAt.addingTimeInterval(Post.lifetime)
+        let post = try #require(PostDocument.post(id: "a", data: data, createdAt: createdAt, expireAt: expireAt))
+        #expect(post.category == .uncategorized)
+        #expect(PostDocument.newPostFields(body: "本文", category: .uncategorized)[PostDocument.Field.category] as? String == "uncategorized")
+    }
+
     /// 6 種類に減らしたときに外したカテゴリの投稿は読まない（タイムラインに出ない。24 時間で消える）
     @Test(arguments: ["own_parents", "relatives", "caregiving", "work_and_family"])
     func skipsRemovedCategories(rawCategory: String) {

@@ -2,7 +2,7 @@
 //  PostCategory.swift
 //  Kobosu
 //
-//  投稿のカテゴリ。タイムラインの絞り込みでも case の順に並べる。
+//  投稿のカテゴリ。タイムラインの絞り込みでも case の順に並べる（未分類は絞り込みに出さない）。
 //  rawValue は保存・通信に使う識別子なので、表示名を変えても書き換えない（表示名は Localizable.xcstrings）。
 //
 
@@ -21,6 +21,11 @@ nonisolated enum PostCategory: String, CaseIterable, Codable, Hashable, Identifi
     case money
     /// どれにも当てはまらないもの
     case other
+    /// カテゴリを付けていないもの。タイムラインでは「すべて」にだけ出る
+    case uncategorized
+
+    /// タイムラインの絞り込みに出すカテゴリ（未分類を除く 6 つ）
+    static let filterable: [PostCategory] = allCases.filter { $0 != .uncategorized }
 
     var id: Self { self }
 
@@ -39,6 +44,13 @@ nonisolated enum PostCategory: String, CaseIterable, Codable, Hashable, Identifi
             "お金"
         case .other:
             "その他"
+        case .uncategorized:
+            "未分類"
         }
+    }
+
+    /// 投稿のカードに出すタグ。未分類のときは出さない
+    var tagTitle: LocalizedStringResource? {
+        self == .uncategorized ? nil : title
     }
 }

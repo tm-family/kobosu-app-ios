@@ -1888,6 +1888,23 @@
         }
       }
     },
+    "未分類" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uncategorized"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未分類"
+          }
+        }
+      }
+    },
     "残り %lld分" : {
       "extractionState" : "manual",
       "localizations" : {
