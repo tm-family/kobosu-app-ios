@@ -53,6 +53,7 @@ struct ComposeView: View {
                     dismiss()
                 } onContinue: {
                     self.posted = nil
+                    model.returnFromComplete()
                 } onCategoryAssigned: { post in
                     // 投稿したときと同じく、タイムラインを読み直す
                     onPosted(post)

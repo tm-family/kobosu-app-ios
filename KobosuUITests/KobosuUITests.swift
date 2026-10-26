@@ -121,9 +121,11 @@ final class KobosuUITests: XCTestCase {
         money.tap()
         XCTAssertTrue(assign.waitForNonExistence(timeout: 5))
 
-        // 続けてこぼす → 前回のカテゴリ（付けたお金）で投稿するので、問いかけない
+        // 続けてこぼす → 前回のカテゴリ（付けたお金）が初期値になり、それで投稿するので、問いかけない
         app.buttons["complete.continue"].tap()
         XCTAssertTrue(body.waitForExistence(timeout: 5))
+        let row = app.buttons["compose.category.change"]
+        XCTAssertTrue(row.label.contains("お金") || row.label.contains("Money"), row.label)
         body.tap()
         body.typeText("UI test 2")
         app.buttons["compose.submit"].tap()

@@ -96,6 +96,12 @@ final class ComposeViewModel {
         return !review.isOverLimit && !isBusy
     }
 
+    /// 投稿完了の画面から投稿画面に戻ったとき（「続けてこぼす」）。完了の画面でカテゴリを付けると前回のカテゴリが変わるので、
+    /// 本人が選んでいなければ、今の前回のカテゴリでカテゴリを選び直す
+    func returnFromComplete() {
+        refreshSuggestion()
+    }
+
     /// 本人がカテゴリを選ぶ（未分類も選べる）。以後は本文を変えても推定で上書きしない
     func choose(_ category: PostCategory) {
         pendingEstimate?.cancel()
