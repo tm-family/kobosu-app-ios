@@ -37,8 +37,15 @@ nonisolated enum CategoryEstimator {
         ]
     ]
 
-    /// 数える前に取り除く言い回し。言葉の一覧の言葉を含むが、そのカテゴリの話ではないもの（「大丈夫」の「夫」など）
-    static let ignoredPhrases = ["大丈夫", "丈夫", "工夫"]
+    /// 数える前に取り除く言い回し。言葉の一覧の言葉を含むが、そのカテゴリの話ではないもの（「大丈夫」の「夫」など）。
+    /// ひらがな・カタカナの言葉は、前後の語とつながって当たることがある（「ふだんなら」の「だんな」、「ドローン」の「ローン」）
+    static let ignoredPhrases = [
+        "大丈夫", "丈夫", "工夫", "夫人", "稲妻", "転嫁", "姑息", "主人公", "ふだん", "ドローン", "クローン"
+    ]
+
+    /// 正規化した言葉の一覧と、取り除く言い回し。推定は入力のたびに呼ばれるので、先に一度だけ作る
+    private static let normalizedKeywords: [PostCategory: Set<String>] = keywords.mapValues { Set($0.map(normalized)) }
+    private static let normalizedIgnoredPhrases: [String] = ignoredPhrases.map(normalized)
 
     /// 同じ数のときに選ぶ順（PostCategory の case の順）
     private static let tieBreakOrder: [PostCategory] = PostCategory.allCases.filter { keywords[$0] != nil }
@@ -55,15 +62,17 @@ nonisolated enum CategoryEstimator {
     /// カテゴリごとの、言葉が本文に出てきた数
     static func scores(for text: String) -> [PostCategory: Int] {
         var normalizedText = normalized(text)
-        for phrase in ignoredPhrases.map(normalized) {
+        for phrase in normalizedIgnoredPhrases {
             normalizedText = normalizedText.replacingOccurrences(of: phrase, with: " ")
         }
-        return keywords.mapValues { words in
-            Set(words.map(normalized)).reduce(0) { $0 + occurrences(of: $1, in: normalizedText) }
+        return normalizedKeywords.mapValues { words in
+            words.reduce(0) { $0 + occurrences(of: $1, in: normalizedText) }
         }
     }
 
-    /// 全角／半角（英数字・カタカナ）をそろえ、カタカナをひらがなに、英字を小文字にする
+    /// 全角／半角（英数字・カタカナ）をそろえ、カタカナをひらがなに、英字を小文字にする。
+    /// カタカナからひらがなへの変換は、長音の「ー」も前の母音にする（「ローン」→「ろおん」）。
+    /// 言葉の一覧も同じ変換を通すので、数え方は合う（テストで固定している）
     static func normalized(_ text: String) -> String {
         let widthFolded = text.precomposedStringWithCompatibilityMapping
         let hiragana = widthFolded.applyingTransform(.hiraganaToKatakana, reverse: true) ?? widthFolded
