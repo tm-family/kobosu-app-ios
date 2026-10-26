@@ -82,6 +82,22 @@ final class KobosuUITests: XCTestCase {
         XCTAssertTrue(row.label.contains("お金") || row.label.contains("Money"), row.label)
     }
 
+    /// 「みんなに共有 · 24時間で消える」の行を押すと説明のシートが開き、閉じると投稿画面に戻る
+    @MainActor
+    func testOpeningPostSettingsSheet() throws {
+        let app = Self.launchAfterOnboarding()
+
+        app.buttons["tab.compose"].tap()
+        let row = app.buttons["compose.settings"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+        let close = app.buttons["compose.settings.close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 5))
+        close.tap()
+        XCTAssertTrue(close.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["compose.submit"].exists)
+    }
+
     /// 伏せ字の候補（電話番号）があると確認の画面に進み、伏せ字にした本文を見てから投稿できる
     @MainActor
     func testPostingThroughMaskingReview() throws {

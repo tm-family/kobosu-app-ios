@@ -137,19 +137,36 @@
         }
       }
     },
-    "24時間たつと、自動で消えます" : {
+    "24時間たつと、自動で消えます。あとから延ばすことはできません。" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It disappears automatically after 24 hours"
+            "value" : "It disappears automatically after 24 hours. It can't be extended."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "24時間たつと、自動で消えます"
+            "value" : "24時間たつと、自動で消えます。あとから延ばすことはできません。"
+          }
+        }
+      }
+    },
+    "24時間で消える" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gone in 24 hours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24時間で消える"
           }
         }
       }
@@ -405,6 +422,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "いまは、ここに投稿がありません。"
+          }
+        }
+      }
+    },
+    "いまは、この設定で投稿します。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your post uses these settings for now."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いまは、この設定で投稿します。"
           }
         }
       }
@@ -902,6 +936,23 @@
         }
       }
     },
+    "だれでも読めます。名前やアカウントは出ません。" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone can read it. Your name and account are never shown."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "だれでも読めます。名前やアカウントは出ません。"
+          }
+        }
+      }
+    },
     "つらいときは、窓口も頼っていい" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -983,6 +1034,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ほんとは「ありがとう」って、ひとこと言ってほしかっただけ。"
+          }
+        }
+      }
+    },
+    "みんなに共有" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared with everyone"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "みんなに共有"
+          }
+        }
+      }
+    },
+    "みんなに共有 · 24時間で消える" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared with everyone · Gone in 24 hours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "みんなに共有 · 24時間で消える"
           }
         }
       }
@@ -1531,6 +1616,40 @@
         }
       }
     },
+    "公開範囲" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Who can read"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開範囲"
+          }
+        }
+      }
+    },
+    "公開範囲と消えるまでの説明を開きます" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows who can read it and when it disappears"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公開範囲と消えるまでの説明を開きます"
+          }
+        }
+      }
+    },
     "共感が届いたら、ノートで見られます" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1918,6 +2037,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "投稿できませんでした。時間をおいて、もう一度ためせます。"
+          }
+        }
+      }
+    },
+    "投稿の設定" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投稿の設定"
           }
         }
       }
