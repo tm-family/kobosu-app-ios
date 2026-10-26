@@ -81,6 +81,7 @@ struct ComposeView: View {
                     PostSettingsRow {
                         isShowingSettings = true
                     }
+                    .disabled(model.isBusy)
                 }
                 if model.state == .failed {
                     note("投稿できませんでした。時間をおいて、もう一度ためせます。")
