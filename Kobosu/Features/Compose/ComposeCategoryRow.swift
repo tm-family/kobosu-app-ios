@@ -51,14 +51,14 @@ struct ComposeCategoryRow: View {
                         Spacer(minLength: 8)
                         changeLabel
                     }
-                    status
+                    wrappingStatus
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .firstTextBaseline, spacing: 10) {
                         sparkle
                         wrappingTag
                     }
-                    status
+                    wrappingStatus
                     changeLabel
                 }
             }
@@ -117,6 +117,13 @@ struct ComposeCategoryRow: View {
         Text(source.statusText)
             .kobosuMetaLabel()
             .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// 2 行目以降に下げた選ばれ方の文言。幅に合わせて折り返すので、ViewThatFits が形を選ぶときの幅には数えない
+    /// （1 行目のタグと「変更」が収まるかだけで 2 つ目の形を選ぶ）
+    private var wrappingStatus: some View {
+        status
+            .frame(minWidth: 0, idealWidth: 0, maxWidth: .infinity, alignment: .leading)
     }
 
     private var changeLabel: some View {
